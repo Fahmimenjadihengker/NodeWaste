@@ -64,11 +64,69 @@
     }
   }
 
+  @keyframes leafy-bounce {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+
+    45% {
+      transform: translateY(-10px) scale(1.04);
+    }
+  }
+
+  @keyframes leafy-shake {
+    0%,
+    100% {
+      transform: translateX(0) rotate(0deg);
+    }
+
+    20% {
+      transform: translateX(-5px) rotate(-3deg);
+    }
+
+    40% {
+      transform: translateX(5px) rotate(3deg);
+    }
+
+    60% {
+      transform: translateX(-4px) rotate(-2deg);
+    }
+
+    80% {
+      transform: translateX(4px) rotate(2deg);
+    }
+  }
+
+  @keyframes leafy-pop {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.92);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   .animate-fade-up {
     animation: fade-up 700ms ease both;
   }
 
   .animate-fade-in {
     animation: fade-in 900ms ease both;
+  }
+
+  .animate-leafy-bounce {
+    animation: leafy-bounce 520ms ease both;
+  }
+
+  .animate-leafy-shake {
+    animation: leafy-shake 420ms ease-in-out both;
+  }
+
+  .animate-leafy-pop {
+    animation: leafy-pop 220ms ease both;
   }
 }
