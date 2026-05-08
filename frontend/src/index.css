@@ -42,6 +42,76 @@
     }
   }
 
+  @keyframes leafy-idle {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg) scaleY(1);
+    }
+
+    50% {
+      transform: translateY(-4px) rotate(-1deg) scaleY(1.015);
+    }
+  }
+
+  @keyframes leafy-tail-sway {
+    0%,
+    100% {
+      transform: rotate(20deg);
+    }
+
+    50% {
+      transform: rotate(34deg) translateY(-2px);
+    }
+  }
+
+  @keyframes leafy-ear-twitch {
+    0%,
+    78%,
+    100% {
+      transform: rotate(var(--ear-rotate));
+    }
+
+    84% {
+      transform: rotate(calc(var(--ear-rotate) + var(--ear-twitch))) translateY(-3px);
+    }
+  }
+
+  @keyframes leafy-blink {
+    0%,
+    88%,
+    92%,
+    100% {
+      transform: scaleY(1);
+    }
+
+    90% {
+      transform: scaleY(0.12);
+    }
+  }
+
+  @keyframes leafy-whisker-twitch {
+    0%,
+    80%,
+    100% {
+      transform: rotate(var(--whisker-rotate));
+    }
+
+    86% {
+      transform: rotate(calc(var(--whisker-rotate) + var(--whisker-twitch)));
+    }
+  }
+
+  @keyframes leafy-paw-wave {
+    0%,
+    100% {
+      transform: rotate(-18deg);
+    }
+
+    50% {
+      transform: rotate(-42deg) translateY(-2px);
+    }
+  }
+
   @keyframes fade-up {
     from {
       opacity: 0;
@@ -128,5 +198,65 @@
 
   .animate-leafy-pop {
     animation: leafy-pop 220ms ease both;
+  }
+
+  .animate-leafy-idle {
+    animation: leafy-idle 3.8s ease-in-out infinite;
+  }
+
+  .animate-leafy-tail-sway {
+    animation: leafy-tail-sway 2.2s ease-in-out infinite;
+  }
+
+  .animate-leafy-blink {
+    animation: leafy-blink 4.2s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  .animate-leafy-paw-wave {
+    animation: leafy-paw-wave 1.45s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .animate-leafy-ear-left {
+    --ear-rotate: -24deg;
+    --ear-twitch: -10deg;
+    animation: leafy-ear-twitch 3.6s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .animate-leafy-ear-right {
+    --ear-rotate: 24deg;
+    --ear-twitch: 10deg;
+    animation: leafy-ear-twitch 4.1s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .animate-whisker-left-up {
+    --whisker-rotate: -8deg;
+    --whisker-twitch: -7deg;
+    animation: leafy-whisker-twitch 3.1s ease-in-out infinite;
+    transform-origin: right center;
+  }
+
+  .animate-whisker-left-down {
+    --whisker-rotate: 8deg;
+    --whisker-twitch: 6deg;
+    animation: leafy-whisker-twitch 3.4s ease-in-out infinite;
+    transform-origin: right center;
+  }
+
+  .animate-whisker-right-up {
+    --whisker-rotate: 8deg;
+    --whisker-twitch: 7deg;
+    animation: leafy-whisker-twitch 3.2s ease-in-out infinite;
+    transform-origin: left center;
+  }
+
+  .animate-whisker-right-down {
+    --whisker-rotate: -8deg;
+    --whisker-twitch: -6deg;
+    animation: leafy-whisker-twitch 3.5s ease-in-out infinite;
+    transform-origin: left center;
   }
 }

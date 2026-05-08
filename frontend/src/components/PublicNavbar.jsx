@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { floatingNavbarClass, navbarFrameClass, transparentNavbarClass } from './navbarStyles.js'
 
 const navItems = [
   { label: 'Tentang', href: '#tentang' },
@@ -23,11 +24,7 @@ function PublicNavbar() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 px-4 py-4 sm:px-6">
       <div
-        className={`mx-auto flex items-center justify-between transition-all duration-300 ${
-          isScrolled
-            ? 'max-w-5xl rounded-full border border-moss/10 bg-[#f5f1df]/90 px-5 py-3 backdrop-blur-xl sm:px-7'
-            : 'max-w-7xl bg-transparent px-0 py-2'
-        }`}
+        className={`${navbarFrameClass} ${isScrolled ? floatingNavbarClass : transparentNavbarClass}`}
       >
         <Link to="/" className="flex items-center gap-3" aria-label="NodeWaste home">
           <span className="text-lg font-black tracking-tight text-leaf-900">NodeWaste</span>

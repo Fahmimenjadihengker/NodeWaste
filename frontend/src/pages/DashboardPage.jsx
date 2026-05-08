@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import { dashboardData } from '../services/dashboardData.js'
-import { clearAuthSession, getStoredUser } from '../services/authApi.js'
 
 function StatBlock({ label, value, helper }) {
   return (
@@ -104,18 +103,12 @@ function ScanActivityChart({ data }) {
 }
 
 function DashboardPage() {
-  const user = getStoredUser()
-  const navigate = useNavigate()
+  const { user } = useOutletContext()
   const { stats, pet, categories, activities, scanActivity } = dashboardData
   const [leafyMood, setLeafyMood] = useState('idle')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
   const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
-
-  const handleLogout = () => {
-    clearAuthSession()
-    navigate('/')
-  }
 
   useEffect(() => () => window.clearTimeout(moodTimerRef.current), [])
 
@@ -133,19 +126,9 @@ function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f1df] text-moss">
-      <header className="border-b border-moss/10 px-5 py-5 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-          <Link className="text-xl font-black tracking-tight text-leaf-900" to="/dashboard">NodeWaste</Link>
-          <button className="rounded-full border border-moss/20 px-5 py-2.5 text-sm font-black text-moss transition hover:border-leaf-600 hover:text-leaf-700" type="button" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-      </header>
-
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.72fr]">
-        <section className="animate-fade-up">
+        <section id="ringkasan" className="order-2 scroll-mt-28 animate-fade-up lg:order-none">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Dashboard</p>
           <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] text-leaf-900 sm:text-5xl lg:text-6xl">
             Halo, {user?.name || 'Eco Hero'}.
@@ -192,8 +175,8 @@ function DashboardPage() {
           </section>
         </section>
 
-        <aside className="space-y-8 animate-fade-up [animation-delay:120ms] [animation-fill-mode:both]">
-          <section className="rounded-[2rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_20px_60px_rgba(32,58,37,0.14)]">
+        <aside className="contents animate-fade-up [animation-delay:120ms] [animation-fill-mode:both] lg:block lg:space-y-8">
+          <section id="leafy" className="order-1 scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_20px_60px_rgba(32,58,37,0.14)] lg:order-none">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Virtual pet</p>
@@ -210,7 +193,7 @@ function DashboardPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-moss/10 bg-[#eef3df] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.10)]">
+          <section id="aktivitas" className="order-3 scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#eef3df] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.10)] lg:order-none">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Aktivitas terbaru</h2>
             <div className="mt-5 divide-y divide-moss/10">
               {activities.length ? activities.map((activity) => (
@@ -231,11 +214,10 @@ function DashboardPage() {
         </aside>
         </div>
 
-        <div className="mt-8">
+        <div id="grafik-scan" className="mt-8 scroll-mt-28">
           <ScanActivityChart data={scanActivity} />
         </div>
       </div>
-    </main>
   )
 }
 
