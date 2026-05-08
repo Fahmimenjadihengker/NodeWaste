@@ -45,7 +45,7 @@ function ScanActivityChart({ data }) {
   }))
 
   return (
-    <section className="animate-fade-up rounded-[2rem] border border-moss/10 bg-[#edf3e3] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)] [animation-delay:180ms] [animation-fill-mode:both] sm:p-7 lg:p-8">
+    <section className="animate-fade-up rounded-[1.25rem] border border-moss/10 bg-[#edf3e3] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)] [animation-delay:180ms] [animation-fill-mode:both] sm:p-7 lg:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Aktivitas scan</p>
@@ -70,12 +70,12 @@ function ScanActivityChart({ data }) {
       </div>
 
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-3xl bg-[#f5f1df]/75 p-5">
+        <div className="rounded-[1.25rem] bg-[#f5f1df]/75 p-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Scan valid</p>
           <p className="mt-2 text-3xl font-black text-leaf-900">{totalValid}</p>
         </div>
         {categorySummary.map((category) => (
-          <div key={category.label} className="rounded-3xl bg-[#f5f1df]/55 p-5">
+          <div key={category.label} className="rounded-[1.25rem] bg-[#f5f1df]/55 p-5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">{category.label}</p>
             <p className="mt-2 text-3xl font-black text-leaf-900">{category.value}</p>
           </div>
@@ -193,7 +193,7 @@ function DashboardPage() {
 
         </section>
 
-          <section id="leafy" className="order-1 scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_20px_60px_rgba(32,58,37,0.12)] lg:order-2">
+          <section id="leafy" className="order-1 scroll-mt-28 rounded-[1.25rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_20px_60px_rgba(32,58,37,0.12)] lg:order-2">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Virtual pet</p>
@@ -212,7 +212,7 @@ function DashboardPage() {
         </div>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
-          <div className="rounded-[2rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <div className="rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Progress level</h2>
             <p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p>
             <div className="mt-8">
@@ -220,7 +220,7 @@ function DashboardPage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <div className="rounded-[1.25rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Kategori sampah</h2>
             <p className="mt-2 text-sm leading-6 text-moss/65">Ringkasan sampah yang sudah kamu scan atau olah.</p>
             <div className="mt-5 space-y-4">
@@ -238,7 +238,7 @@ function DashboardPage() {
             </div>
           </div>
 
-          <section id="aktivitas" className="scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <section id="aktivitas" className="scroll-mt-28 rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Aktivitas terbaru</h2>
             <div className="mt-5 divide-y divide-moss/10">
               {activities.length ? activities.map((activity) => (

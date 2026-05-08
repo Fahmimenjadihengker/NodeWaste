@@ -54,7 +54,7 @@ function getPetMood(pet, fallbackMood) {
 
 function StatusMeter({ label, value, helper }) {
   return (
-    <div className="rounded-3xl bg-[#f8f4e6]/70 p-5">
+    <div className="rounded-[1.25rem] bg-[#f8f4e6]/70 p-5">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="font-black text-leaf-900">{label}</p>
@@ -71,7 +71,7 @@ function StatusMeter({ label, value, helper }) {
 
 function ActionCard({ action, disabled, onAction }) {
   return (
-    <article className="rounded-[2rem] border border-moss/10 bg-[#fff8e8] p-5 shadow-[0_16px_42px_rgba(32,58,37,0.08)]">
+    <article className="rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] p-5 shadow-[0_16px_42px_rgba(32,58,37,0.08)]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Aksi</p>
@@ -94,7 +94,7 @@ function ActionCard({ action, disabled, onAction }) {
 
 function ActivityLog({ items }) {
   return (
-    <section className="rounded-[2rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+    <section className="rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
       <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Catatan perawatan</h2>
       <div className="mt-5 divide-y divide-moss/10">
         {items.map((item) => (
@@ -186,7 +186,7 @@ function PetPage() {
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-[2.4rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_22px_70px_rgba(32,58,37,0.13)] sm:p-8">
+        <div className="rounded-[1.5rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_22px_70px_rgba(32,58,37,0.13)] sm:p-8">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Virtual pet</p>
@@ -196,9 +196,9 @@ function PetPage() {
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
           </div>
 
-          <div className="mt-8 rounded-[2rem] bg-[#f5f1df]/50 p-5 text-center">
+          <div className="mt-8 rounded-[1.25rem] bg-[#f5f1df]/50 p-5 text-center">
             <LeafyAvatar mood={avatarMood} onClick={handleLeafyClick} />
-            <div className="mx-auto mt-2 max-w-sm rounded-3xl bg-[#fff8e8]/80 p-4">
+            <div className="mx-auto mt-2 max-w-sm rounded-[1.25rem] bg-[#fff8e8]/80 p-4">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Mood</p>
               <h2 className="mt-1 text-2xl font-black text-leaf-900">{moodInfo.label}</h2>
               <p className="mt-2 text-sm leading-6 text-moss/65">{moodInfo.message}</p>
@@ -207,19 +207,19 @@ function PetPage() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <div className="rounded-[2rem] border border-moss/10 bg-[#fff8e8] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <div className="rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">EcoPoints</p>
             <p className="mt-2 text-4xl font-black text-leaf-900">{ecoPoints}</p>
             <p className="mt-2 text-sm font-semibold text-moss/60">Resource untuk perawatan Leafy.</p>
           </div>
-          <div className="rounded-[2rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <div className="rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Pet XP</p>
             <p className="mt-2 text-4xl font-black text-leaf-900">{pet.xp}/{pet.nextLevelXp}</p>
             <div className="mt-4 h-2 overflow-hidden rounded-full bg-moss/10">
               <div className="h-full rounded-full bg-leaf-600 transition-all duration-300" style={{ width: `${petXpProgress}%` }} />
             </div>
           </div>
-          <div className="sm:col-span-2 rounded-[2rem] border border-moss/10 bg-[#f8f4e6] p-5 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <div className="sm:col-span-2 rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-5 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <p className="text-sm font-black text-leaf-900">{feedback}</p>
           </div>
           {statusItems.map((status) => (
@@ -235,7 +235,7 @@ function PetPage() {
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="self-start rounded-[2rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+        <div className="self-start rounded-[1.25rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
           <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Prioritas perawatan</h2>
           <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
