@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
+import AppCard from '../components/AppCard.jsx'
+import ProgressBar from '../components/ProgressBar.jsx'
 import { dashboardData } from '../services/dashboardData.js'
 
 const historyFilters = [
@@ -26,17 +28,17 @@ function getInitial(name) {
 
 function StatCard({ label, value, helper }) {
   return (
-    <div className="min-h-44 rounded-[1.25rem] border border-moss/10 bg-[#fff8e8]/75 p-6 shadow-[0_18px_42px_rgba(32,58,37,0.08)]">
+    <AppCard as="div" tone="softCream" className="min-h-44 bg-[#fff8e8]/75 shadow-[0_18px_42px_rgba(32,58,37,0.08)]">
       <p className="text-sm font-black uppercase tracking-[0.2em] text-moss/45">{label}</p>
       <p className="mt-4 text-4xl font-black tracking-[-0.04em] text-leaf-900">{value}</p>
       {helper ? <p className="mt-3 text-base font-semibold text-moss/60">{helper}</p> : null}
-    </div>
+    </AppCard>
   )
 }
 
 function ProfileHero({ user, xpProgress }) {
   return (
-    <section className="rounded-[1.5rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_22px_70px_rgba(32,58,37,0.12)] sm:p-8">
+    <AppCard className="rounded-[1.5rem] shadow-[0_22px_70px_rgba(32,58,37,0.1)] sm:p-8">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
         <div className="mx-auto grid h-32 w-32 shrink-0 place-items-center rounded-full bg-[#f5f1df] text-5xl font-black text-leaf-900 shadow-inner shadow-moss/10 sm:mx-0">
           {getInitial(user?.name)}
@@ -44,11 +46,9 @@ function ProfileHero({ user, xpProgress }) {
 
         <div className="flex-1 text-center sm:text-left">
           <h1 className="text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{user?.name || 'Eco Hero'}</h1>
-          <div className="mt-5 flex flex-col gap-3 rounded-[1.25rem] bg-[#f8f4e6]/70 p-3 sm:flex-row sm:items-center">
+          <div className="mt-5 flex flex-col gap-3 rounded-[1.25rem] bg-[#fff8e8]/80 p-3 sm:flex-row sm:items-center">
             <span className="inline-flex shrink-0 items-center justify-center rounded-full border border-moss/10 bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Level {dashboardData.stats.level}</span>
-            <div className="h-3 flex-1 overflow-hidden rounded-full bg-[#e8e7fb]">
-              <div className="h-full rounded-full bg-leaf-600" style={{ width: `${xpProgress}%` }} />
-            </div>
+            <ProgressBar value={xpProgress} className="h-3 flex-1" trackClassName="bg-[#e8e7fb]" />
             <span className="shrink-0 text-sm font-bold text-moss/65">{dashboardData.stats.xp} / {dashboardData.stats.nextLevelXp} XP</span>
           </div>
         </div>
@@ -57,13 +57,13 @@ function ProfileHero({ user, xpProgress }) {
       <button className="mt-6 w-full rounded-full border border-moss/15 px-5 py-3 text-sm font-black text-moss/50 sm:w-auto" type="button" disabled>
         Ubah foto segera hadir
       </button>
-    </section>
+    </AppCard>
   )
 }
 
 function SettingsCard({ form, password, settingsFeedback, passwordFeedback, onFormChange, onSave, onPasswordChange, onPasswordSubmit }) {
   return (
-    <section className="rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+    <AppCard tone="softCream">
       <div>
         <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Pengaturan akun</p>
         <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Data dan preferensi</h2>
@@ -113,26 +113,26 @@ function SettingsCard({ form, password, settingsFeedback, passwordFeedback, onFo
           {passwordFeedback ? <p className="text-sm font-bold text-leaf-900">{passwordFeedback}</p> : null}
         </div>
       </div>
-    </section>
+    </AppCard>
   )
 }
 
 function AccountActionCard({ onLogout }) {
   return (
-    <section className="rounded-[1.25rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_42px_rgba(32,58,37,0.08)]">
+    <AppCard tone="yellow" className="shadow-[0_18px_42px_rgba(32,58,37,0.08)]">
       <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Aksi akun</p>
       <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Keluar dari sesi</h2>
       <p className="mt-2 text-sm leading-6 text-moss/65">Logout tersedia di Profile agar mudah diakses dari mobile PWA.</p>
-      <button className="mt-5 w-full rounded-full border border-moss/20 px-5 py-3 text-sm font-black text-moss transition hover:border-leaf-600 hover:text-leaf-700" type="button" onClick={onLogout}>
+      <button className="mt-5 w-full rounded-full border border-moss/20 px-5 py-3 text-sm font-black text-moss transition hover:border-red-700 hover:bg-red-700 hover:text-white" type="button" onClick={onLogout}>
         Logout
       </button>
-    </section>
+    </AppCard>
   )
 }
 
 function HistorySection({ activeFilter, items, onFilterChange }) {
   return (
-    <section className="rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+    <AppCard>
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Riwayat lengkap</p>
@@ -168,7 +168,7 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
           <p className="rounded-[1.25rem] bg-[#f8f4e6] p-5 text-sm font-semibold text-moss/65">Belum ada aktivitas untuk filter ini.</p>
         )}
       </div>
-    </section>
+    </AppCard>
   )
 }
 

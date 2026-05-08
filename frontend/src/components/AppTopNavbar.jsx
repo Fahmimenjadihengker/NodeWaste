@@ -45,7 +45,7 @@ function AppTopNavbar({ user, onLogout }) {
             </span>
             <span className="max-w-28 truncate">{user?.name || 'Eco Hero'}</span>
           </Link>
-          <button className="rounded-full border border-moss/20 px-5 py-2.5 text-sm font-black text-moss transition hover:border-leaf-600 hover:text-leaf-700" type="button" onClick={onLogout}>
+          <button className="rounded-full px-5 py-2.5 text-sm font-black text-moss transition hover:bg-red-700 hover:text-white" type="button" onClick={onLogout}>
             Logout
           </button>
         </div>

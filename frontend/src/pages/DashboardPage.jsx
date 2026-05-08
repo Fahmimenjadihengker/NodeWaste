@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
+import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
+import ProgressBar from '../components/ProgressBar.jsx'
 import { dashboardData } from '../services/dashboardData.js'
 
 const scanCategorySegments = [
@@ -27,9 +29,7 @@ function ProgressLine({ label, value }) {
         <span>{label}</span>
         <span>{value}%</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-moss/10">
-        <div className="h-full rounded-full bg-leaf-600" style={{ width: `${value}%` }} />
-      </div>
+      <ProgressBar value={value} />
     </div>
   )
 }
@@ -45,7 +45,7 @@ function ScanActivityChart({ data }) {
   }))
 
   return (
-    <section className="animate-fade-up rounded-[1.25rem] border border-moss/10 bg-[#edf3e3] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)] [animation-delay:180ms] [animation-fill-mode:both] sm:p-7 lg:p-8">
+    <AppCard className="animate-fade-up shadow-[0_18px_56px_rgba(32,58,37,0.08)] [animation-delay:180ms] [animation-fill-mode:both] sm:p-7 lg:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Aktivitas scan</p>
@@ -70,12 +70,12 @@ function ScanActivityChart({ data }) {
       </div>
 
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-[1.25rem] bg-[#f5f1df]/75 p-5">
+        <div className="rounded-[1.25rem] bg-[#f8f4e6]/75 p-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Scan valid</p>
           <p className="mt-2 text-3xl font-black text-leaf-900">{totalValid}</p>
         </div>
         {categorySummary.map((category) => (
-          <div key={category.label} className="rounded-[1.25rem] bg-[#f5f1df]/55 p-5">
+          <div key={category.label} className="rounded-[1.25rem] bg-[#f8f4e6]/60 p-5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">{category.label}</p>
             <p className="mt-2 text-3xl font-black text-leaf-900">{category.value}</p>
           </div>
@@ -142,7 +142,7 @@ function ScanActivityChart({ data }) {
           <span key={segment.key} className="inline-flex items-center gap-2"><span className={`h-3 w-3 rounded-full ${segment.colorClass}`} />{segment.label}</span>
         ))}
       </div>
-    </section>
+    </AppCard>
   )
 }
 
@@ -212,15 +212,15 @@ function DashboardPage() {
         </div>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
-          <div className="rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <AppCard>
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Progress level</h2>
             <p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p>
             <div className="mt-8">
               <ProgressLine label="XP menuju level berikutnya" value={xpProgress} />
             </div>
-          </div>
+          </AppCard>
 
-          <div className="rounded-[1.25rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <AppCard>
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Kategori sampah</h2>
             <p className="mt-2 text-sm leading-6 text-moss/65">Ringkasan sampah yang sudah kamu scan atau olah.</p>
             <div className="mt-5 space-y-4">
@@ -228,17 +228,15 @@ function DashboardPage() {
                 <div key={category.label} className="grid grid-cols-[1fr_auto] items-center gap-4">
                   <div>
                     <p className="font-black text-moss">{category.label}</p>
-                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-moss/10">
-                      <div className={`h-full rounded-full ${category.color}`} style={{ width: `${category.value * 12}%` }} />
-                    </div>
+                    <ProgressBar value={category.value * 12} className="mt-2 h-2" barClassName={category.color} />
                   </div>
                   <span className="font-black text-leaf-900">{category.value}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </AppCard>
 
-          <section id="aktivitas" className="scroll-mt-28 rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <AppCard id="aktivitas" className="scroll-mt-28">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Aktivitas terbaru</h2>
             <div className="mt-5 divide-y divide-moss/10">
               {activities.length ? activities.map((activity) => (
@@ -255,7 +253,7 @@ function DashboardPage() {
                 <p className="rounded-2xl bg-[#f5f1df] p-4 text-sm font-semibold text-moss/65">Belum ada aktivitas. Yuk mulai scan sampah pertamamu.</p>
               )}
             </div>
-          </section>
+          </AppCard>
         </section>
 
         <div id="grafik-scan" className="mt-8 scroll-mt-28">

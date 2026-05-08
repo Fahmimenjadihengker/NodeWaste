@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
+import ProgressBar from '../components/ProgressBar.jsx'
 import { dashboardData } from '../services/dashboardData.js'
 
 const petActions = [
@@ -62,16 +64,14 @@ function StatusMeter({ label, value, helper }) {
         </div>
         <span className="text-lg font-black text-leaf-900">{value}%</span>
       </div>
-      <div className="mt-4 h-2 overflow-hidden rounded-full bg-moss/10">
-        <div className="h-full rounded-full bg-leaf-600 transition-all duration-300" style={{ width: `${value}%` }} />
-      </div>
+      <ProgressBar value={value} className="mt-4 h-2" />
     </div>
   )
 }
 
 function ActionCard({ action, disabled, onAction }) {
   return (
-    <article className="rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] p-5 shadow-[0_16px_42px_rgba(32,58,37,0.08)]">
+    <AppCard as="article" tone="softCream" className="p-5 shadow-[0_16px_42px_rgba(32,58,37,0.08)]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Aksi</p>
@@ -88,13 +88,13 @@ function ActionCard({ action, disabled, onAction }) {
       >
         {disabled ? 'Poin belum cukup' : `Pakai ${action.label}`}
       </button>
-    </article>
+    </AppCard>
   )
 }
 
 function ActivityLog({ items }) {
   return (
-    <section className="rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+    <AppCard>
       <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Catatan perawatan</h2>
       <div className="mt-5 divide-y divide-moss/10">
         {items.map((item) => (
@@ -109,7 +109,7 @@ function ActivityLog({ items }) {
           </article>
         ))}
       </div>
-    </section>
+    </AppCard>
   )
 }
 
@@ -207,18 +207,16 @@ function PetPage() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <div className="rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <AppCard as="div" tone="softCream">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">EcoPoints</p>
             <p className="mt-2 text-4xl font-black text-leaf-900">{ecoPoints}</p>
             <p className="mt-2 text-sm font-semibold text-moss/60">Resource untuk perawatan Leafy.</p>
-          </div>
-          <div className="rounded-[1.25rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          </AppCard>
+          <AppCard as="div">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Pet XP</p>
             <p className="mt-2 text-4xl font-black text-leaf-900">{pet.xp}/{pet.nextLevelXp}</p>
-            <div className="mt-4 h-2 overflow-hidden rounded-full bg-moss/10">
-              <div className="h-full rounded-full bg-leaf-600 transition-all duration-300" style={{ width: `${petXpProgress}%` }} />
-            </div>
-          </div>
+            <ProgressBar value={petXpProgress} className="mt-4 h-2" />
+          </AppCard>
           <div className="sm:col-span-2 rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-5 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <p className="text-sm font-black text-leaf-900">{feedback}</p>
           </div>
@@ -235,7 +233,7 @@ function PetPage() {
       </section>
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="self-start rounded-[1.25rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+        <AppCard as="div" tone="yellow" className="self-start">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
           <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Prioritas perawatan</h2>
           <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
@@ -243,7 +241,7 @@ function PetPage() {
             <p>Jika Happiness rendah, ajak Leafy Main.</p>
             <p>Jika Cleanliness rendah, gunakan Mandi untuk menjaga health.</p>
           </div>
-        </div>
+        </AppCard>
         <ActivityLog items={logs} />
       </section>
     </div>
