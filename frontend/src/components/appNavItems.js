@@ -6,6 +6,9 @@ export const appNavItems = [
 ]
 
 export const mobileAppNavItems = [
-  ...appNavItems,
+  appNavItems[0],
+  appNavItems[2],
+  appNavItems[1],
+  appNavItems[3],
   { label: 'Profile', to: '/profile', icon: 'profile' },
 ]

@@ -11,8 +11,8 @@ function MobileBottomNavbar() {
             key={item.to}
             className={({ isActive }) => {
               const baseClass = 'flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-[11px] font-black transition'
-              const activeClass = item.featured ? 'bg-[#4b16b8] text-white shadow-[0_14px_26px_rgba(75,22,184,0.34)]' : 'text-[#4b16b8]'
-              const inactiveClass = item.featured ? 'bg-[#4b16b8] text-white shadow-[0_14px_26px_rgba(75,22,184,0.34)]' : 'text-moss/45 hover:text-leaf-900'
+              const activeClass = item.featured ? 'bg-leaf-600 text-white shadow-[0_14px_26px_rgba(52,122,55,0.34)]' : 'text-leaf-700'
+              const inactiveClass = item.featured ? 'bg-leaf-600 text-white shadow-[0_14px_26px_rgba(52,122,55,0.34)]' : 'text-moss/45 hover:text-leaf-900'
 
               return `${baseClass} ${isActive ? activeClass : inactiveClass} ${item.featured ? '-mt-8 mx-auto h-16 w-16 rounded-full border-[6px] border-white' : ''}`
             }}

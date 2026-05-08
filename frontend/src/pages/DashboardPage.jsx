@@ -3,6 +3,13 @@ import { Link, useOutletContext } from 'react-router-dom'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import { dashboardData } from '../services/dashboardData.js'
 
+const scanCategorySegments = [
+  { key: 'organik', label: 'Organik', colorClass: 'bg-leaf-600' },
+  { key: 'anorganik', label: 'Anorganik', colorClass: 'bg-[#7fa765]' },
+  { key: 'b3', label: 'B3', colorClass: 'bg-honey' },
+  { key: 'total', label: 'Total scan', colorClass: 'bg-moss' },
+]
+
 function StatBlock({ label, value, helper }) {
   return (
     <div className="border-l border-moss/15 pl-4">
@@ -30,18 +37,21 @@ function ProgressLine({ label, value }) {
 function ScanActivityChart({ data }) {
   const [range, setRange] = useState('weekly')
   const chartData = data[range]
-  const maxScan = Math.max(...chartData.map((item) => item.valid + item.invalid), 1)
+  const maxScan = Math.max(...chartData.map((item) => Object.values(item.categories).reduce((sum, value) => sum + value, 0)), 1)
   const totalValid = chartData.reduce((sum, item) => sum + item.valid, 0)
-  const totalInvalid = chartData.reduce((sum, item) => sum + item.invalid, 0)
+  const categorySummary = dashboardData.categories.map((category) => ({
+    label: category.label,
+    value: category.value,
+  }))
 
   return (
-    <section className="animate-fade-up rounded-[2rem] border border-moss/10 bg-[#e6edd8] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.10)] [animation-delay:180ms] [animation-fill-mode:both] sm:p-7 lg:p-8">
+    <section className="animate-fade-up rounded-[2rem] border border-moss/10 bg-[#edf3e3] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)] [animation-delay:180ms] [animation-fill-mode:both] sm:p-7 lg:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Aktivitas scan</p>
           <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-leaf-900">Pola scan sampah</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-moss/65">
-            Pantau scan valid dan invalid agar kebiasaan memilahmu makin konsisten.
+            Pantau scan valid yang berhasil diproses untuk melihat ritme kebiasaan memilahmu.
           </p>
         </div>
 
@@ -59,44 +69,78 @@ function ScanActivityChart({ data }) {
         </div>
       </div>
 
-      <div className="mt-7 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-3xl bg-[#f5f1df]/70 p-5">
+      <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-3xl bg-[#f5f1df]/75 p-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Scan valid</p>
           <p className="mt-2 text-3xl font-black text-leaf-900">{totalValid}</p>
         </div>
-        <div className="rounded-3xl bg-[#fff8e8]/70 p-5">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Scan invalid</p>
-          <p className="mt-2 text-3xl font-black text-moss">{totalInvalid}</p>
-        </div>
+        {categorySummary.map((category) => (
+          <div key={category.label} className="rounded-3xl bg-[#f5f1df]/55 p-5">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">{category.label}</p>
+            <p className="mt-2 text-3xl font-black text-leaf-900">{category.value}</p>
+          </div>
+        ))}
       </div>
 
       <div className="mt-8 overflow-x-auto pb-2">
-        <div className="flex min-w-[34rem] items-end gap-4 rounded-[1.75rem] bg-[#f5f1df]/60 px-5 pb-5 pt-8 sm:min-w-0">
-          {chartData.map((item) => {
-            const validHeight = Math.max((item.valid / maxScan) * 13, 1.5)
-            const invalidHeight = Math.max((item.invalid / maxScan) * 13, item.invalid ? 1.5 : 0)
+        <div className="relative min-w-[34rem] pb-5 pl-10 pr-2 pt-8 sm:min-w-0">
+          <div className="absolute left-0 top-8 flex h-44 w-8 flex-col justify-between text-right text-xs font-bold text-moss/45">
+            {[maxScan, Math.round(maxScan * 0.67), Math.round(maxScan * 0.33), 0].map((value, index) => (
+              <span key={`${value}-${index}`}>{value}</span>
+            ))}
+          </div>
 
-            return (
-              <div key={item.label} className="flex flex-1 flex-col items-center gap-3">
-                <div className="flex h-56 w-full max-w-14 items-end justify-center rounded-full bg-white/45 p-1.5 shadow-inner shadow-moss/5">
-                  <div className="flex w-full flex-col justify-end overflow-hidden rounded-full bg-leaf-100">
-                    <div className="bg-honey" style={{ height: `${invalidHeight}rem` }} title={`${item.invalid} scan invalid`} />
-                    <div className="bg-leaf-600" style={{ height: `${validHeight}rem` }} title={`${item.valid} scan valid`} />
+          <div className="absolute left-10 right-2 top-8 h-44 border-b border-moss/20">
+            {[0, 1, 2, 3].map((line) => (
+              <div key={line} className="absolute left-0 right-0 border-t border-moss/10" style={{ top: `${line * 33.33}%` }} />
+            ))}
+          </div>
+
+          <div className="relative grid h-44 items-end gap-5" style={{ gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))` }}>
+            {chartData.map((item) => {
+              const categoryTotal = Object.values(item.categories).reduce((sum, value) => sum + value, 0)
+
+              return (
+                <div key={item.label} className="flex h-full items-end justify-center">
+                  <div className="flex h-full w-full max-w-24 items-end justify-center gap-1.5">
+                    {scanCategorySegments.map((segment) => {
+                      const value = segment.key === 'total' ? categoryTotal : item.categories[segment.key]
+                      const height = value ? Math.max((value / maxScan) * 11, 1) : 0
+
+                      return (
+                        <div
+                          key={segment.key}
+                          className={`${segment.colorClass} w-3 rounded-[0.2rem] sm:w-4`}
+                          style={{ height: `${height}rem` }}
+                          title={`${segment.label}: ${value} scan`}
+                        />
+                      )
+                    })}
                   </div>
                 </div>
-                <div className="text-center">
+              )
+            })}
+          </div>
+
+          <div className="mt-4 grid gap-5" style={{ gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))` }}>
+            {chartData.map((item) => {
+              const categoryTotal = Object.values(item.categories).reduce((sum, value) => sum + value, 0)
+
+              return (
+                <div key={item.label} className="text-center">
                   <p className="text-sm font-black text-leaf-900">{item.label}</p>
-                  <p className="mt-1 text-xs font-bold text-moss/50">{item.valid + item.invalid} scan</p>
+                  <p className="mt-1 text-xs font-bold text-moss/50">{categoryTotal} scan</p>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-4 text-sm font-bold text-moss/65">
-        <span className="inline-flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-leaf-600" />Valid</span>
-        <span className="inline-flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-honey" />Invalid</span>
+        {scanCategorySegments.map((segment) => (
+          <span key={segment.key} className="inline-flex items-center gap-2"><span className={`h-3 w-3 rounded-full ${segment.colorClass}`} />{segment.label}</span>
+        ))}
       </div>
     </section>
   )
@@ -127,8 +171,8 @@ function DashboardPage() {
 
   return (
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.72fr]">
-        <section id="ringkasan" className="order-2 scroll-mt-28 animate-fade-up lg:order-none">
+        <div className="grid gap-8 lg:grid-cols-[1fr_0.42fr]">
+        <section id="ringkasan" className="order-2 scroll-mt-28 animate-fade-up lg:order-1">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Dashboard</p>
           <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] text-leaf-900 sm:text-5xl lg:text-6xl">
             Halo, {user?.name || 'Eco Hero'}.
@@ -147,36 +191,9 @@ function DashboardPage() {
             <StatBlock label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} />
           </div>
 
-          <section className="mt-10 grid gap-8 lg:grid-cols-2">
-            <div className="rounded-[2rem] border border-moss/10 bg-[#eaf1dc] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.10)]">
-              <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Progress level</h2>
-              <p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p>
-              <div className="mt-6">
-                <ProgressLine label="XP menuju level berikutnya" value={xpProgress} />
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-moss/10 bg-[#fff2cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.10)]">
-              <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Kategori sampah</h2>
-              <div className="mt-5 space-y-4">
-                {categories.map((category) => (
-                  <div key={category.label} className="grid grid-cols-[1fr_auto] items-center gap-4">
-                    <div>
-                      <p className="font-black text-moss">{category.label}</p>
-                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-moss/10">
-                        <div className={`h-full rounded-full ${category.color}`} style={{ width: `${category.value * 12}%` }} />
-                      </div>
-                    </div>
-                    <span className="font-black text-leaf-900">{category.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
         </section>
 
-        <aside className="contents animate-fade-up [animation-delay:120ms] [animation-fill-mode:both] lg:block lg:space-y-8">
-          <section id="leafy" className="order-1 scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_20px_60px_rgba(32,58,37,0.14)] lg:order-none">
+          <section id="leafy" className="order-1 scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#dce8cf] p-6 shadow-[0_20px_60px_rgba(32,58,37,0.12)] lg:order-2">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Virtual pet</p>
@@ -192,8 +209,36 @@ function DashboardPage() {
               <ProgressLine label="Cleanliness" value={pet.cleanliness} />
             </div>
           </section>
+        </div>
 
-          <section id="aktivitas" className="order-3 scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#eef3df] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.10)] lg:order-none">
+        <section className="mt-8 grid gap-6 lg:grid-cols-3">
+          <div className="rounded-[2rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+            <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Progress level</h2>
+            <p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p>
+            <div className="mt-8">
+              <ProgressLine label="XP menuju level berikutnya" value={xpProgress} />
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+            <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Kategori sampah</h2>
+            <p className="mt-2 text-sm leading-6 text-moss/65">Ringkasan sampah yang sudah kamu scan atau olah.</p>
+            <div className="mt-5 space-y-4">
+              {categories.map((category) => (
+                <div key={category.label} className="grid grid-cols-[1fr_auto] items-center gap-4">
+                  <div>
+                    <p className="font-black text-moss">{category.label}</p>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-moss/10">
+                      <div className={`h-full rounded-full ${category.color}`} style={{ width: `${category.value * 12}%` }} />
+                    </div>
+                  </div>
+                  <span className="font-black text-leaf-900">{category.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <section id="aktivitas" className="scroll-mt-28 rounded-[2rem] border border-moss/10 bg-[#edf4e6] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Aktivitas terbaru</h2>
             <div className="mt-5 divide-y divide-moss/10">
               {activities.length ? activities.map((activity) => (
@@ -211,8 +256,7 @@ function DashboardPage() {
               )}
             </div>
           </section>
-        </aside>
-        </div>
+        </section>
 
         <div id="grafik-scan" className="mt-8 scroll-mt-28">
           <ScanActivityChart data={scanActivity} />
