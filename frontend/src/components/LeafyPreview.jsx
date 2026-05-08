@@ -1,8 +1,9 @@
 import LeafyAvatar from './LeafyAvatar.jsx'
+import LeafySpeechBubble from './LeafySpeechBubble.jsx'
 
 function LeafyPreview() {
   return (
-    <div className="relative min-h-[620px] animate-fade-in pt-8 lg:min-h-[640px] lg:pt-0">
+    <div id="leafy" className="relative min-h-[620px] scroll-mt-28 animate-fade-in pt-8 lg:min-h-[640px] lg:pt-0">
       <div className="absolute bottom-0 left-1/2 h-[520px] w-[min(320px,100%)] -translate-x-1/2 border-l border-r border-moss/15 sm:w-[380px] lg:h-[540px]">
         <div className="absolute bottom-0 left-1/2 h-[430px] w-px -translate-x-1/2 bg-moss/20" />
         <div className="absolute bottom-10 left-1/2 h-20 w-20 -translate-x-1/2 rounded-full border border-moss/20" />
@@ -15,6 +16,7 @@ function LeafyPreview() {
 
       <div className="relative z-10 mx-auto mt-8 w-[310px] max-w-full animate-fade-up sm:w-[390px] lg:absolute lg:left-1/2 lg:top-52 lg:mt-0 lg:-translate-x-1/2" aria-label="Leafy, kucing hijau chubby">
         <div className="relative mx-auto h-[390px] w-[310px]">
+          <LeafySpeechBubble className="absolute left-1/2 top-0 z-20 w-64 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-10" />
           <div className="absolute left-1/2 top-16 origin-top -translate-x-1/2 scale-[1.38] sm:scale-[1.52]">
             <LeafyAvatar />
           </div>
