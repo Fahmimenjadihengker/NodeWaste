@@ -202,7 +202,7 @@ function DashboardPage() {
               </div>
               <span className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
             </div>
-            <LeafyAvatar compact mood={leafyMood} onClick={handleLeafyClick} />
+            <LeafyAvatar mood={leafyMood} onClick={handleLeafyClick} />
             <div className="mt-5 space-y-4">
               <ProgressLine label="Health" value={pet.health} />
               <ProgressLine label="Happiness" value={pet.happiness} />
