@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom'
-import { getAuthToken } from '../services/authApi.js'
+import { getAuthToken } from '../services/apiClient.js'
 
 function ProtectedRoute({ children }) {
   if (!getAuthToken()) {
