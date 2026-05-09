@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum WasteCategory {
+  ORGANIK
+  ANORGANIK
+  B3
+}
+
+enum ActivityType {
+  SCAN
+  PET
+  PROFILE
+}
+
+enum PetActionType {
+  FEED
+  PLAY
+  BATH
+}
+
+enum FacilityType {
+  BANK_SAMPAH
+  TPS3R
+  DROPBOX_B3
+  KOMPOSTER
+  LAINNYA
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole @default(USER)
+  ecoPoints    Int      @default(0) @map("eco_points")
+  xp           Int      @default(0)
+  level        Int      @default(1)
+  streak       Int      @default(0)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  pet        Pet?
+  scans      Scan[]
+  activities Activity[]
+  petActions PetAction[]
+
+  @@map("users")
+}
+
+model Pet {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  name        String   @default("Leafy")
+  level       Int      @default(1)
+  xp          Int      @default(0)
+  nextLevelXp Int      @default(100) @map("next_level_xp")
+  health      Int      @default(80)
+  happiness   Int      @default(80)
+  hunger      Int      @default(30)
+  cleanliness Int      @default(80)
+  mood        String   @default("happy")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actions PetAction[]
+
+  @@map("pets")
+}
+
+model Scan {
+  id         String        @id @default(uuid())
+  userId     String        @map("user_id")
+  category   WasteCategory
+  label      String
+  confidence Int
+  isValid    Boolean       @default(false) @map("is_valid")
+  ecoPoints  Int           @default(0) @map("eco_points")
+  xpReward   Int           @default(0) @map("xp_reward")
+  imageUrl   String?       @map("image_url")
+  latitude   Float?
+  longitude  Float?
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities Activity[]
+
+  @@index([userId, createdAt])
+  @@map("scans")
+}
+
+model PetAction {
+  id         String        @id @default(uuid())
+  userId     String        @map("user_id")
+  petId      String        @map("pet_id")
+  actionType PetActionType @map("action_type")
+  ecoCost    Int           @default(0) @map("eco_cost")
+  xpReward   Int           @default(0) @map("xp_reward")
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pet        Pet        @relation(fields: [petId], references: [id], onDelete: Cascade)
+  activities Activity[]
+
+  @@index([userId, createdAt])
+  @@map("pet_actions")
+}
+
+model Activity {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  type        ActivityType
+  title       String
+  meta        String
+  detail      String?
+  scanId      String?      @map("scan_id")
+  petActionId String?      @map("pet_action_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scan      Scan?      @relation(fields: [scanId], references: [id], onDelete: SetNull)
+  petAction PetAction? @relation(fields: [petActionId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@map("activities")
+}
+
+model RecyclingFacility {
+  id          String       @id @default(uuid())
+  name        String
+  type        FacilityType
+  address     String
+  latitude    Float
+  longitude   Float
+  description String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@map("recycling_facilities")
+}

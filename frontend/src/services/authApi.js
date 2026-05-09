@@ -1,9 +1,12 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
 
 async function request(path, options) {
+  const token = getAuthToken()
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
     ...options,
@@ -32,9 +35,53 @@ export function loginUser(data) {
   })
 }
 
+export function getProfile() {
+  return request('/profile')
+}
+
+export function updateProfile(data) {
+  return request('/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export function updateProfilePassword(data) {
+  return request('/profile/password', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export function getDashboard() {
+  return request('/dashboard')
+}
+
+export function getPet() {
+  return request('/pet')
+}
+
+export function runPetAction(action) {
+  return request(`/pet/${action}`, {
+    method: 'POST',
+  })
+}
+
+export function getActivities(filter = 'all') {
+  return request(`/activities?filter=${encodeURIComponent(filter)}`)
+}
+
+export function getRecyclingFacilities() {
+  return request('/recycling-facilities')
+}
+
 export function saveAuthSession(authData) {
   localStorage.setItem('nodewaste_token', authData.token)
   localStorage.setItem('nodewaste_user', JSON.stringify(authData.user))
+}
+
+export function saveStoredUser(user) {
+  localStorage.setItem('nodewaste_user', JSON.stringify(user))
 }
 
 export function getAuthToken() {

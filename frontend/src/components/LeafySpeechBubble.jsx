@@ -14,7 +14,9 @@ const leafyMessages = [
 ]
 
 function LeafySpeechBubble({ className = '' }) {
-  const message = useRotatingMessages(leafyMessages, 10000)
+  const { message, isVisible } = useRotatingMessages(leafyMessages, 5000, 20000)
+
+  if (!isVisible) return null
 
   return (
     <div className={`animate-leafy-pop rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] px-4 py-3 text-left text-sm font-black leading-6 text-leaf-900 shadow-[0_18px_45px_rgba(32,58,37,0.12)] ${className}`}>

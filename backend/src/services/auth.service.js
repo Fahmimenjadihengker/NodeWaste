@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { randomUUID } from 'node:crypto'
 import { createUser, findUserByEmail } from '../stores/user.store.js'
 import { HttpError } from '../utils/http-error.js'
 
@@ -14,6 +13,10 @@ function toPublicUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
+    ecoPoints: user.ecoPoints,
+    xp: user.xp,
+    level: user.level,
+    streak: user.streak,
   }
 }
 
@@ -38,12 +41,10 @@ export async function registerUser(payload) {
 
   const passwordHash = await bcrypt.hash(payload.password, saltRounds)
   const user = await createUser({
-    id: randomUUID(),
     name: payload.name,
     email: payload.email.toLowerCase(),
-    password_hash: passwordHash,
+    passwordHash,
     role: 'USER',
-    created_at: new Date().toISOString(),
   })
 
   return {
@@ -59,7 +60,7 @@ export async function loginUser(payload) {
     throw new HttpError(401, 'Email atau password salah')
   }
 
-  const isPasswordValid = await bcrypt.compare(payload.password, user.password_hash)
+  const isPasswordValid = await bcrypt.compare(payload.password, user.passwordHash)
 
   if (!isPasswordValid) {
     throw new HttpError(401, 'Email atau password salah')
@@ -70,3 +71,5 @@ export async function loginUser(payload) {
     token: issueToken(user),
   }
 }
+
+export { toPublicUser }

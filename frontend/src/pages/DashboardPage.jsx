@@ -3,6 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
+import { getDashboard } from '../services/authApi.js'
 import { dashboardData } from '../services/dashboardData.js'
 
 const scanCategorySegments = [
@@ -34,12 +35,12 @@ function ProgressLine({ label, value }) {
   )
 }
 
-function ScanActivityChart({ data }) {
+function ScanActivityChart({ data, categories }) {
   const [range, setRange] = useState('weekly')
   const chartData = data[range]
   const maxScan = Math.max(...chartData.map((item) => Object.values(item.categories).reduce((sum, value) => sum + value, 0)), 1)
   const totalValid = chartData.reduce((sum, item) => sum + item.valid, 0)
-  const categorySummary = dashboardData.categories.map((category) => ({
+  const categorySummary = categories.map((category) => ({
     label: category.label,
     value: category.value,
   }))
@@ -148,13 +149,27 @@ function ScanActivityChart({ data }) {
 
 function DashboardPage() {
   const { user } = useOutletContext()
-  const { stats, pet, categories, activities, scanActivity } = dashboardData
+  const [data, setData] = useState(dashboardData)
+  const { stats, pet, categories, activities, scanActivity } = data
   const [leafyMood, setLeafyMood] = useState('idle')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
   const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
 
-  useEffect(() => () => window.clearTimeout(moodTimerRef.current), [])
+  useEffect(() => {
+    let isMounted = true
+
+    getDashboard()
+      .then((response) => {
+        if (isMounted) setData(response.data)
+      })
+      .catch(() => {})
+
+    return () => {
+      isMounted = false
+      window.clearTimeout(moodTimerRef.current)
+    }
+  }, [])
 
   const handleLeafyClick = () => {
     const now = Date.now()
@@ -257,7 +272,7 @@ function DashboardPage() {
         </section>
 
         <div id="grafik-scan" className="mt-8 scroll-mt-28">
-          <ScanActivityChart data={scanActivity} />
+          <ScanActivityChart data={scanActivity} categories={categories} />
         </div>
       </div>
   )

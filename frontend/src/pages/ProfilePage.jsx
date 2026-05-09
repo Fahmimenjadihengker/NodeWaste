@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
+import { getActivities, getProfile, saveStoredUser, updateProfile, updateProfilePassword } from '../services/authApi.js'
 import { dashboardData } from '../services/dashboardData.js'
 
 const historyFilters = [
@@ -180,18 +181,53 @@ function ProfilePage() {
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' })
   const [passwordFeedback, setPasswordFeedback] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
+  const [history, setHistory] = useState(mockHistory)
   const filteredHistory = useMemo(() => {
-    if (activeFilter === 'all') return mockHistory
-    if (activeFilter === 'scan' || activeFilter === 'pet') return mockHistory.filter((item) => item.type === activeFilter)
+    if (activeFilter === 'all') return history
+    if (activeFilter === 'scan' || activeFilter === 'pet') return history.filter((item) => item.type === activeFilter)
 
-    return mockHistory.filter((item) => item.category === activeFilter)
+    return history.filter((item) => item.category === activeFilter)
+  }, [activeFilter, history])
+
+  useEffect(() => {
+    let isMounted = true
+
+    getProfile()
+      .then((response) => {
+        if (!isMounted) return
+
+        const nextUser = response.data.user
+        setForm({ name: nextUser.name, email: nextUser.email })
+        saveStoredUser(nextUser)
+      })
+      .catch((error) => {
+        if (isMounted) setSettingsFeedback(error.message)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let isMounted = true
+
+    getActivities(activeFilter)
+      .then((response) => {
+        if (isMounted) setHistory(response.data.activities)
+      })
+      .catch(() => {})
+
+    return () => {
+      isMounted = false
+    }
   }, [activeFilter])
 
   const handleFormChange = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }))
   }
 
-  const handleSaveSettings = () => {
+  const handleSaveSettings = async () => {
     if (!form.name.trim()) {
       setSettingsFeedback('Nama tidak boleh kosong.')
       return
@@ -202,14 +238,20 @@ function ProfilePage() {
       return
     }
 
-    setSettingsFeedback('Perubahan tervalidasi secara lokal.')
+    try {
+      const response = await updateProfile(form)
+      saveStoredUser(response.data.user)
+      setSettingsFeedback('Profile berhasil diperbarui.')
+    } catch (error) {
+      setSettingsFeedback(error.message)
+    }
   }
 
   const handlePasswordChange = (key, value) => {
     setPassword((current) => ({ ...current, [key]: value }))
   }
 
-  const handlePasswordSubmit = () => {
+  const handlePasswordSubmit = async () => {
     if (!password.current || !password.next || !password.confirm) {
       setPasswordFeedback('Semua field password wajib diisi.')
       return
@@ -225,8 +267,16 @@ function ProfilePage() {
       return
     }
 
-    setPasswordFeedback('Password lolos validasi lokal. Integrasi backend menyusul.')
-    setPassword({ current: '', next: '', confirm: '' })
+    try {
+      await updateProfilePassword({
+        currentPassword: password.current,
+        newPassword: password.next,
+      })
+      setPasswordFeedback('Password berhasil diperbarui.')
+      setPassword({ current: '', next: '', confirm: '' })
+    } catch (error) {
+      setPasswordFeedback(error.message)
+    }
   }
 
   return (

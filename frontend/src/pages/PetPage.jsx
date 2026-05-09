@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
+import { getPet, runPetAction } from '../services/authApi.js'
 import { dashboardData } from '../services/dashboardData.js'
 
 const petActions = [
@@ -39,10 +40,6 @@ const moodCopy = {
   dirty: { label: 'Kotor', message: 'Leafy butuh mandi agar cleanliness kembali naik.' },
   sick: { label: 'Kurang sehat', message: 'Health Leafy rendah. Rawat pelan-pelan dengan makan atau mandi.' },
   lonely: { label: 'Butuh main', message: 'Ajak Leafy bermain agar happiness naik lagi.' },
-}
-
-function clamp(value) {
-  return Math.min(Math.max(value, 0), 100)
 }
 
 function getPetMood(pet, fallbackMood) {
@@ -137,7 +134,24 @@ function PetPage() {
     { label: 'Cleanliness', value: pet.cleanliness, helper: 'Naik saat Leafy mandi' },
   ], [pet, satiety])
 
-  useEffect(() => () => window.clearTimeout(moodTimerRef.current), [])
+  useEffect(() => {
+    let isMounted = true
+
+    getPet()
+      .then((response) => {
+        if (!isMounted) return
+
+        setEcoPoints(response.data.ecoPoints)
+        setPet(response.data.pet)
+        setLogs(response.data.activities)
+      })
+      .catch(() => {})
+
+    return () => {
+      isMounted = false
+      window.clearTimeout(moodTimerRef.current)
+    }
+  }, [])
 
   const handleLeafyClick = () => {
     const now = Date.now()
@@ -153,34 +167,26 @@ function PetPage() {
     }, nextMood === 'angry' ? 3000 : 1800)
   }
 
-  const handleAction = (action) => {
+  const handleAction = async (action) => {
     if (ecoPoints < action.cost) {
       setFeedback(`EcoPoints belum cukup untuk ${action.label.toLowerCase()}.`)
       return
     }
 
-    setEcoPoints((current) => current - action.cost)
-    setLastMood(action.mood)
-    setAvatarMood('happy')
-    setPet((current) => {
-      const nextXp = current.xp + (action.effect.xp || 0)
-      const didLevelUp = nextXp >= current.nextLevelXp
-
-      return {
-        ...current,
-        level: didLevelUp ? current.level + 1 : current.level,
-        xp: didLevelUp ? nextXp - current.nextLevelXp : nextXp,
-        health: clamp(current.health + (action.effect.health || 0)),
-        happiness: clamp(current.happiness + (action.effect.happiness || 0)),
-        hunger: clamp(current.hunger + (action.effect.hunger || 0)),
-        cleanliness: clamp(current.cleanliness + (action.effect.cleanliness || 0)),
-      }
-    })
-    setFeedback(`${action.label} berhasil. Leafy ${moodCopy[action.mood].label.toLowerCase()}!`)
-    setLogs((current) => [
-      { title: `Leafy ${action.label.toLowerCase()}`, meta: `-${action.cost} EcoPoints`, time: 'Baru saja' },
-      ...current.slice(0, 3),
-    ])
+    try {
+      const response = await runPetAction(action.id)
+      setEcoPoints(response.data.ecoPoints)
+      setPet(response.data.pet)
+      setLastMood(action.mood)
+      setAvatarMood('happy')
+      setFeedback(`${action.label} berhasil. Leafy ${moodCopy[action.mood].label.toLowerCase()}!`)
+      setLogs((current) => [
+        { title: `Leafy ${action.label.toLowerCase()}`, meta: `-${action.cost} EcoPoints`, time: 'Baru saja' },
+        ...current.slice(0, 3),
+      ])
+    } catch (error) {
+      setFeedback(error.message)
+    }
   }
 
   return (

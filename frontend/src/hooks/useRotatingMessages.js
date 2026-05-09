@@ -11,20 +11,29 @@ function getNextIndex(length, currentIndex) {
   return nextIndex
 }
 
-function useRotatingMessages(messages, intervalMs = 10000) {
+function useRotatingMessages(messages, visibleMs = 5000, pauseMs = 20000) {
   const [messageIndex, setMessageIndex] = useState(() => getNextIndex(messages.length, -1))
+  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     if (!messages.length) return undefined
 
-    const intervalId = window.setInterval(() => {
+    const hideTimer = window.setTimeout(() => {
+      setIsVisible(false)
+    }, visibleMs)
+
+    const nextTimer = window.setTimeout(() => {
       setMessageIndex((currentIndex) => getNextIndex(messages.length, currentIndex))
-    }, intervalMs)
+      setIsVisible(true)
+    }, visibleMs + pauseMs)
 
-    return () => window.clearInterval(intervalId)
-  }, [messages.length, intervalMs])
+    return () => {
+      window.clearTimeout(hideTimer)
+      window.clearTimeout(nextTimer)
+    }
+  }, [messageIndex, messages.length, visibleMs, pauseMs])
 
-  return messages[messageIndex] || ''
+  return { message: messages[messageIndex] || '', isVisible }
 }
 
 export default useRotatingMessages
