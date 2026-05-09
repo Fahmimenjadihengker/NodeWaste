@@ -1,4 +1,13 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+const productionApiBaseUrl = 'https://nodewaste-backend.vercel.app/api'
+
+function getApiBaseUrl() {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL
+  if (window.location.hostname === 'nodewaste.vercel.app') return productionApiBaseUrl
+
+  return 'http://localhost:5000/api'
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 async function request(path, options) {
   const token = getAuthToken()
