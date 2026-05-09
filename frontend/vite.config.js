@@ -8,6 +8,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      selfDestroying: false,
       includeAssets: ['favicon.svg', 'pwa-192.svg', 'pwa-512.svg', 'maskable-icon.svg'],
       manifest: {
         name: 'NodeWaste',
@@ -39,6 +41,9 @@ export default defineConfig({
         ],
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,svg,ico}'],
         navigateFallback: '/index.html',
         runtimeCaching: [
@@ -52,9 +57,10 @@ export default defineConfig({
           },
           {
             urlPattern: ({ request }) => ['script', 'style', 'image', 'font'].includes(request.destination),
-            handler: 'StaleWhileRevalidate',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'nodewaste-assets',
+              networkTimeoutSeconds: 3,
             },
           },
         ],

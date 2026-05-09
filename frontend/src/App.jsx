@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppShell from './components/AppShell.jsx'
+import PwaInstallPrompt from './components/PwaInstallPrompt.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import LandingPage from './pages/LandingPage.jsx'
@@ -25,6 +26,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Routes>
+      <PwaInstallPrompt />
     </BrowserRouter>
   )
 }
