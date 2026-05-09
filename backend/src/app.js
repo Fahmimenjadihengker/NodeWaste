@@ -6,6 +6,7 @@ import dashboardRoutes from './routes/dashboard.routes.js'
 import facilityRoutes from './routes/facility.routes.js'
 import petRoutes from './routes/pet.routes.js'
 import profileRoutes from './routes/profile.routes.js'
+import prisma from './config/prisma.js'
 import { errorMiddleware } from './middlewares/error.middleware.js'
 
 const app = express()
@@ -43,6 +44,29 @@ app.get('/api/health', (_request, response) => {
       service: 'backend',
     },
   })
+})
+
+app.get('/api/health/db', async (_request, response) => {
+  try {
+    await prisma.user.count()
+
+    response.json({
+      success: true,
+      message: 'Database connection is healthy',
+      data: {
+        database: 'connected',
+      },
+    })
+  } catch (error) {
+    response.status(500).json({
+      success: false,
+      message: 'Database connection failed',
+      data: {
+        database: 'disconnected',
+        error: error.code || error.name || 'UNKNOWN_ERROR',
+      },
+    })
+  }
 })
 
 app.use('/api/auth', authRoutes)
