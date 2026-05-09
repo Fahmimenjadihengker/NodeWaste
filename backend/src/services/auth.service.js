@@ -40,12 +40,22 @@ export async function registerUser(payload) {
   }
 
   const passwordHash = await bcrypt.hash(payload.password, saltRounds)
-  const user = await createUser({
-    name: payload.name,
-    email: payload.email.toLowerCase(),
-    passwordHash,
-    role: 'USER',
-  })
+  let user
+
+  try {
+    user = await createUser({
+      name: payload.name,
+      email: payload.email.toLowerCase(),
+      passwordHash,
+      role: 'USER',
+    })
+  } catch (error) {
+    if (error.code === 'P2002') {
+      throw new HttpError(409, 'Email sudah digunakan')
+    }
+
+    throw error
+  }
 
   return {
     user: toPublicUser(user),

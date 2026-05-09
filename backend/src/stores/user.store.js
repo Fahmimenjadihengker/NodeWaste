@@ -13,16 +13,13 @@ export async function findUserByIdWithPassword(id) {
 }
 
 export async function createUser(user) {
-  return prisma.$transaction(async (tx) => {
-    const createdUser = await tx.user.create({ data: user })
-
-    await tx.pet.create({
-      data: {
-        userId: createdUser.id,
+  return prisma.user.create({
+    data: {
+      ...user,
+      pet: {
+        create: {},
       },
-    })
-
-    return createdUser
+    },
   })
 }
 
