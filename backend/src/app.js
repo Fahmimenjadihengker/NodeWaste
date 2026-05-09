@@ -9,15 +9,22 @@ import profileRoutes from './routes/profile.routes.js'
 import { errorMiddleware } from './middlewares/error.middleware.js'
 
 const app = express()
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
-  .split(',')
-  .map((origin) => origin.trim())
+const defaultAllowedOrigins = [
+  'http://localhost:5173',
+  'https://nodewaste.vercel.app',
+]
+function normalizeOrigin(origin) {
+  return origin.replace(/^['"]|['"]$/g, '').replace(/\/$/, '')
+}
+
+const allowedOrigins = [...defaultAllowedOrigins, ...(process.env.CORS_ORIGIN || '').split(',')]
+  .map((origin) => normalizeOrigin(origin.trim()))
   .filter(Boolean)
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
         callback(null, true)
         return
       }
