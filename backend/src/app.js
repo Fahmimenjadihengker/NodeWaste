@@ -1,82 +1,101 @@
-import express from 'express'
-import cors from 'cors'
-import activityRoutes from './routes/activity.routes.js'
-import authRoutes from './routes/auth.routes.js'
-import dashboardRoutes from './routes/dashboard.routes.js'
-import facilityRoutes from './routes/facility.routes.js'
-import petRoutes from './routes/pet.routes.js'
-import profileRoutes from './routes/profile.routes.js'
-import prisma from './config/prisma.js'
-import { errorMiddleware } from './middlewares/error.middleware.js'
+import express from "express";
+import cors from "cors";
+import activityRoutes from "./routes/activity.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+import facilityRoutes from "./routes/facility.routes.js";
+import petRoutes from "./routes/pet.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
+import prisma from "./config/prisma.js";
+import swaggerUi from "swagger-ui-express";
+import { swaggerDocument } from "./config/swagger.js";
+import { errorMiddleware } from "./middlewares/error.middleware.js";
 
-const app = express()
+const app = express();
 const defaultAllowedOrigins = [
-  'http://localhost:5173',
-  'https://nodewaste.vercel.app',
-]
+  "http://localhost:5173",
+  "https://nodewaste.vercel.app",
+];
+
 function normalizeOrigin(origin) {
-  return origin.replace(/^['"]|['"]$/g, '').replace(/\/$/, '')
+  return origin.replace(/^['"]|['"]$/g, "").replace(/\/$/, "");
 }
 
-const allowedOrigins = [...defaultAllowedOrigins, ...(process.env.CORS_ORIGIN || '').split(',')]
+const allowedOrigins = [
+  ...defaultAllowedOrigins,
+  ...(process.env.CORS_ORIGIN || "").split(","),
+]
   .map((origin) => normalizeOrigin(origin.trim()))
-  .filter(Boolean)
+  .filter(Boolean);
 
 app.use(
   cors({
     origin(origin, callback) {
       if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
-        callback(null, true)
-        return
+        callback(null, true);
+        return;
       }
 
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error("Not allowed by CORS"));
     },
   }),
-)
-app.use(express.json())
+);
+app.use(express.json());
 
-app.get('/api/health', (_request, response) => {
+app.get("/api/health", (_request, response) => {
   response.json({
     success: true,
-    message: 'NodeWaste backend is healthy',
+    message: "NodeWaste backend is healthy",
     data: {
-      service: 'backend',
+      service: "backend",
     },
-  })
-})
+  });
+});
 
-app.get('/api/health/db', async (_request, response) => {
+app.get("/api/health/db", async (_request, response) => {
   try {
-    await prisma.user.count()
+    await prisma.user.count();
 
     response.json({
       success: true,
-      message: 'Database connection is healthy',
+      message: "Database connection is healthy",
       data: {
-        database: 'connected',
+        database: "connected",
       },
-    })
+    });
   } catch (error) {
-    console.error('Database health check failed:', error)
+    console.error("Database health check failed:", error);
 
     response.status(500).json({
       success: false,
-      message: 'Database connection failed',
+      message: "Database connection failed",
       data: {
-        database: 'disconnected',
-        error: error.code || error.name || 'UNKNOWN_ERROR',
+        database: "disconnected",
+        error: error.code || error.name || "UNKNOWN_ERROR",
       },
-    })
+    });
   }
-})
+});
 
-app.use('/api/auth', authRoutes)
-app.use('/api/profile', profileRoutes)
-app.use('/api/dashboard', dashboardRoutes)
-app.use('/api/pet', petRoutes)
-app.use('/api/activities', activityRoutes)
-app.use('/api/recycling-facilities', facilityRoutes)
-app.use(errorMiddleware)
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/pet", petRoutes);
+app.use("/api/activities", activityRoutes);
+app.use("/api/recycling-facilities", facilityRoutes);
+app.use(errorMiddleware);
+// Dokumentasi Swagger UI
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, {
+    customSiteTitle: "NodeWaste API Docs",
+  }),
+);
 
-export default app
+// Daftarkan Routes yang sudah ada...
+app.use("/api/auth", authRoutes);
+app.use("/api/profile", profileRoutes);
+// ...dan seterusnya
+
+export default app;

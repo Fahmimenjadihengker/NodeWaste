@@ -1,0 +1,67 @@
+# =========================
+# 1. Keamanan & Kredensial (Sangat Penting)
+# =========================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.log
+
+# =========================
+# 2. Direktori Kustom Anda
+# =========================
+/docs/
+
+# =========================
+# 3. Node.js & Frontend (React/Vue/dll)
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store
+
+# Hasil Build Frontend
+dist/
+build/
+.next/
+out/
+
+# =========================
+# 4. PHP & Laravel (Jika ada backend PHP)
+# =========================
+vendor/
+public/storage
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+storage/logs/
+*.sqlite
+Homestead.json
+Homestead.yaml
+
+# =========================
+# 5. Sistem Operasi (Khususnya macOS)
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Trash
+.Spotlight-V100
+.Trashes
+
+# =========================
+# 6. IDE & Text Editor
+# =========================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
