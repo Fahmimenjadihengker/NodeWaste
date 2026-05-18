@@ -1,26 +1,20 @@
-const regionApiBaseUrl = 'https://wilayah.id/api'
+import { apiRequest } from './apiClient.js'
 
 async function fetchRegion(path) {
-  const response = await fetch(`${regionApiBaseUrl}${path}`)
-  const payload = await response.json().catch(() => null)
-
-  if (!response.ok) {
-    throw new Error(payload?.message || 'Data wilayah belum bisa dimuat.')
-  }
-
-  return payload?.data || []
+  const payload = await apiRequest(path)
+  return payload?.data?.regions || []
 }
 
 export function getProvinces() {
-  return fetchRegion('/provinces.json')
+  return fetchRegion('/regions/provinces')
 }
 
 export function getRegencies(provinceCode) {
   if (!provinceCode) return Promise.resolve([])
-  return fetchRegion(`/regencies/${provinceCode}.json`)
+  return fetchRegion(`/regions/regencies/${encodeURIComponent(provinceCode)}`)
 }
 
 export function getDistricts(regencyCode) {
   if (!regencyCode) return Promise.resolve([])
-  return fetchRegion(`/districts/${regencyCode}.json`)
+  return fetchRegion(`/regions/districts/${encodeURIComponent(regencyCode)}`)
 }

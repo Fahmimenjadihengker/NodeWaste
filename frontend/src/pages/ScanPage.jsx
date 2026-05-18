@@ -1,47 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import { createScan } from '../services/scanApi.js'
 
-const dummyResults = [
-  {
-    wasteName: 'Botol Plastik',
-    category: 'Anorganik',
-    confidence: 0.92,
-    points: 15,
-    xp: 10,
-    isValid: true,
-    guide: 'Kosongkan isi botol, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
-    impact: 'Botol plastik yang dipilah membantu mengurangi sampah sulit terurai di TPA.',
-  },
-  {
-    wasteName: 'Sisa Makanan',
-    category: 'Organik',
-    confidence: 0.88,
-    points: 10,
-    xp: 10,
-    isValid: true,
-    guide: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
-    impact: 'Sampah organik yang terolah bisa mengurangi bau dan menghasilkan kompos.',
-  },
-  {
-    wasteName: 'Baterai Bekas',
-    category: 'B3',
-    confidence: 0.84,
-    points: 20,
-    xp: 10,
-    isValid: true,
-    guide: 'Jangan campur dengan sampah rumah tangga. Simpan kering, lalu bawa ke titik pengumpulan B3 atau e-waste.',
-    impact: 'Baterai yang dipilah mencegah kontaminasi logam berat ke tanah dan air.',
-  },
-  {
-    wasteName: 'Objek belum jelas',
-    category: 'Unknown',
-    confidence: 0.58,
-    points: 0,
-    xp: 0,
-    isValid: false,
-    guide: 'Gambar kurang jelas. Coba dekatkan kamera, pastikan cahaya cukup, dan scan satu objek sampah saja.',
-    impact: 'Scan ulang membantu sistem memberi edukasi yang lebih akurat.',
-  },
-]
+const categoryGuide = {
+  ORGANIK: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
+  ANORGANIK: 'Kosongkan isi, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
+  B3: 'Jangan campur dengan sampah rumah tangga. Simpan kering, lalu bawa ke titik pengumpulan B3 atau e-waste.',
+}
 
 function getConfidenceLabel(confidence) {
   return `${Math.round(confidence * 100)}%`
@@ -173,7 +137,6 @@ function ScanPage() {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
   const streamRef = useRef(null)
-  const resultIndexRef = useRef(0)
   const [cameraState, setCameraState] = useState('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [previewUrl, setPreviewUrl] = useState('')
@@ -220,18 +183,6 @@ function ScanPage() {
     }
   }
 
-  const analyzeDummyResult = () => {
-    setIsAnalyzing(true)
-    setResult(null)
-
-    window.setTimeout(() => {
-      const nextResult = dummyResults[resultIndexRef.current % dummyResults.length]
-      resultIndexRef.current += 1
-      setResult(nextResult)
-      setIsAnalyzing(false)
-    }, 900)
-  }
-
   const captureImage = () => {
     const video = videoRef.current
     const canvas = canvasRef.current
@@ -243,7 +194,33 @@ function ScanPage() {
     canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height)
     setPreviewUrl(canvas.toDataURL('image/jpeg', 0.88))
     stopCamera()
-    analyzeDummyResult()
+    setIsAnalyzing(true)
+    setResult(null)
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        setIsAnalyzing(false)
+        setResult({ wasteName: 'Gambar gagal diproses', category: 'Unknown', confidence: 0, points: 0, xp: 0, isValid: false, guide: 'Coba ambil gambar ulang.' })
+        return
+      }
+
+      try {
+        const response = await createScan(blob)
+        const scan = response.data.scan
+        setResult({
+          wasteName: scan.label,
+          category: scan.category,
+          confidence: scan.confidence / 100,
+          points: scan.ecoPoints,
+          xp: scan.xpReward,
+          isValid: scan.isValid,
+          guide: categoryGuide[scan.category] || 'Ikuti panduan pemilahan sampah sesuai kategori.',
+        })
+      } catch (error) {
+        setResult({ wasteName: 'Scan gagal', category: 'Unknown', confidence: 0, points: 0, xp: 0, isValid: false, guide: error.message })
+      } finally {
+        setIsAnalyzing(false)
+      }
+    }, 'image/jpeg', 0.88)
   }
 
   const resetScan = () => {

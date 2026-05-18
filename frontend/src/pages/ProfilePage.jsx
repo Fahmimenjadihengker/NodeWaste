@@ -4,7 +4,6 @@ import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { getActivities, getProfile, saveStoredUser, updateProfile, updateProfilePassword } from '../services/authApi.js'
-import { dashboardData } from '../services/dashboardData.js'
 
 const historyFilters = [
   { label: 'Semua', value: 'all' },
@@ -15,14 +14,7 @@ const historyFilters = [
   { label: 'B3', value: 'b3' },
 ]
 
-const mockHistory = [
-  { id: 1, type: 'scan', category: 'anorganik', title: 'Scan Botol Plastik', meta: '+15 EcoPoints, +10 XP', time: 'Hari ini', detail: 'Anorganik, confidence 92%' },
-  { id: 2, type: 'pet', category: 'pet', title: 'Leafy diberi makan', meta: '-20 EcoPoints', time: 'Kemarin', detail: 'Health Leafy naik dan hunger turun.' },
-  { id: 3, type: 'scan', category: 'organik', title: 'Scan Sisa Makanan', meta: '+10 EcoPoints, +10 XP', time: '2 hari lalu', detail: 'Organik, confidence 88%' },
-  { id: 4, type: 'pet', category: 'pet', title: 'Leafy diajak main', meta: '-15 EcoPoints, +15 Pet XP', time: '3 hari lalu', detail: 'Happiness Leafy meningkat.' },
-  { id: 5, type: 'scan', category: 'b3', title: 'Scan Baterai Bekas', meta: '+20 EcoPoints, +10 XP', time: '4 hari lalu', detail: 'B3, confidence 84%' },
-  { id: 6, type: 'scan', category: 'anorganik', title: 'Scan Kaleng Minuman', meta: '+15 EcoPoints, +10 XP', time: '5 hari lalu', detail: 'Anorganik, confidence 90%' },
-]
+const emptyStats = { ecoPoints: 0, xp: 0, level: 1, streak: 0, totalScans: 0, validScans: 0, nextLevelXp: 250 }
 
 function getInitial(name) {
   return (name?.trim()?.charAt(0) || 'E').toUpperCase()
@@ -38,7 +30,7 @@ function StatCard({ label, value, helper }) {
   )
 }
 
-function ProfileHero({ user, xpProgress }) {
+function ProfileHero({ user, stats, xpProgress }) {
   return (
     <AppCard className="rounded-[1.5rem] shadow-[0_22px_70px_rgba(32,58,37,0.1)] sm:p-8">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
@@ -49,9 +41,9 @@ function ProfileHero({ user, xpProgress }) {
         <div className="flex-1 text-center sm:text-left">
           <h1 className="text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{user?.name || 'Eco Hero'}</h1>
           <div className="mt-5 flex flex-col gap-3 rounded-[1.25rem] bg-[#fff8e8]/80 p-3 sm:flex-row sm:items-center">
-            <span className="inline-flex shrink-0 items-center justify-center rounded-full border border-moss/10 bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Level {dashboardData.stats.level}</span>
+            <span className="inline-flex shrink-0 items-center justify-center rounded-full border border-moss/10 bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Level {stats.level}</span>
             <ProgressBar value={xpProgress} className="h-3 flex-1" trackClassName="bg-[#e8e7fb]" />
-            <span className="shrink-0 text-sm font-bold text-moss/65">{dashboardData.stats.xp} / {dashboardData.stats.nextLevelXp} XP</span>
+            <span className="shrink-0 text-sm font-bold text-moss/65">{stats.xp} / {stats.nextLevelXp} XP</span>
           </div>
         </div>
       </div>
@@ -176,14 +168,15 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
 
 function ProfilePage() {
   const { user, onLogout } = useOutletContext()
-  const xpProgress = Math.min(Math.round((dashboardData.stats.xp / dashboardData.stats.nextLevelXp) * 100), 100)
+  const [stats, setStats] = useState(emptyStats)
+  const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
   const [form, setForm] = useState({ name: user?.name || 'Eco Hero', email: user?.email || '' })
   const [addressForm, setAddressForm] = useState({ address: '', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' })
   const [settingsFeedback, setSettingsFeedback] = useState('')
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' })
   const [passwordFeedback, setPasswordFeedback] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
-  const [history, setHistory] = useState(mockHistory)
+  const [history, setHistory] = useState([])
   const filteredHistory = useMemo(() => {
     if (activeFilter === 'all') return history
     if (activeFilter === 'scan' || activeFilter === 'pet') return history.filter((item) => item.type === activeFilter)
@@ -199,6 +192,7 @@ function ProfilePage() {
         if (!isMounted) return
 
         const nextUser = response.data.user
+        setStats({ ...emptyStats, ...response.data.stats, nextLevelXp: response.data.stats?.nextLevelXp || 250 })
         setForm({ name: nextUser.name, email: nextUser.email })
         if (response.data.address) {
           setAddressForm({
@@ -301,7 +295,7 @@ function ProfilePage() {
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <section>
-        <ProfileHero user={{ ...user, ...form }} xpProgress={xpProgress} />
+        <ProfileHero user={{ ...user, ...form }} stats={stats} xpProgress={xpProgress} />
       </section>
 
       <section className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
@@ -313,10 +307,10 @@ function ProfilePage() {
         </div>
         <div className="space-y-6">
           <div className="grid gap-5 sm:grid-cols-2">
-            <StatCard label="EcoPoints" value={dashboardData.stats.ecoPoints} helper="Siap dipakai merawat Leafy" />
-            <StatCard label="Level" value={dashboardData.stats.level} helper={`${dashboardData.stats.xp}/${dashboardData.stats.nextLevelXp} XP`} />
-            <StatCard label="Total scan" value={dashboardData.stats.totalScans} helper={`${dashboardData.stats.validScans} scan valid`} />
-            <StatCard label="Streak" value={`${dashboardData.stats.streak} hari`} helper="Pertahankan hari ini" />
+            <StatCard label="EcoPoints" value={stats.ecoPoints} helper="Siap dipakai merawat Leafy" />
+            <StatCard label="Level" value={stats.level} helper={`${stats.xp}/${stats.nextLevelXp} XP`} />
+            <StatCard label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} />
+            <StatCard label="Streak" value={`${stats.streak} hari`} helper="Pertahankan hari ini" />
           </div>
           <AccountActionCard onLogout={onLogout} />
         </div>

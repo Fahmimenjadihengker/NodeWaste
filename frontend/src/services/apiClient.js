@@ -1,6 +1,6 @@
 const productionApiBaseUrl = 'https://nodewaste-backend.vercel.app/api'
 
-function getApiBaseUrl() {
+export function getApiBaseUrl() {
   if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL
   if (window.location.hostname === 'nodewaste.vercel.app') return productionApiBaseUrl
 
@@ -15,7 +15,7 @@ export async function apiRequest(path, options = {}) {
   const token = getAuthToken()
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     headers: {
-      'Content-Type': 'application/json',
+      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },

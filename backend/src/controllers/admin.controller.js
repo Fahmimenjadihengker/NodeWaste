@@ -1,15 +1,18 @@
 import {
   createAdminDriver,
+  createAdminAccount,
   createAdminSchedule,
   deleteAdminSchedule,
   getAdminDashboard,
+  listAdminAccounts,
   listAdminDrivers,
   listAdminSchedules,
   listAdminUsers,
+  updateAdminAccount,
   updateAdminDriver,
   updateAdminSchedule,
 } from '../services/admin.service.js'
-import { validateAdminDriverCreatePayload, validateAdminDriverUpdatePayload, validateSchedulePayload } from '../validators/admin.validator.js'
+import { validateAdminAccountCreatePayload, validateAdminAccountUpdatePayload, validateAdminDriverCreatePayload, validateAdminDriverUpdatePayload, validateSchedulePayload } from '../validators/admin.validator.js'
 
 export async function getCurrentAdminDashboard(_request, response, next) {
   try {
@@ -22,6 +25,32 @@ export async function getCurrentAdminDashboard(_request, response, next) {
 export async function listUsers(_request, response, next) {
   try {
     response.json({ success: true, message: 'User berhasil diambil', data: await listAdminUsers() })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function listAccounts(request, response, next) {
+  try {
+    response.json({ success: true, message: 'Akun berhasil diambil', data: await listAdminAccounts(request.query) })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function createAccount(request, response, next) {
+  try {
+    const payload = validateAdminAccountCreatePayload(request.body)
+    response.status(201).json({ success: true, message: 'Akun berhasil dibuat', data: await createAdminAccount(payload) })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function updateAccount(request, response, next) {
+  try {
+    const payload = validateAdminAccountUpdatePayload(request.body)
+    response.json({ success: true, message: 'Akun berhasil diperbarui', data: await updateAdminAccount(request.params.id, payload, request.user.id) })
   } catch (error) {
     next(error)
   }

@@ -1,6 +1,9 @@
 import prisma from '../config/prisma.js'
+import bcrypt from 'bcryptjs'
 import { registerDriver, toPublicUser } from './auth.service.js'
 import { HttpError } from '../utils/http-error.js'
+
+const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS || 10)
 
 function toDistrict(district) {
   if (!district) return null
@@ -19,6 +22,25 @@ function toDistrict(district) {
 function toDriver(user) {
   return {
     user: toPublicUser(user),
+    driverProfile: user.driver ? {
+      id: user.driver.id,
+      vehiclePlate: user.driver.vehiclePlate,
+      vehicleType: user.driver.vehicleType,
+      district: toDistrict(user.driver.district),
+    } : null,
+  }
+}
+
+function toAccount(user) {
+  return {
+    ...toPublicUser(user),
+    address: user.address ? {
+      id: user.address.id,
+      address: user.address.address,
+      latitude: user.address.latitude,
+      longitude: user.address.longitude,
+      district: toDistrict(user.address.district),
+    } : null,
     driverProfile: user.driver ? {
       id: user.driver.id,
       vehiclePlate: user.driver.vehiclePlate,
@@ -68,35 +90,103 @@ async function resolveDistrict(tx, payload) {
 }
 
 export async function getAdminDashboard() {
-  const [users, drivers, schedules] = await Promise.all([
+  const [users, drivers, admins, schedules, activeAccounts, disabledAccounts, usersWithAddress] = await Promise.all([
     prisma.user.count({ where: { role: 'USER' } }),
     prisma.user.count({ where: { role: 'DRIVER' } }),
+    prisma.user.count({ where: { role: 'ADMIN' } }),
     prisma.wasteSchedule.count(),
+    prisma.user.count({ where: { isActive: true } }),
+    prisma.user.count({ where: { isActive: false } }),
+    prisma.userAddress.count(),
   ])
 
-  return { stats: { users, drivers, schedules } }
+  return { stats: { users, drivers, admins, schedules, activeAccounts, disabledAccounts, usersWithAddress } }
+}
+
+export async function listAdminAccounts(query = {}) {
+  const role = ['USER', 'DRIVER', 'ADMIN'].includes(query.role) ? query.role : undefined
+  const accounts = await prisma.user.findMany({
+    where: role ? { role } : undefined,
+    include: {
+      address: { include: { district: true } },
+      driver: { include: { district: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 150,
+  })
+
+  return { accounts: accounts.map(toAccount) }
+}
+
+export async function createAdminAccount(payload) {
+  if (payload.role === 'DRIVER') {
+    const driver = await registerDriver(payload)
+    return { account: { ...driver.user, driverProfile: driver.driverProfile } }
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email: payload.email } })
+  if (existing) throw new HttpError(409, 'Email sudah digunakan')
+
+  const passwordHash = await bcrypt.hash(payload.password, saltRounds)
+  const user = await prisma.user.create({
+    data: {
+      name: payload.name,
+      email: payload.email,
+      passwordHash,
+      role: payload.role,
+      ...(payload.role === 'USER' ? { pet: { create: {} } } : {}),
+    },
+    include: { address: { include: { district: true } }, driver: { include: { district: true } } },
+  })
+
+  return { account: toAccount(user) }
+}
+
+export async function updateAdminAccount(id, payload, actorId) {
+  const user = await prisma.user.findUnique({ where: { id }, include: { driver: true } })
+  if (!user) throw new HttpError(404, 'Akun tidak ditemukan')
+  if (id === actorId && payload.isActive === false) throw new HttpError(400, 'Admin tidak bisa menonaktifkan akun sendiri')
+
+  await prisma.$transaction(async (tx) => {
+    const district = payload.district && user.role === 'DRIVER' ? await resolveDistrict(tx, payload.district) : null
+
+    await tx.user.update({
+      where: { id },
+      data: {
+        ...(payload.name ? { name: payload.name } : {}),
+        ...(payload.email ? { email: payload.email } : {}),
+        ...(typeof payload.isActive === 'boolean' ? { isActive: payload.isActive } : {}),
+      },
+    })
+
+    if (user.role === 'DRIVER' && user.driver) {
+      await tx.driverProfile.update({
+        where: { id: user.driver.id },
+        data: {
+          ...(payload.vehiclePlate ? { vehiclePlate: payload.vehiclePlate } : {}),
+          ...(Object.prototype.hasOwnProperty.call(payload, 'vehicleType') ? { vehicleType: payload.vehicleType } : {}),
+          ...(district ? { districtId: district.id } : {}),
+        },
+      })
+    }
+  })
+
+  const updated = await prisma.user.findUnique({
+    where: { id },
+    include: { address: { include: { district: true } }, driver: { include: { district: true } } },
+  })
+
+  return { account: toAccount(updated) }
 }
 
 export async function listAdminUsers() {
   const users = await prisma.user.findMany({
-    where: { role: 'USER' },
-    include: { address: { include: { district: true } } },
+    include: { address: { include: { district: true } }, driver: { include: { district: true } } },
     orderBy: { createdAt: 'desc' },
     take: 100,
   })
 
-  return {
-    users: users.map((user) => ({
-      ...toPublicUser(user),
-      address: user.address ? {
-        id: user.address.id,
-        address: user.address.address,
-        latitude: user.address.latitude,
-        longitude: user.address.longitude,
-        district: toDistrict(user.address.district),
-      } : null,
-    })),
-  }
+  return { users: users.map(toAccount) }
 }
 
 export async function listAdminDrivers() {
@@ -146,6 +236,7 @@ export async function updateAdminDriver(userId, payload) {
 
 export async function listAdminSchedules() {
   const schedules = await prisma.wasteSchedule.findMany({
+    where: { districtId: null },
     include: { district: true },
     orderBy: [{ districtId: 'asc' }, { wasteCategory: 'asc' }],
     take: 200,
@@ -155,12 +246,9 @@ export async function listAdminSchedules() {
 }
 
 export async function createAdminSchedule(payload) {
-  const schedule = await prisma.$transaction(async (tx) => {
-    const district = payload.district ? await resolveDistrict(tx, payload.district) : null
-
-    return tx.wasteSchedule.create({
+  const schedule = await prisma.wasteSchedule.create({
       data: {
-        districtId: district?.id || null,
+        districtId: null,
         wasteCategory: payload.wasteCategory,
         pickupDay: payload.pickupDay,
         pickupTime: payload.pickupTime,
@@ -168,7 +256,6 @@ export async function createAdminSchedule(payload) {
       },
       include: { district: true },
     })
-  })
 
   return { schedule: toSchedule(schedule) }
 }
@@ -177,13 +264,10 @@ export async function updateAdminSchedule(id, payload) {
   const existing = await prisma.wasteSchedule.findUnique({ where: { id } })
   if (!existing) throw new HttpError(404, 'Jadwal tidak ditemukan')
 
-  const schedule = await prisma.$transaction(async (tx) => {
-    const district = payload.district ? await resolveDistrict(tx, payload.district) : null
-
-    return tx.wasteSchedule.update({
+  const schedule = await prisma.wasteSchedule.update({
       where: { id },
       data: {
-        ...(district ? { districtId: district.id } : {}),
+        districtId: null,
         ...(payload.wasteCategory ? { wasteCategory: payload.wasteCategory } : {}),
         ...(payload.pickupDay ? { pickupDay: payload.pickupDay } : {}),
         ...(payload.pickupTime ? { pickupTime: payload.pickupTime } : {}),
@@ -191,7 +275,6 @@ export async function updateAdminSchedule(id, payload) {
       },
       include: { district: true },
     })
-  })
 
   return { schedule: toSchedule(schedule) }
 }

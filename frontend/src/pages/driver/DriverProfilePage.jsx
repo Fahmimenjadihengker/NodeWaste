@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import AppCard from '../../components/AppCard.jsx'
-import { getDriverProfile } from '../../services/driverApi.js'
+import { getDriverProfile, updateDriverProfile } from '../../services/driverApi.js'
 
 const fallbackProfile = {
   user: null,
@@ -28,7 +28,9 @@ function InfoBlock({ label, value }) {
 function DriverProfilePage() {
   const { user: storedUser, onLogout } = useOutletContext()
   const [data, setData] = useState(fallbackProfile)
+  const [form, setForm] = useState({ name: '', email: '', vehiclePlate: '', vehicleType: '' })
   const [status, setStatus] = useState('loading')
+  const [feedback, setFeedback] = useState('')
   const user = data.user || storedUser
   const profile = data.driverProfile || fallbackProfile.driverProfile
   const district = profile.district
@@ -41,6 +43,12 @@ function DriverProfilePage() {
       .then((response) => {
         if (!isMounted) return
         setData(response.data || fallbackProfile)
+        setForm({
+          name: response.data?.user?.name || '',
+          email: response.data?.user?.email || '',
+          vehiclePlate: response.data?.driverProfile?.vehiclePlate || '',
+          vehicleType: response.data?.driverProfile?.vehicleType || '',
+        })
         setStatus('success')
       })
       .catch(() => {
@@ -51,6 +59,16 @@ function DriverProfilePage() {
       isMounted = false
     }
   }, [])
+
+  const handleSave = async () => {
+    try {
+      const response = await updateDriverProfile(form)
+      setData(response.data || fallbackProfile)
+      setFeedback('Profile driver berhasil diperbarui.')
+    } catch (error) {
+      setFeedback(error.message)
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
@@ -98,6 +116,28 @@ function DriverProfilePage() {
           <p className="mt-3 text-sm font-semibold leading-6 text-moss/65">
             Titik rumah di map hanya muncul jika user biasa mengisi alamat rumah, kecamatan, latitude, dan longitude di Profile mereka.
           </p>
+        </AppCard>
+      </section>
+
+      <section className="mt-8">
+        <AppCard>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Edit profile</p>
+          <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Akun dan kendaraan</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {[
+              ['name', 'Nama'],
+              ['email', 'Email'],
+              ['vehiclePlate', 'Plat kendaraan'],
+              ['vehicleType', 'Tipe kendaraan'],
+            ].map(([key, label]) => (
+              <label key={key} className="block">
+                <span className="text-sm font-black text-moss/70">{label}</span>
+                <input className="mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600" value={form[key]} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} />
+              </label>
+            ))}
+          </div>
+          <button className="mt-6 rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white" type="button" onClick={handleSave}>Simpan perubahan</button>
+          {feedback ? <p className="mt-4 text-sm font-bold text-moss/70">{feedback}</p> : null}
         </AppCard>
       </section>
     </div>

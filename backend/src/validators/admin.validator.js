@@ -3,6 +3,7 @@ import { HttpError } from '../utils/http-error.js'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const wasteCategories = ['ORGANIK', 'ANORGANIK', 'B3', 'DAUR_ULANG_RESIDU']
+const roles = ['USER', 'DRIVER', 'ADMIN']
 
 function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : ''
@@ -27,6 +28,44 @@ function normalizeDistrict(body) {
 
 export function validateAdminDriverCreatePayload(body) {
   return validateDriverRegisterPayload(body)
+}
+
+export function validateAdminAccountCreatePayload(body) {
+  const role = normalizeString(body?.role).toUpperCase() || 'USER'
+  if (!roles.includes(role)) throw new HttpError(400, 'Role akun tidak valid')
+
+  if (role === 'DRIVER') return { ...validateDriverRegisterPayload(body), role }
+
+  const name = normalizeString(body?.name)
+  const email = normalizeString(body?.email).toLowerCase()
+  const password = normalizeString(body?.password)
+
+  if (name.length < 2) throw new HttpError(400, 'Nama minimal 2 karakter')
+  if (!emailRegex.test(email)) throw new HttpError(400, 'Format email tidak valid')
+  if (password.length < 8) throw new HttpError(400, 'Password minimal 8 karakter')
+
+  return { name, email, password, role }
+}
+
+export function validateAdminAccountUpdatePayload(body) {
+  const payload = {}
+  const name = normalizeString(body?.name)
+  const email = normalizeString(body?.email).toLowerCase()
+  const vehiclePlate = normalizeString(body?.vehiclePlate).toUpperCase()
+  const vehicleType = normalizeString(body?.vehicleType)
+
+  if (name) payload.name = name
+  if (email) {
+    if (!emailRegex.test(email)) throw new HttpError(400, 'Format email tidak valid')
+    payload.email = email
+  }
+  if (typeof body?.isActive === 'boolean') payload.isActive = body.isActive
+  if (vehiclePlate) payload.vehiclePlate = vehiclePlate
+  if (body && Object.prototype.hasOwnProperty.call(body, 'vehicleType')) payload.vehicleType = vehicleType || null
+  if (body?.district) payload.district = normalizeDistrict(body.district)
+
+  if (!Object.keys(payload).length) throw new HttpError(400, 'Tidak ada data akun yang diubah')
+  return payload
 }
 
 export function validateAdminDriverUpdatePayload(body) {

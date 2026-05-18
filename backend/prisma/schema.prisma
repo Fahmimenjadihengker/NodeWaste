@@ -17,6 +17,7 @@ model User {
   xp           Int         @default(0)
   level        Int         @default(1)
   streak       Int         @default(0)
+  isActive     Boolean     @default(true) @map("is_active")
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @updatedAt @map("updated_at")
   activities   Activity[]

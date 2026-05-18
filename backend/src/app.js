@@ -7,6 +7,7 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import facilityRoutes from "./routes/facility.routes.js";
 import petRoutes from "./routes/pet.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
+import regionRoutes from "./routes/region.routes.js";
 import scheduleRoutes from "./routes/schedule.routes.js";
 import scanRoutes from "./routes/scan.routes.js";
 import driverRoutes from "./routes/driver.routes.js";
@@ -84,6 +85,7 @@ app.get("/api/health/db", async (_request, response) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/regions", regionRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/pet", petRoutes);
 app.use("/api/activities", activityRoutes);

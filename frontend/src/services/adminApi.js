@@ -5,7 +5,15 @@ export function getAdminDashboard() {
 }
 
 export function getAdminUsers() {
-  return apiRequest('/admin/users')
+  return apiRequest('/admin/accounts')
+}
+
+export function createAdminAccount(data) {
+  return apiRequest('/admin/accounts', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function updateAdminAccount(id, data) {
+  return apiRequest(`/admin/accounts/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 export function getAdminDrivers() {
@@ -22,4 +30,12 @@ export function getAdminSchedules() {
 
 export function createAdminSchedule(data) {
   return apiRequest('/admin/schedules', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function updateAdminSchedule(id, data) {
+  return apiRequest(`/admin/schedules/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export function deleteAdminSchedule(id) {
+  return apiRequest(`/admin/schedules/${id}`, { method: 'DELETE' })
 }

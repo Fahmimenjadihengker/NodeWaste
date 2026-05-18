@@ -60,12 +60,7 @@ export async function getUserSchedules(userId) {
   })
 
   const schedules = await prisma.wasteSchedule.findMany({
-    where: address?.districtId ? {
-      OR: [
-        { districtId: address.districtId },
-        { districtId: null },
-      ],
-    } : { districtId: null },
+    where: { districtId: null },
     include: { district: true },
     orderBy: [
       { districtId: 'desc' },

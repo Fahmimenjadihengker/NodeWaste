@@ -4,7 +4,17 @@ import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { getDashboard } from '../services/authApi.js'
-import { dashboardData } from '../services/dashboardData.js'
+const emptyDashboardData = {
+  stats: { ecoPoints: 0, xp: 0, nextLevelXp: 250, level: 1, streak: 0, totalScans: 0, validScans: 0 },
+  pet: { name: 'Leafy', level: 1, mood: 'happy', health: 80, happiness: 80, hunger: 30, cleanliness: 80 },
+  categories: [
+    { label: 'Organik', value: 0, color: 'bg-leaf-600' },
+    { label: 'Anorganik', value: 0, color: 'bg-[#7fa765]' },
+    { label: 'B3', value: 0, color: 'bg-honey' },
+  ],
+  activities: [],
+  scanActivity: { weekly: [], monthly: [] },
+}
 
 const scanCategorySegments = [
   { key: 'organik', label: 'Organik', colorClass: 'bg-leaf-600' },
@@ -149,7 +159,8 @@ function ScanActivityChart({ data, categories }) {
 
 function DashboardPage() {
   const { user } = useOutletContext()
-  const [data, setData] = useState(dashboardData)
+  const [data, setData] = useState(emptyDashboardData)
+  const [feedback, setFeedback] = useState('')
   const { stats, pet, categories, activities, scanActivity } = data
   const [leafyMood, setLeafyMood] = useState('idle')
   const clickTimesRef = useRef([])
@@ -163,7 +174,9 @@ function DashboardPage() {
       .then((response) => {
         if (isMounted) setData(response.data)
       })
-      .catch(() => {})
+      .catch((error) => {
+        if (isMounted) setFeedback(error.message)
+      })
 
     return () => {
       isMounted = false
@@ -195,6 +208,7 @@ function DashboardPage() {
           <p className="mt-5 max-w-2xl text-base leading-8 text-moss/70 sm:text-lg">
             Ini ringkasan kebiasaan memilahmu. Mulai scan berikutnya untuk menambah EcoPoints, XP, dan menjaga Leafy tetap bahagia.
           </p>
+          {feedback ? <p className="mt-4 rounded-2xl bg-[#fff3cf] p-4 text-sm font-bold text-moss">{feedback}</p> : null}
 
           <Link className="mt-8 inline-flex w-full justify-center rounded-full bg-leaf-600 px-7 py-4 font-black text-white transition hover:bg-leaf-900 sm:w-auto" to="/scan">
             Scan Sampah

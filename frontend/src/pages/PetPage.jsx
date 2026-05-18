@@ -3,7 +3,6 @@ import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { getPet, runPetAction } from '../services/authApi.js'
-import { dashboardData } from '../services/dashboardData.js'
 
 const petActions = [
   {
@@ -111,17 +110,14 @@ function ActivityLog({ items }) {
 }
 
 function PetPage() {
-  const [ecoPoints, setEcoPoints] = useState(dashboardData.stats.ecoPoints)
-  const [pet, setPet] = useState({ ...dashboardData.pet, xp: 45, nextLevelXp: 100 })
+  const [ecoPoints, setEcoPoints] = useState(0)
+  const [pet, setPet] = useState({ name: 'Leafy', level: 1, mood: 'happy', health: 80, happiness: 80, hunger: 30, cleanliness: 80, xp: 0, nextLevelXp: 100 })
   const [lastMood, setLastMood] = useState('happy')
   const [avatarMood, setAvatarMood] = useState('idle')
-  const [feedback, setFeedback] = useState('Leafy siap dirawat hari ini.')
+  const [feedback, setFeedback] = useState('Memuat data Leafy...')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
-  const [logs, setLogs] = useState([
-    { title: 'Leafy diberi makan', meta: '-20 EcoPoints', time: 'Kemarin' },
-    { title: 'Leafy ikut progres scan', meta: '+10 XP dari aktivitas memilah', time: '2 hari lalu' },
-  ])
+  const [logs, setLogs] = useState([])
   const mood = getPetMood(pet, lastMood)
   const moodInfo = moodCopy[mood]
   const satiety = 100 - pet.hunger
@@ -144,8 +140,11 @@ function PetPage() {
         setEcoPoints(response.data.ecoPoints)
         setPet(response.data.pet)
         setLogs(response.data.activities)
+        setFeedback('Leafy siap dirawat hari ini.')
       })
-      .catch(() => {})
+      .catch((error) => {
+        if (isMounted) setFeedback(error.message)
+      })
 
     return () => {
       isMounted = false

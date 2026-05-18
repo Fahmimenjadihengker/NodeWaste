@@ -1,12 +1,15 @@
 import { Router } from 'express'
 import {
   createDriver,
+  createAccount,
   createSchedule,
   deleteSchedule,
   getCurrentAdminDashboard,
+  listAccounts,
   listDrivers,
   listSchedules,
   listUsers,
+  updateAccount,
   updateDriver,
   updateSchedule,
 } from '../controllers/admin.controller.js'
@@ -16,6 +19,9 @@ const router = Router()
 
 router.use(authMiddleware, requireRole('ADMIN'))
 router.get('/dashboard', getCurrentAdminDashboard)
+router.get('/accounts', listAccounts)
+router.post('/accounts', createAccount)
+router.put('/accounts/:id', updateAccount)
 router.get('/users', listUsers)
 router.get('/drivers', listDrivers)
 router.post('/drivers', createDriver)

@@ -18,6 +18,7 @@ function toPublicUser(user) {
     xp: user.xp,
     level: user.level,
     streak: user.streak,
+    isActive: user.isActive,
   }
 }
 
@@ -175,6 +176,10 @@ export async function loginUser(payload) {
     throw new HttpError(401, 'Email atau password salah')
   }
 
+  if (!user.isActive) {
+    throw new HttpError(403, 'Akun dinonaktifkan')
+  }
+
   const isPasswordValid = await bcrypt.compare(payload.password, user.passwordHash)
 
   if (!isPasswordValid) {
@@ -199,6 +204,10 @@ export async function getCurrentAuthUser(userId) {
 
   if (!user) {
     throw new HttpError(404, 'User tidak ditemukan')
+  }
+
+  if (!user.isActive) {
+    throw new HttpError(403, 'Akun dinonaktifkan')
   }
 
   return {

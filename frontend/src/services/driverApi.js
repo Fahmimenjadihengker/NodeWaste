@@ -11,3 +11,10 @@ export function getDriverMap() {
 export function getDriverProfile() {
   return apiRequest('/driver/profile')
 }
+
+export function updateDriverProfile(data) {
+  return apiRequest('/driver/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}

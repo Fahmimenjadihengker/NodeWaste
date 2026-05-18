@@ -20,6 +20,10 @@ export async function authMiddleware(request, _response, next) {
       throw new HttpError(401, 'User tidak ditemukan')
     }
 
+    if (!user.isActive) {
+      throw new HttpError(403, 'Akun dinonaktifkan')
+    }
+
     request.user = user
     next()
   } catch (error) {
