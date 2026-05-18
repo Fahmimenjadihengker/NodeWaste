@@ -2,6 +2,7 @@ import {
   createAdminDriver,
   createAdminAccount,
   createAdminSchedule,
+  deleteAdminAccount,
   deleteAdminSchedule,
   getAdminDashboard,
   listAdminAccounts,
@@ -51,6 +52,14 @@ export async function updateAccount(request, response, next) {
   try {
     const payload = validateAdminAccountUpdatePayload(request.body)
     response.json({ success: true, message: 'Akun berhasil diperbarui', data: await updateAdminAccount(request.params.id, payload, request.user.id) })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function deleteAccount(request, response, next) {
+  try {
+    response.json({ success: true, message: 'Akun berhasil dihapus permanen', data: await deleteAdminAccount(request.params.id, request.user.id) })
   } catch (error) {
     next(error)
   }

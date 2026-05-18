@@ -3,6 +3,7 @@ import {
   createDriver,
   createAccount,
   createSchedule,
+  deleteAccount,
   deleteSchedule,
   getCurrentAdminDashboard,
   listAccounts,
@@ -22,6 +23,7 @@ router.get('/dashboard', getCurrentAdminDashboard)
 router.get('/accounts', listAccounts)
 router.post('/accounts', createAccount)
 router.put('/accounts/:id', updateAccount)
+router.delete('/accounts/:id', deleteAccount)
 router.get('/users', listUsers)
 router.get('/drivers', listDrivers)
 router.post('/drivers', createDriver)

@@ -179,6 +179,25 @@ export async function updateAdminAccount(id, payload, actorId) {
   return { account: toAccount(updated) }
 }
 
+export async function deleteAdminAccount(id, actorId) {
+  if (id === actorId) throw new HttpError(400, 'Admin tidak bisa menghapus akun sendiri')
+
+  const user = await prisma.user.findUnique({ where: { id } })
+  if (!user) throw new HttpError(404, 'Akun tidak ditemukan')
+
+  await prisma.$transaction(async (tx) => {
+    await tx.activity.deleteMany({ where: { userId: id } })
+    await tx.scan.deleteMany({ where: { userId: id } })
+    await tx.petAction.deleteMany({ where: { userId: id } })
+    await tx.pet.deleteMany({ where: { userId: id } })
+    await tx.userAddress.deleteMany({ where: { userId: id } })
+    await tx.driverProfile.deleteMany({ where: { userId: id } })
+    await tx.user.delete({ where: { id } })
+  })
+
+  return { deleted: true }
+}
+
 export async function listAdminUsers() {
   const users = await prisma.user.findMany({
     include: { address: { include: { district: true } }, driver: { include: { district: true } } },

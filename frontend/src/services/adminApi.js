@@ -31,6 +31,11 @@ export function updateAdminAccount(id, data) {
   return apiRequest(`/admin/accounts/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
+export function deleteAdminAccount(id) {
+  accountsCache = null
+  return apiRequest(`/admin/accounts/${id}`, { method: 'DELETE' })
+}
+
 export function getAdminDrivers() {
   return apiRequest('/admin/drivers')
 }
