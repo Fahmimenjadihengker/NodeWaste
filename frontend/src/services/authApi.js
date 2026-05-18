@@ -32,6 +32,16 @@ export function updateProfilePassword(data) {
   })
 }
 
+export function updateProfilePhoto(file) {
+  const formData = new FormData()
+  formData.append('photo', file)
+
+  return apiRequest('/profile/photo', {
+    method: 'PUT',
+    body: formData,
+  })
+}
+
 export function getDashboard() {
   return apiRequest('/dashboard')
 }

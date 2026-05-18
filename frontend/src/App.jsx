@@ -17,6 +17,7 @@ import DashboardPage from './pages/DashboardPage.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import PetPage from './pages/PetPage.jsx'
+import ProfileEditPage from './pages/ProfileEditPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
 import SchedulePage from './pages/SchedulePage.jsx'
@@ -48,6 +49,7 @@ function App() {
           <Route path="/pet" element={<PetPage />} />
           <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/edit" element={<ProfileEditPage />} />
         </Route>
       </Routes>
       <PwaInstallPrompt />

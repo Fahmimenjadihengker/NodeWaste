@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import AppCard from '../components/AppCard.jsx'
 import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getSchedules } from '../services/authApi.js'
 
@@ -163,13 +162,9 @@ function SchedulePage() {
   }, [])
 
   const showTemporaryBadge = scheduleState.isDummy || scheduleState.isFallback
-  const districtLabel = scheduleState.district
-    ? `${scheduleState.district.name}${scheduleState.district.city ? `, ${scheduleState.district.city}` : ''}`
-    : 'Semua wilayah'
-
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
-      <section className="grid gap-6 lg:grid-cols-[0.9fr_0.45fr]">
+      <section>
         <div>
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Jadwal sampah</p>
@@ -178,21 +173,7 @@ function SchedulePage() {
           <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] text-leaf-900 sm:text-5xl lg:text-6xl">
             Keluarkan sampah di waktu yang tepat.
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-moss/70 sm:text-lg">
-            Jadwal ini membantu kamu memilah kapan sampah organik, anorganik, B3, dan daur ulang/residu sebaiknya dikeluarkan dari rumah.
-          </p>
         </div>
-
-        <AppCard>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Aturan utama</p>
-          <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Pagi hari, bukan malam.</h2>
-          <p className="mt-3 text-sm leading-6 text-moss/65">
-            Siapkan sampah sesuai kategori, lalu keluarkan pada pagi hari sebelum jadwal pengangkutan agar tidak tercecer, berbau, atau mengundang hewan.
-          </p>
-          <div className="mt-5 rounded-2xl bg-[#f5f1df] px-4 py-3 text-sm font-black text-leaf-900">
-            Wilayah: {districtLabel}
-          </div>
-        </AppCard>
       </section>
 
       <section className="mt-8">

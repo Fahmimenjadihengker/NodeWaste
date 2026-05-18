@@ -1,4 +1,4 @@
-import { getProfile, updatePassword, updateProfile } from '../services/profile.service.js'
+import { getProfile, updatePassword, updateProfile, updateProfilePhoto } from '../services/profile.service.js'
 import { validatePasswordUpdatePayload, validateProfileUpdatePayload } from '../validators/profile.validator.js'
 
 export async function getCurrentProfile(request, response, next) {
@@ -37,6 +37,20 @@ export async function updateCurrentPassword(request, response, next) {
       success: true,
       message: 'Password berhasil diperbarui',
       data: { updated: true },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function updateCurrentProfilePhoto(request, response, next) {
+  try {
+    const user = await updateProfilePhoto(request.user, request.file)
+
+    response.json({
+      success: true,
+      message: 'Foto profile berhasil diperbarui',
+      data: { user },
     })
   } catch (error) {
     next(error)

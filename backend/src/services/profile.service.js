@@ -156,3 +156,16 @@ export async function updatePassword(user, payload) {
 
   return { updated: true }
 }
+
+export async function updateProfilePhoto(user, file) {
+  if (!file) throw new HttpError(400, 'Foto profile wajib diunggah')
+  if (!file.mimetype.startsWith('image/')) throw new HttpError(400, 'File harus berupa gambar')
+
+  const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`
+  const updatedUser = await prisma.user.update({
+    where: { id: user.id },
+    data: { profilePhotoUrl: dataUrl },
+  })
+
+  return toPublicUser(updatedUser)
+}

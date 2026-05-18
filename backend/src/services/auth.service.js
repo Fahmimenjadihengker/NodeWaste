@@ -19,6 +19,7 @@ function toPublicUser(user) {
     level: user.level,
     streak: user.streak,
     isActive: user.isActive,
+    profilePhotoUrl: user.profilePhotoUrl,
   }
 }
 
