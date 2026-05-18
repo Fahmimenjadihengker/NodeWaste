@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import AppCard from '../components/AppCard.jsx'
+import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getSchedules } from '../services/authApi.js'
 
 const fallbackSchedules = [
@@ -201,9 +202,7 @@ function SchedulePage() {
           </p>
         ) : null}
         {scheduleState.isLoading ? (
-          <div className="rounded-[1.25rem] border border-moss/10 bg-white/70 p-6 text-sm font-black text-moss/60">
-            Memuat jadwal...
-          </div>
+          <SkeletonCard className="min-h-72" />
         ) : (
           <ScheduleTable schedules={scheduleState.schedules} />
         )}

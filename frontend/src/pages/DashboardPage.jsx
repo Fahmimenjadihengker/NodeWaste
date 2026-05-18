@@ -3,6 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
+import { SkeletonCard, SkeletonText } from '../components/Skeleton.jsx'
 import { getDashboard } from '../services/authApi.js'
 const emptyDashboardData = {
   stats: { ecoPoints: 0, xp: 0, nextLevelXp: 250, level: 1, streak: 0, totalScans: 0, validScans: 0 },
@@ -161,6 +162,7 @@ function DashboardPage() {
   const { user } = useOutletContext()
   const [data, setData] = useState(emptyDashboardData)
   const [feedback, setFeedback] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
   const { stats, pet, categories, activities, scanActivity } = data
   const [leafyMood, setLeafyMood] = useState('idle')
   const clickTimesRef = useRef([])
@@ -176,6 +178,9 @@ function DashboardPage() {
       })
       .catch((error) => {
         if (isMounted) setFeedback(error.message)
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false)
       })
 
     return () => {
@@ -215,9 +220,7 @@ function DashboardPage() {
           </Link>
 
           <div className="mt-10 grid gap-5 border-y border-moss/15 py-7 sm:grid-cols-3">
-            <StatBlock label="EcoPoints" value={stats.ecoPoints} helper="Siap dipakai merawat Leafy" />
-            <StatBlock label="Streak" value={`${stats.streak} hari`} helper="Pertahankan hari ini" />
-            <StatBlock label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} />
+            {isLoading ? <><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /></> : <><StatBlock label="EcoPoints" value={stats.ecoPoints} helper="Siap dipakai merawat Leafy" /><StatBlock label="Streak" value={`${stats.streak} hari`} helper="Pertahankan hari ini" /><StatBlock label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} /></>}
           </div>
 
         </section>
@@ -243,10 +246,7 @@ function DashboardPage() {
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
           <AppCard>
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Progress level</h2>
-            <p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p>
-            <div className="mt-8">
-              <ProgressLine label="XP menuju level berikutnya" value={xpProgress} />
-            </div>
+            {isLoading ? <div className="mt-4 space-y-4"><SkeletonText className="w-2/3" /><SkeletonText className="h-8 w-full" /></div> : <><p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p><div className="mt-8"><ProgressLine label="XP menuju level berikutnya" value={xpProgress} /></div></>}
           </AppCard>
 
           <AppCard>

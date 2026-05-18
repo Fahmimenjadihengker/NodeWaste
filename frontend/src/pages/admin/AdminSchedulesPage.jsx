@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import AdminTable from '../../components/admin/AdminTable.jsx'
-import { createAdminSchedule, deleteAdminSchedule, getAdminSchedules, updateAdminSchedule } from '../../services/adminApi.js'
+import { createAdminSchedule, deleteAdminSchedule, getCachedAdminSchedules, loadAdminSchedules, updateAdminSchedule } from '../../services/adminApi.js'
 
 const emptyForm = { id: '', wasteCategory: 'ORGANIK', pickupDay: '', pickupTime: '', instruction: '' }
 const inputClass = 'rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-700 focus:ring-4 focus:ring-leaf-900/10'
@@ -18,11 +18,17 @@ function CategoryBadge({ category }) {
 }
 
 function AdminSchedulesPage() {
-  const [schedules, setSchedules] = useState([])
+  const [schedules, setSchedules] = useState(() => getCachedAdminSchedules() || [])
   const [form, setForm] = useState(emptyForm)
   const [feedback, setFeedback] = useState('')
+  const [isLoading, setIsLoading] = useState(!getCachedAdminSchedules())
 
-  const loadSchedules = () => getAdminSchedules().then((response) => setSchedules(response.data.schedules)).catch(() => {})
+  const loadSchedules = () => {
+    return loadAdminSchedules()
+      .then((response) => setSchedules(response.data.schedules))
+      .catch(() => {})
+      .finally(() => setIsLoading(false))
+  }
 
   useEffect(() => {
     loadSchedules()
@@ -38,6 +44,7 @@ function AdminSchedulesPage() {
         setFeedback('Jadwal berhasil dibuat.')
       }
       setForm(emptyForm)
+      setIsLoading(true)
       loadSchedules()
     } catch (error) {
       setFeedback(error.message)
@@ -53,6 +60,7 @@ function AdminSchedulesPage() {
     try {
       await deleteAdminSchedule(schedule.id)
       setFeedback('Jadwal berhasil dihapus.')
+      setIsLoading(true)
       loadSchedules()
     } catch (error) {
       setFeedback(error.message)
@@ -61,7 +69,7 @@ function AdminSchedulesPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
-      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#fffdf4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
+      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Manajemen jadwal</p>
@@ -86,7 +94,7 @@ function AdminSchedulesPage() {
             <input className={inputClass} placeholder="Instruksi" value={form.instruction} onChange={(event) => setForm((current) => ({ ...current, instruction: event.target.value }))} />
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <button className="rounded-full bg-leaf-800 px-6 py-3 text-sm font-black text-cream shadow-lg shadow-leaf-950/15 transition hover:bg-moss" type="button" onClick={submit}>{form.id ? 'Simpan jadwal' : 'Buat jadwal'}</button>
+            <button className="rounded-full bg-[#edf5e4] px-6 py-3 text-sm font-black text-leaf-900 shadow-lg shadow-leaf-950/10 transition hover:bg-[#e2edd8]" type="button" onClick={submit}>{form.id ? 'Simpan jadwal' : 'Buat jadwal'}</button>
           </div>
           {feedback ? <p className="mt-4 rounded-2xl bg-[#edf5e4] px-4 py-3 text-sm font-bold text-moss/75">{feedback}</p> : null}
         </div>
@@ -97,10 +105,9 @@ function AdminSchedulesPage() {
               <p className="text-xs font-black uppercase tracking-[0.2em] text-leaf-700">Daftar jadwal</p>
               <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">{schedules.length} jadwal global</h2>
             </div>
-            <span className="rounded-full bg-[#edf5e4] px-4 py-2 text-xs font-black text-leaf-900">Semua wilayah</span>
           </div>
           <div>
-            <AdminTable columns={[{ key: 'category', label: 'Kategori', render: (row) => <CategoryBadge category={row.wasteCategory} /> }, { key: 'day', label: 'Hari', render: (row) => <span className="font-black text-leaf-950">{row.pickupDay}</span> }, { key: 'time', label: 'Jam', render: (row) => row.pickupTime }, { key: 'district', label: 'Wilayah', render: () => 'Semua wilayah' }, { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><button className="rounded-full bg-[#edf5e4] px-3 py-2 text-xs font-black text-leaf-900" type="button" onClick={() => editSchedule(row)}>Edit</button><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => removeSchedule(row)}>Hapus</button></div> }]} rows={schedules} emptyText="Belum ada jadwal." />
+            <AdminTable isLoading={isLoading} columns={[{ key: 'category', label: 'Kategori', render: (row) => <CategoryBadge category={row.wasteCategory} /> }, { key: 'day', label: 'Hari', render: (row) => <span className="font-black text-leaf-950">{row.pickupDay}</span> }, { key: 'time', label: 'Jam', render: (row) => row.pickupTime }, { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><button className="rounded-full bg-[#edf5e4] px-3 py-2 text-xs font-black text-leaf-900" type="button" onClick={() => editSchedule(row)}>Edit</button><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => removeSchedule(row)}>Hapus</button></div> }]} rows={schedules} emptyText="Belum ada jadwal." />
           </div>
         </div>
       </section>

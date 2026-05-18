@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import AppCard from '../../components/AppCard.jsx'
+import { SkeletonCard, SkeletonText } from '../../components/Skeleton.jsx'
 import { getDriverProfile, updateDriverProfile } from '../../services/driverApi.js'
 
 const fallbackProfile = {
@@ -84,7 +85,7 @@ function DriverProfilePage() {
               <p className="mt-3 text-base font-semibold text-moss/60">{user?.email || '-'}</p>
             </div>
           </div>
-          {status === 'loading' ? <p className="mt-6 text-sm font-bold text-moss/55">Memuat profile driver...</p> : null}
+          {status === 'loading' ? <div className="mt-6 max-w-xl space-y-3"><SkeletonText className="w-2/3" /><SkeletonText className="w-1/2" /></div> : null}
           {status === 'error' ? <p className="mt-6 rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800">Profile driver belum bisa dimuat.</p> : null}
         </AppCard>
 
@@ -103,10 +104,7 @@ function DriverProfilePage() {
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Data operasional</p>
           <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Kendaraan dan wilayah</h2>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <InfoBlock label="Plat kendaraan" value={profile.vehiclePlate} />
-            <InfoBlock label="Tipe kendaraan" value={profile.vehicleType} />
-            <InfoBlock label="Wilayah kerja" value={districtLabel} />
-            <InfoBlock label="Role" value="DRIVER" />
+            {status === 'loading' ? <><SkeletonCard className="min-h-24" /><SkeletonCard className="min-h-24" /><SkeletonCard className="min-h-24" /><SkeletonCard className="min-h-24" /></> : <><InfoBlock label="Plat kendaraan" value={profile.vehiclePlate} /><InfoBlock label="Tipe kendaraan" value={profile.vehicleType} /><InfoBlock label="Wilayah kerja" value={districtLabel} /><InfoBlock label="Role" value="DRIVER" /></>}
           </div>
         </AppCard>
 

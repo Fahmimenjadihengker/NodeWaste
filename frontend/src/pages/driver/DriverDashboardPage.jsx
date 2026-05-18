@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../../components/AppCard.jsx'
+import { SkeletonCard, SkeletonText } from '../../components/Skeleton.jsx'
 import { getDriverDashboard } from '../../services/driverApi.js'
 
 const fallbackData = {
@@ -71,7 +72,7 @@ function DriverDashboardPage() {
               Data dashboard belum bisa dimuat. Pastikan akun driver memiliki profile wilayah.
             </p>
           ) : null}
-          {status === 'loading' ? <p className="mt-5 text-sm font-bold text-moss/55">Memuat ringkasan driver...</p> : null}
+          {status === 'loading' ? <div className="mt-6 max-w-xl space-y-3"><SkeletonText className="w-3/4" /><SkeletonText className="w-1/2" /></div> : null}
         </div>
 
         <AppCard tone="leaf" className="p-6 sm:p-7">
@@ -91,8 +92,7 @@ function DriverDashboardPage() {
       </section>
 
       <section className="mt-6 grid gap-5 sm:grid-cols-2">
-        <StatCard label="Rumah dalam wilayah" value={data.stats?.housesInDistrict ?? 0} helper="Total alamat user yang masuk district driver aktif." />
-        <StatCard label="Tempat pengolahan" value={data.stats?.processingSites ?? 0} helper="Tujuan operasional yang tersedia untuk wilayah ini atau umum." />
+        {status === 'loading' ? <><SkeletonCard /><SkeletonCard /></> : <><StatCard label="Rumah dalam wilayah" value={data.stats?.housesInDistrict ?? 0} helper="Total alamat user yang masuk district driver aktif." /><StatCard label="Tempat pengolahan" value={data.stats?.processingSites ?? 0} helper="Tujuan operasional yang tersedia untuk wilayah ini atau umum." /></>}
       </section>
 
       <section className="mt-6 rounded-[1.5rem] border border-moss/10 bg-white/70 p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)] sm:p-8">

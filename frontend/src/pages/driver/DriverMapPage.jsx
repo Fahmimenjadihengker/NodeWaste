@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import AppCard from '../../components/AppCard.jsx'
 import MapCN from '../../components/driver/MapCN.jsx'
+import { SkeletonCard, SkeletonText } from '../../components/Skeleton.jsx'
 import { getDriverMap } from '../../services/driverApi.js'
 
 const fallbackData = {
@@ -44,7 +45,7 @@ function DriverMapPage() {
           <p className="mt-5 max-w-2xl text-base leading-8 text-moss/70 sm:text-lg">
             Satu map operasional untuk melihat rumah user biasa yang sudah mengisi alamat dan tempat TPS/pengolahan di {districtLabel}.
           </p>
-          {status === 'loading' ? <p className="mt-4 text-sm font-bold text-moss/55">Memuat map driver...</p> : null}
+          {status === 'loading' ? <div className="mt-5 max-w-xl space-y-3"><SkeletonText className="w-3/4" /><SkeletonText className="w-1/2" /></div> : null}
           {status === 'error' ? <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800">Map belum bisa dimuat. Coba ulang setelah backend aktif.</p> : null}
         </div>
 
@@ -64,7 +65,7 @@ function DriverMapPage() {
       </section>
 
       <section className="mt-8">
-        <MapCN houses={data.houses} processingSites={data.processingSites} />
+        {status === 'loading' ? <SkeletonCard className="min-h-[26rem]" /> : <MapCN houses={data.houses} processingSites={data.processingSites} />}
       </section>
 
       <section className="mt-6 grid gap-4 lg:grid-cols-2">
