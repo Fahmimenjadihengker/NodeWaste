@@ -77,6 +77,10 @@ export function getStoredUser() {
   }
 }
 
+export function getRoleHomePath(user) {
+  return user?.role === 'COLLECTOR' ? '/collector/dashboard' : '/dashboard'
+}
+
 export function clearAuthSession() {
   localStorage.removeItem('nodewaste_token')
   localStorage.removeItem('nodewaste_user')

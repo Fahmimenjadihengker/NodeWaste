@@ -2,6 +2,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import AppShell from './components/AppShell.jsx'
 import PwaInstallPrompt from './components/PwaInstallPrompt.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import PublicRoute from './components/PublicRoute.jsx'
+import CollectorDashboardPage from './pages/CollectorDashboardPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
@@ -15,10 +17,13 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
         <Route element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
+          <Route path="/collector/dashboard" element={<ProtectedRoute allowedRoles={['COLLECTOR']}><CollectorDashboardPage /></ProtectedRoute>} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['USER']}><AppShell /></ProtectedRoute>}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/scan" element={<ScanPage />} />
           <Route path="/pet" element={<PetPage />} />

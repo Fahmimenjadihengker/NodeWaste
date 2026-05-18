@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import AuthField from '../components/AuthField.jsx'
 import FeedbackMessage from '../components/FeedbackMessage.jsx'
 import AuthLayout from './AuthLayout.jsx'
-import { loginUser, saveAuthSession } from '../services/authApi.js'
+import { getRoleHomePath, loginUser, saveAuthSession } from '../services/authApi.js'
 
 function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
@@ -24,7 +24,7 @@ function LoginPage() {
     try {
       const response = await loginUser(form)
       saveAuthSession(response.data)
-      navigate('/dashboard')
+      navigate(getRoleHomePath(response.data.user))
     } catch (error) {
       setStatus({ type: 'error', message: error.message })
     } finally {
