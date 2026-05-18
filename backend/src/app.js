@@ -6,6 +6,9 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import facilityRoutes from "./routes/facility.routes.js";
 import petRoutes from "./routes/pet.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
+import scheduleRoutes from "./routes/schedule.routes.js";
+import scanRoutes from "./routes/scan.routes.js";
+import collectorRoutes from "./routes/collector.routes.js";
 import prisma from "./config/prisma.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerDocument } from "./config/swagger.js";
@@ -82,8 +85,11 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/pet", petRoutes);
 app.use("/api/activities", activityRoutes);
+app.use("/api/schedules", scheduleRoutes);
+app.use("/api/scans", scanRoutes);
+app.use("/api/collector", collectorRoutes);
 app.use("/api/recycling-facilities", facilityRoutes);
-app.use(errorMiddleware);
+
 // Dokumentasi Swagger UI
 app.use(
   "/api-docs",
@@ -92,10 +98,6 @@ app.use(
     customSiteTitle: "NodeWaste API Docs",
   }),
 );
-
-// Daftarkan Routes yang sudah ada...
-app.use("/api/auth", authRoutes);
-app.use("/api/profile", profileRoutes);
-// ...dan seterusnya
+app.use(errorMiddleware);
 
 export default app;

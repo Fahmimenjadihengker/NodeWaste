@@ -1,14 +1,12 @@
 import { getProfile, updatePassword, updateProfile } from '../services/profile.service.js'
 import { validatePasswordUpdatePayload, validateProfileUpdatePayload } from '../validators/profile.validator.js'
 
-export function getCurrentProfile(request, response, next) {
+export async function getCurrentProfile(request, response, next) {
   try {
     response.json({
       success: true,
       message: 'Profile berhasil diambil',
-      data: {
-        user: getProfile(request.user),
-      },
+      data: await getProfile(request.user),
     })
   } catch (error) {
     next(error)

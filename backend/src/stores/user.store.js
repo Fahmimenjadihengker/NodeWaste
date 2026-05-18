@@ -12,13 +12,13 @@ export async function findUserByIdWithPassword(id) {
   return prisma.user.findUnique({ where: { id } })
 }
 
-export async function createUser(user) {
+export async function createUser(user, options = {}) {
+  const withPet = options.withPet !== false
+
   return prisma.user.create({
     data: {
       ...user,
-      pet: {
-        create: {},
-      },
+      ...(withPet ? { pet: { create: {} } } : {}),
     },
   })
 }

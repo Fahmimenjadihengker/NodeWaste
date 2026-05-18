@@ -40,6 +40,9 @@ export async function saveScanResult(userId, scanData, points, xp) {
         userId,
         scanId: scan.id,
         type: "SCAN", // Pastikan enum atau tipe di DB sesuai
+        title: `Scan ${scan.label}`,
+        meta: `+${points} EcoPoints, +${xp} XP`,
+        detail: `Kategori: ${scan.category}, confidence ${scan.confidence}%`,
       },
     });
 

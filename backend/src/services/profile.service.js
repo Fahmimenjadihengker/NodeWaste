@@ -1,12 +1,39 @@
 import bcrypt from 'bcryptjs'
+import prisma from '../config/prisma.js'
 import { toPublicUser } from './auth.service.js'
 import { findUserByEmail, findUserByIdWithPassword, updatePasswordById, updateUserById } from '../stores/user.store.js'
 import { HttpError } from '../utils/http-error.js'
 
 const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS || 10)
 
-export function getProfile(user) {
-  return toPublicUser(user)
+function emptyCategoryCounts() {
+  return { organik: 0, anorganik: 0, b3: 0 }
+}
+
+export async function getProfile(user) {
+  const scans = await prisma.scan.findMany({
+    where: { userId: user.id },
+    select: { category: true, isValid: true },
+  })
+  const categoryCounts = emptyCategoryCounts()
+
+  for (const scan of scans) {
+    const key = scan.category.toLowerCase()
+    categoryCounts[key] = (categoryCounts[key] || 0) + 1
+  }
+
+  return {
+    user: toPublicUser(user),
+    stats: {
+      ecoPoints: user.ecoPoints,
+      xp: user.xp,
+      level: user.level,
+      streak: user.streak,
+      totalScans: scans.length,
+      validScans: scans.filter((scan) => scan.isValid).length,
+      categories: categoryCounts,
+    },
+  }
 }
 
 export async function updateProfile(user, payload) {

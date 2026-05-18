@@ -20,11 +20,99 @@ model User {
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @updatedAt @map("updated_at")
   activities   Activity[]
+  address      UserAddress?
+  collector    CollectorProfile?
   petActions   PetAction[]
   pet          Pet?
   scans        Scan[]
 
   @@map("users")
+}
+
+model District {
+  id        String   @id @default(uuid())
+  name      String
+  city      String?
+  province  String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  collectors      CollectorProfile[]
+  processingSites ProcessingSite[]
+  userAddresses   UserAddress[]
+  wasteSchedules  WasteSchedule[]
+
+  @@unique([name, city])
+  @@map("districts")
+}
+
+model CollectorProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique @map("user_id")
+  vehiclePlate String   @unique @map("vehicle_plate")
+  vehicleType  String?  @map("vehicle_type")
+  districtId   String   @map("district_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([districtId])
+  @@map("collector_profiles")
+}
+
+model UserAddress {
+  id            String   @id @default(uuid())
+  userId        String   @unique @map("user_id")
+  districtId    String   @map("district_id")
+  address       String
+  latitude      Float
+  longitude     Float
+  frontPhotoUrl String?  @map("front_photo_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  district District @relation(fields: [districtId], references: [id], onDelete: Restrict)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([districtId])
+  @@map("user_addresses")
+}
+
+model WasteSchedule {
+  id            String   @id @default(uuid())
+  districtId    String?  @map("district_id")
+  wasteCategory String   @map("waste_category")
+  pickupDay     String   @map("pickup_day")
+  pickupTime    String   @map("pickup_time")
+  instruction   String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  district District? @relation(fields: [districtId], references: [id], onDelete: SetNull)
+
+  @@index([districtId])
+  @@map("waste_schedules")
+}
+
+model ProcessingSite {
+  id                      String         @id @default(uuid())
+  districtId              String?        @map("district_id")
+  name                    String
+  address                 String
+  latitude                Float
+  longitude               Float
+  photoUrl                String?        @map("photo_url")
+  acceptedWasteCategories Json           @map("accepted_waste_categories")
+  capacityStatus          CapacityStatus @default(AVAILABLE) @map("capacity_status")
+  createdAt               DateTime       @default(now()) @map("created_at")
+  updatedAt               DateTime       @updatedAt @map("updated_at")
+
+  district District? @relation(fields: [districtId], references: [id], onDelete: SetNull)
+
+  @@index([districtId])
+  @@map("processing_sites")
 }
 
 model Pet {
@@ -117,7 +205,14 @@ model RecyclingFacility {
 
 enum UserRole {
   USER
-  ADMIN
+  COLLECTOR
+}
+
+enum CapacityStatus {
+  AVAILABLE
+  NEAR_FULL
+  FULL
+  OVERLOADED
 }
 
 enum WasteCategory {

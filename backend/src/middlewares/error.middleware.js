@@ -1,5 +1,5 @@
 export function errorMiddleware(error, _request, response, _next) {
-  const statusCode = error.statusCode || 500
+  const statusCode = error.statusCode || (error.code === 'LIMIT_FILE_SIZE' ? 413 : 500)
   const isPrismaKnownError = error.code && String(error.code).startsWith('P')
 
   if (statusCode === 500) {

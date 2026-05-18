@@ -26,6 +26,34 @@ export function validateRegisterPayload(body) {
   return { name, email, password }
 }
 
+export function validateCollectorRegisterPayload(body) {
+  const basePayload = validateRegisterPayload(body)
+  const vehiclePlate = normalizeString(body?.vehiclePlate).toUpperCase()
+  const vehicleType = normalizeString(body?.vehicleType)
+  const districtId = normalizeString(body?.districtId)
+  const districtName = normalizeString(body?.districtName)
+  const city = normalizeString(body?.city)
+  const province = normalizeString(body?.province)
+
+  if (vehiclePlate.length < 4) {
+    throw new HttpError(400, 'Plat kendaraan minimal 4 karakter')
+  }
+
+  if (!districtId && districtName.length < 2) {
+    throw new HttpError(400, 'District atau nama wilayah wajib diisi')
+  }
+
+  return {
+    ...basePayload,
+    vehiclePlate,
+    vehicleType: vehicleType || null,
+    districtId: districtId || null,
+    districtName: districtName || null,
+    city: city || null,
+    province: province || null,
+  }
+}
+
 export function validateLoginPayload(body) {
   const email = normalizeString(body?.email).toLowerCase()
   const password = normalizeString(body?.password)

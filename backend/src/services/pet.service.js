@@ -48,7 +48,7 @@ function applyPetEffect(pet, action) {
 export async function getPetOverview(userId) {
   const [user, pet, activities] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
-    prisma.pet.findUnique({ where: { userId } }),
+    prisma.pet.upsert({ where: { userId }, update: {}, create: { userId } }),
     getUserActivities(userId, { filter: 'pet', limit: 5 }),
   ])
 

@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import prisma from '../config/prisma.js'
 import { createUser, findUserByEmail } from '../stores/user.store.js'
 import { HttpError } from '../utils/http-error.js'
 
@@ -30,6 +31,49 @@ function issueToken(user) {
     jwtSecret,
     { expiresIn: jwtExpiresIn },
   )
+}
+
+function toPublicCollectorProfile(profile) {
+  if (!profile) return null
+
+  return {
+    id: profile.id,
+    vehiclePlate: profile.vehiclePlate,
+    vehicleType: profile.vehicleType,
+    district: profile.district ? {
+      id: profile.district.id,
+      name: profile.district.name,
+      city: profile.district.city,
+      province: profile.district.province,
+    } : null,
+  }
+}
+
+async function resolveCollectorDistrict(tx, payload) {
+  if (payload.districtId) {
+    const district = await tx.district.findUnique({ where: { id: payload.districtId } })
+
+    if (!district) throw new HttpError(400, 'District tidak ditemukan')
+
+    return district
+  }
+
+  const district = await tx.district.findFirst({
+    where: {
+      name: { equals: payload.districtName, mode: 'insensitive' },
+      city: payload.city,
+    },
+  })
+
+  if (district) return district
+
+  return tx.district.create({
+    data: {
+      name: payload.districtName,
+      city: payload.city,
+      province: payload.province,
+    },
+  })
 }
 
 export async function registerUser(payload) {
@@ -63,6 +107,62 @@ export async function registerUser(payload) {
   }
 }
 
+export async function registerCollector(payload) {
+  const existingUser = await findUserByEmail(payload.email)
+
+  if (existingUser) {
+    throw new HttpError(409, 'Email sudah digunakan')
+  }
+
+  const passwordHash = await bcrypt.hash(payload.password, saltRounds)
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      const district = await resolveCollectorDistrict(tx, payload)
+      const user = await tx.user.create({
+        data: {
+          name: payload.name,
+          email: payload.email.toLowerCase(),
+          passwordHash,
+          role: 'COLLECTOR',
+          collector: {
+            create: {
+              vehiclePlate: payload.vehiclePlate,
+              vehicleType: payload.vehicleType,
+              districtId: district.id,
+            },
+          },
+        },
+        include: {
+          collector: {
+            include: { district: true },
+          },
+        },
+      })
+
+      return {
+        user,
+        collectorProfile: user.collector,
+      }
+    })
+
+    return {
+      user: toPublicUser(result.user),
+      collectorProfile: toPublicCollectorProfile(result.collectorProfile),
+      token: issueToken(result.user),
+    }
+  } catch (error) {
+    if (error instanceof HttpError) throw error
+    if (error.code === 'P2002') {
+      const targets = error.meta?.target || []
+      const message = targets.includes('vehicle_plate') ? 'Plat kendaraan sudah digunakan' : 'Email sudah digunakan'
+      throw new HttpError(409, message)
+    }
+
+    throw error
+  }
+}
+
 export async function loginUser(payload) {
   const user = await findUserByEmail(payload.email)
 
@@ -79,6 +179,26 @@ export async function loginUser(payload) {
   return {
     user: toPublicUser(user),
     token: issueToken(user),
+  }
+}
+
+export async function getCurrentAuthUser(userId) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      collector: {
+        include: { district: true },
+      },
+    },
+  })
+
+  if (!user) {
+    throw new HttpError(404, 'User tidak ditemukan')
+  }
+
+  return {
+    user: toPublicUser(user),
+    collectorProfile: toPublicCollectorProfile(user.collector),
   }
 }
 

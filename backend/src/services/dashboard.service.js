@@ -62,7 +62,7 @@ function buildScanActivity(scans) {
 export async function getDashboard(userId) {
   const [user, pet, scans, recentActivities] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
-    prisma.pet.findUnique({ where: { userId } }),
+    prisma.pet.upsert({ where: { userId }, update: {}, create: { userId } }),
     prisma.scan.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } }),
     getUserActivities(userId, { limit: 5 }),
   ])

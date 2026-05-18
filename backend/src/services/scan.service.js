@@ -11,8 +11,8 @@ export async function processScan(user, file, mockResult) {
   const ecoPoints = pointMap[mockResult.category] || 0;
   const xpReward = 10; // Standar XP per scan
 
-  // Simulasi URL gambar (nanti bisa diganti dengan upload ke Supabase Storage)
-  const imageUrl = `uploads/${file.filename}`;
+  // Gambar belum disimpan permanen sampai storage/Path AI final tersedia.
+  const imageUrl = null;
 
   const result = await saveScanResult(
     user.id,
