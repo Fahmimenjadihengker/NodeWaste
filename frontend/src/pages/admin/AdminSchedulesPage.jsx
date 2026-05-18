@@ -66,9 +66,7 @@ function AdminSchedulesPage() {
           <div>
             <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Manajemen jadwal</p>
             <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Atur jadwal angkut.</h1>
-            <p className="mt-3 max-w-2xl text-sm font-semibold leading-7 text-moss/62">Jadwal saat ini berlaku global untuk semua user dan wilayah.</p>
           </div>
-          <span className="w-fit rounded-full bg-[#edf5e4] px-4 py-2 text-xs font-black text-leaf-900">{schedules.length} jadwal global</span>
         </div>
 
         <div className="mt-8 rounded-[1.5rem] border border-leaf-900/10 bg-[#f5f1df] p-5">
