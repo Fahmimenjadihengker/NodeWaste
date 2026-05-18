@@ -6,7 +6,6 @@ import PwaInstallPrompt from './components/PwaInstallPrompt.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import PublicRoute from './components/PublicRoute.jsx'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
-import AdminDriversPage from './pages/admin/AdminDriversPage.jsx'
 import AdminSchedulesPage from './pages/admin/AdminSchedulesPage.jsx'
 import AdminUsersPage from './pages/admin/AdminUsersPage.jsx'
 import DriverDashboardPage from './pages/driver/DriverDashboardPage.jsx'
@@ -31,7 +30,6 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminShell /></ProtectedRoute>}>
           <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
-          <Route path="/admin/drivers" element={<AdminDriversPage />} />
           <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['DRIVER']}><DriverShell /></ProtectedRoute>}>
