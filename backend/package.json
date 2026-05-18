@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "check": "node --check src/server.js",
     "smoke:test": "node scripts/smoke-test.js",
+    "seed:collector": "node scripts/seed-collector-data.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio"

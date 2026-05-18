@@ -8,6 +8,7 @@ Backend NodeWaste berbasis Express, PostgreSQL, dan Prisma. Scope implementasi s
 - `npm start` menjalankan server.
 - `npm run check` mengecek syntax entrypoint.
 - `npm run smoke:test` membuat user sementara, mengetes auth/dashboard/pet/activity ke database, lalu menghapus user test.
+- `npm run seed:collector` menjalankan seed manual idempotent untuk district, akun collector demo, rumah user demo, jadwal, dan tempat pengolahan.
 - `npm run prisma:generate` generate Prisma Client.
 - `npm run prisma:migrate` menjalankan migration development.
 - `npm run prisma:studio` membuka Prisma Studio.
@@ -50,6 +51,8 @@ DATABASE_URL="postgresql://postgres.<project-ref>:<password>@<region>.pooler.sup
 ```
 
 Saat user register, backend membuat row `users` dan pet default di `pets` lewat nested write Prisma yang atomic. Saat collector register, backend membuat row `users` role `COLLECTOR` dan `collector_profiles` tanpa membuat pet.
+
+Seed collector tidak berjalan otomatis. Jalankan `npm run seed:collector` hanya saat membutuhkan data demo collector. Akun demo yang dibuat adalah `collector.demo@nodewaste.test` dengan password `password123`.
 
 Endpoint scan saat ini masih memakai mock backend sementara. Integrasi classifier final tetap menunggu kontrak Path AI.
 
