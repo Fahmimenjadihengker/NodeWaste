@@ -7,10 +7,10 @@ import CollectorDashboardPage from './pages/CollectorDashboardPage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
-import MapPage from './pages/MapPage.jsx'
 import PetPage from './pages/PetPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import RegisterPage from './pages/RegisterPage.jsx'
+import SchedulePage from './pages/SchedulePage.jsx'
 import ScanPage from './pages/ScanPage.jsx'
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/scan" element={<ScanPage />} />
           <Route path="/pet" element={<PetPage />} />
-          <Route path="/map" element={<MapPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Routes>

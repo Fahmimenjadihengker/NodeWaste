@@ -50,6 +50,10 @@ export function getActivities(filter = 'all') {
   return apiRequest(`/activities?filter=${encodeURIComponent(filter)}`)
 }
 
+export function getSchedules() {
+  return apiRequest('/schedules')
+}
+
 export function getRecyclingFacilities() {
   return apiRequest('/recycling-facilities')
 }
