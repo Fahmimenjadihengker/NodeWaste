@@ -23,13 +23,13 @@ async function main() {
     },
   })
 
-  const collector = await prisma.user.upsert({
-    where: { email: 'collector.demo@nodewaste.test' },
+  const driver = await prisma.user.upsert({
+    where: { email: 'driver.demo@nodewaste.test' },
     update: {
-      name: 'Collector Demo',
+      name: 'Driver Demo',
       passwordHash,
-      role: 'COLLECTOR',
-      collector: {
+      role: 'DRIVER',
+      driver: {
         upsert: {
           update: {
             vehiclePlate: 'NW 1001 CL',
@@ -45,11 +45,11 @@ async function main() {
       },
     },
     create: {
-      name: 'Collector Demo',
-      email: 'collector.demo@nodewaste.test',
+      name: 'Driver Demo',
+      email: 'driver.demo@nodewaste.test',
       passwordHash,
-      role: 'COLLECTOR',
-      collector: {
+      role: 'DRIVER',
+      driver: {
         create: {
           vehiclePlate: 'NW 1001 CL',
           vehicleType: 'pickup',
@@ -185,7 +185,7 @@ async function main() {
     }
   }
 
-  console.log(`collector seed ok: ${collector.email} / ${password}`)
+  console.log(`driver seed ok: ${driver.email} / ${password}`)
 }
 
 try {

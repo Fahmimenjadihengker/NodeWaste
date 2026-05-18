@@ -33,7 +33,7 @@ function issueToken(user) {
   )
 }
 
-function toPublicCollectorProfile(profile) {
+function toPublicDriverProfile(profile) {
   if (!profile) return null
 
   return {
@@ -49,7 +49,7 @@ function toPublicCollectorProfile(profile) {
   }
 }
 
-async function resolveCollectorDistrict(tx, payload) {
+async function resolveDriverDistrict(tx, payload) {
   if (payload.districtId) {
     const district = await tx.district.findUnique({ where: { id: payload.districtId } })
 
@@ -60,8 +60,10 @@ async function resolveCollectorDistrict(tx, payload) {
 
   const district = await tx.district.findFirst({
     where: {
-      name: { equals: payload.districtName, mode: 'insensitive' },
-      city: payload.city,
+      ...(payload.districtCode ? { districtCode: payload.districtCode } : {
+        name: { equals: payload.districtName, mode: 'insensitive' },
+        city: payload.city,
+      }),
     },
   })
 
@@ -72,6 +74,9 @@ async function resolveCollectorDistrict(tx, payload) {
       name: payload.districtName,
       city: payload.city,
       province: payload.province,
+      provinceCode: payload.provinceCode,
+      cityCode: payload.cityCode,
+      districtCode: payload.districtCode,
     },
   })
 }
@@ -107,7 +112,7 @@ export async function registerUser(payload) {
   }
 }
 
-export async function registerCollector(payload) {
+export async function registerDriver(payload) {
   const existingUser = await findUserByEmail(payload.email)
 
   if (existingUser) {
@@ -118,14 +123,14 @@ export async function registerCollector(payload) {
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      const district = await resolveCollectorDistrict(tx, payload)
+      const district = await resolveDriverDistrict(tx, payload)
       const user = await tx.user.create({
         data: {
           name: payload.name,
           email: payload.email.toLowerCase(),
           passwordHash,
-          role: 'COLLECTOR',
-          collector: {
+          role: 'DRIVER',
+          driver: {
             create: {
               vehiclePlate: payload.vehiclePlate,
               vehicleType: payload.vehicleType,
@@ -134,7 +139,7 @@ export async function registerCollector(payload) {
           },
         },
         include: {
-          collector: {
+          driver: {
             include: { district: true },
           },
         },
@@ -142,13 +147,13 @@ export async function registerCollector(payload) {
 
       return {
         user,
-        collectorProfile: user.collector,
+        driverProfile: user.driver,
       }
     })
 
     return {
       user: toPublicUser(result.user),
-      collectorProfile: toPublicCollectorProfile(result.collectorProfile),
+      driverProfile: toPublicDriverProfile(result.driverProfile),
       token: issueToken(result.user),
     }
   } catch (error) {
@@ -186,7 +191,7 @@ export async function getCurrentAuthUser(userId) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
-      collector: {
+      driver: {
         include: { district: true },
       },
     },
@@ -198,7 +203,7 @@ export async function getCurrentAuthUser(userId) {
 
   return {
     user: toPublicUser(user),
-    collectorProfile: toPublicCollectorProfile(user.collector),
+    driverProfile: toPublicDriverProfile(user.driver),
   }
 }
 

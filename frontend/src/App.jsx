@@ -1,14 +1,17 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import AdminShell from './components/admin/AdminShell.jsx'
 import AppShell from './components/AppShell.jsx'
-import CollectorShell from './components/collector/CollectorShell.jsx'
+import DriverShell from './components/driver/DriverShell.jsx'
 import PwaInstallPrompt from './components/PwaInstallPrompt.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import PublicRoute from './components/PublicRoute.jsx'
-import CollectorDashboardPage from './pages/collector/CollectorDashboardPage.jsx'
-import CollectorHouseMapPage from './pages/collector/CollectorHouseMapPage.jsx'
-import CollectorProcessingSitesPage from './pages/collector/CollectorProcessingSitesPage.jsx'
-import CollectorProfilePage from './pages/collector/CollectorProfilePage.jsx'
-import CollectorRoutePage from './pages/collector/CollectorRoutePage.jsx'
+import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
+import AdminDriversPage from './pages/admin/AdminDriversPage.jsx'
+import AdminSchedulesPage from './pages/admin/AdminSchedulesPage.jsx'
+import AdminUsersPage from './pages/admin/AdminUsersPage.jsx'
+import DriverDashboardPage from './pages/driver/DriverDashboardPage.jsx'
+import DriverMapPage from './pages/driver/DriverMapPage.jsx'
+import DriverProfilePage from './pages/driver/DriverProfilePage.jsx'
 import DashboardPage from './pages/DashboardPage.jsx'
 import LandingPage from './pages/LandingPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
@@ -25,12 +28,16 @@ function App() {
         <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />
         <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
         <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-        <Route element={<ProtectedRoute allowedRoles={['COLLECTOR']}><CollectorShell /></ProtectedRoute>}>
-          <Route path="/collector/dashboard" element={<CollectorDashboardPage />} />
-          <Route path="/collector/profile" element={<CollectorProfilePage />} />
-          <Route path="/collector/maps/houses" element={<CollectorHouseMapPage />} />
-          <Route path="/collector/maps/processing-sites" element={<CollectorProcessingSitesPage />} />
-          <Route path="/collector/route" element={<CollectorRoutePage />} />
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminShell /></ProtectedRoute>}>
+          <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+          <Route path="/admin/users" element={<AdminUsersPage />} />
+          <Route path="/admin/drivers" element={<AdminDriversPage />} />
+          <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['DRIVER']}><DriverShell /></ProtectedRoute>}>
+          <Route path="/driver/dashboard" element={<DriverDashboardPage />} />
+          <Route path="/driver/map" element={<DriverMapPage />} />
+          <Route path="/driver/profile" element={<DriverProfilePage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['USER']}><AppShell /></ProtectedRoute>}>
           <Route path="/dashboard" element={<DashboardPage />} />

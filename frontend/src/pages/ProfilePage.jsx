@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
+import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { getActivities, getProfile, saveStoredUser, updateProfile, updateProfilePassword } from '../services/authApi.js'
@@ -68,7 +69,7 @@ function SettingsCard({ form, password, settingsFeedback, passwordFeedback, onFo
       <div>
         <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Pengaturan akun</p>
         <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Data dan preferensi</h2>
-        <p className="mt-2 text-sm leading-6 text-moss/65">Nama dan email masih divalidasi lokal sampai endpoint update profile tersedia.</p>
+        <p className="mt-2 text-sm leading-6 text-moss/65">Nama, email, dan alamat disimpan ke backend profile.</p>
       </div>
 
       <div className="mt-6 grid gap-4">
@@ -92,7 +93,7 @@ function SettingsCard({ form, password, settingsFeedback, passwordFeedback, onFo
       <div className="mt-8 border-t border-moss/10 pt-8">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Keamanan akun</p>
         <h3 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Ubah password</h3>
-        <p className="mt-2 text-sm leading-6 text-moss/65">Validasi masih lokal untuk persiapan integrasi endpoint keamanan.</p>
+        <p className="mt-2 text-sm leading-6 text-moss/65">Password divalidasi dan diperbarui melalui backend.</p>
 
         <div className="mt-6 grid gap-4">
           {[
@@ -177,6 +178,7 @@ function ProfilePage() {
   const { user, onLogout } = useOutletContext()
   const xpProgress = Math.min(Math.round((dashboardData.stats.xp / dashboardData.stats.nextLevelXp) * 100), 100)
   const [form, setForm] = useState({ name: user?.name || 'Eco Hero', email: user?.email || '' })
+  const [addressForm, setAddressForm] = useState({ address: '', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' })
   const [settingsFeedback, setSettingsFeedback] = useState('')
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' })
   const [passwordFeedback, setPasswordFeedback] = useState('')
@@ -198,6 +200,19 @@ function ProfilePage() {
 
         const nextUser = response.data.user
         setForm({ name: nextUser.name, email: nextUser.email })
+        if (response.data.address) {
+          setAddressForm({
+            address: response.data.address.address || '',
+            districtName: response.data.address.district?.name || '',
+            city: response.data.address.district?.city || '',
+            province: response.data.address.district?.province || '',
+            provinceCode: response.data.address.district?.provinceCode || '',
+            cityCode: response.data.address.district?.cityCode || '',
+            districtCode: response.data.address.district?.districtCode || '',
+            latitude: String(response.data.address.latitude ?? ''),
+            longitude: String(response.data.address.longitude ?? ''),
+          })
+        }
         saveStoredUser(nextUser)
       })
       .catch((error) => {
@@ -239,7 +254,11 @@ function ProfilePage() {
     }
 
     try {
-      const response = await updateProfile(form)
+      const hasAddress = Object.values(addressForm).some((value) => String(value).trim())
+      const response = await updateProfile({
+        ...form,
+        ...(hasAddress ? { address: addressForm } : {}),
+      })
       saveStoredUser(response.data.user)
       setSettingsFeedback('Profile berhasil diperbarui.')
     } catch (error) {
@@ -286,7 +305,12 @@ function ProfilePage() {
       </section>
 
       <section className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <SettingsCard form={form} password={password} settingsFeedback={settingsFeedback} passwordFeedback={passwordFeedback} onFormChange={handleFormChange} onSave={handleSaveSettings} onPasswordChange={handlePasswordChange} onPasswordSubmit={handlePasswordSubmit} />
+        <div className="space-y-6">
+          <SettingsCard form={form} password={password} settingsFeedback={settingsFeedback} passwordFeedback={passwordFeedback} onFormChange={handleFormChange} onSave={handleSaveSettings} onPasswordChange={handlePasswordChange} onPasswordSubmit={handlePasswordSubmit} />
+          <AppCard tone="green">
+            <AddressForm value={addressForm} onChange={setAddressForm} description="Isi alamat dan koordinat agar rumahmu tampil di map driver wilayahmu. Alamat tidak wajib saat register." />
+          </AppCard>
+        </div>
         <div className="space-y-6">
           <div className="grid gap-5 sm:grid-cols-2">
             <StatCard label="EcoPoints" value={dashboardData.stats.ecoPoints} helper="Siap dipakai merawat Leafy" />

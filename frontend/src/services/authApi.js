@@ -82,7 +82,10 @@ export function getStoredUser() {
 }
 
 export function getRoleHomePath(user) {
-  return user?.role === 'COLLECTOR' ? '/collector/dashboard' : '/dashboard'
+  if (user?.role === 'DRIVER') return '/driver/dashboard'
+  if (user?.role === 'ADMIN') return '/admin/dashboard'
+
+  return '/dashboard'
 }
 
 export function clearAuthSession() {

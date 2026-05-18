@@ -1,6 +1,6 @@
 # NodeWaste Backend
 
-Backend NodeWaste berbasis Express, PostgreSQL, dan Prisma. Scope implementasi saat ini mencakup auth register/login role-aware, profile user aktif, dashboard, pet, activity, scan mock sementara, jadwal dummy/database-ready, recycling facilities, endpoint collector dasar, serta schema awal untuk scan.
+Backend NodeWaste berbasis Express, PostgreSQL, dan Prisma. Scope implementasi saat ini mencakup auth register/login role-aware, profile user aktif dengan alamat wilayah.id, dashboard, pet, activity, scan mock sementara, jadwal dummy/database-ready, recycling facilities, endpoint driver, endpoint admin, serta schema awal untuk scan.
 
 ## Scripts
 
@@ -8,7 +8,8 @@ Backend NodeWaste berbasis Express, PostgreSQL, dan Prisma. Scope implementasi s
 - `npm start` menjalankan server.
 - `npm run check` mengecek syntax entrypoint.
 - `npm run smoke:test` membuat user sementara, mengetes auth/dashboard/pet/activity ke database, lalu menghapus user test.
-- `npm run seed:collector` menjalankan seed manual idempotent untuk district, akun collector demo, rumah user demo, jadwal, dan tempat pengolahan.
+- `npm run seed:driver` menjalankan seed manual idempotent untuk district, akun driver demo, rumah user demo, jadwal, dan tempat pengolahan.
+- `npm run seed:admin` membuat akun admin demo manual idempotent.
 - `npm run prisma:generate` generate Prisma Client.
 - `npm run prisma:migrate` menjalankan migration development.
 - `npm run prisma:studio` membuka Prisma Studio.
@@ -17,7 +18,7 @@ Backend NodeWaste berbasis Express, PostgreSQL, dan Prisma. Scope implementasi s
 
 - `GET /api/health`
 - `POST /api/auth/register`
-- `POST /api/auth/register/collector`
+- `POST /api/auth/register/driver`
 - `POST /api/auth/login`
 - `GET /api/auth/me`
 - `GET /api/profile`
@@ -31,12 +32,19 @@ Backend NodeWaste berbasis Express, PostgreSQL, dan Prisma. Scope implementasi s
 - `GET /api/activities`
 - `GET /api/schedules`
 - `POST /api/scans`
-- `GET /api/collector/dashboard`
-- `GET /api/collector/profile`
-- `PUT /api/collector/profile`
-- `GET /api/collector/houses`
-- `GET /api/collector/processing-sites`
-- `GET /api/collector/routes`
+- `GET /api/driver/dashboard`
+- `GET /api/driver/profile`
+- `PUT /api/driver/profile`
+- `GET /api/driver/map`
+- `GET /api/admin/dashboard`
+- `GET /api/admin/users`
+- `GET /api/admin/drivers`
+- `POST /api/admin/drivers`
+- `PUT /api/admin/drivers/:id`
+- `GET /api/admin/schedules`
+- `POST /api/admin/schedules`
+- `PUT /api/admin/schedules/:id`
+- `DELETE /api/admin/schedules/:id`
 - `GET /api/recycling-facilities`
 - `GET /api-docs`
 
@@ -50,9 +58,9 @@ Untuk deploy Vercel dengan Supabase, gunakan Supabase pooler connection string d
 DATABASE_URL="postgresql://postgres.<project-ref>:<password>@<region>.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require"
 ```
 
-Saat user register, backend membuat row `users` dan pet default di `pets` lewat nested write Prisma yang atomic. Saat collector register, backend membuat row `users` role `COLLECTOR` dan `collector_profiles` tanpa membuat pet.
+Saat user register, backend membuat row `users` dan pet default di `pets` lewat nested write Prisma yang atomic. User dapat mengisi alamat rumah lewat `PUT /api/profile`; alamat ini memakai kode wilayah dari wilayah.id, masuk ke `user_addresses`, dan menjadi titik rumah pada map driver jika district-nya sesuai. Saat driver dibuat, backend membuat row `users` role `DRIVER` dan `DriverProfile` tanpa membuat pet. Model `DriverProfile` masih memetakan tabel lama `collector_profiles` untuk migrasi aman.
 
-Seed collector tidak berjalan otomatis. Jalankan `npm run seed:collector` hanya saat membutuhkan data demo collector. Akun demo yang dibuat adalah `collector.demo@nodewaste.test` dengan password `password123`.
+Seed driver/admin tidak berjalan otomatis. Jalankan `npm run seed:driver` atau `npm run seed:admin` hanya saat membutuhkan data demo. Akun demo driver adalah `driver.demo@nodewaste.test`; akun demo admin adalah `admin.demo@nodewaste.test`. Keduanya memakai password `password123`.
 
 Endpoint scan saat ini masih memakai mock backend sementara. Integrasi classifier final tetap menunggu kontrak Path AI.
 

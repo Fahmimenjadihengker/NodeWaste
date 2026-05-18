@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../../components/AppCard.jsx'
-import { getCollectorDashboard } from '../../services/collectorApi.js'
+import { getDriverDashboard } from '../../services/driverApi.js'
 
 const fallbackData = {
-  collectorProfile: {
+  driverProfile: {
     vehiclePlate: '-',
     vehicleType: 'Belum diatur',
     district: { name: 'Wilayah belum diatur', city: null, province: null },
@@ -14,9 +14,8 @@ const fallbackData = {
     processingSites: 0,
   },
   quickLinks: [
-    { label: 'Maps Rumah', path: '/collector/maps/houses' },
-    { label: 'Tempat Pengolahan', path: '/collector/maps/processing-sites' },
-    { label: 'Rute', path: '/collector/route' },
+    { label: 'Map Wilayah', path: '/driver/map' },
+    { label: 'Profil Driver', path: '/driver/profile' },
   ],
 }
 
@@ -30,18 +29,18 @@ function StatCard({ label, value, helper }) {
   )
 }
 
-function CollectorDashboardPage() {
+function DriverDashboardPage() {
   const { user } = useOutletContext()
   const [data, setData] = useState(fallbackData)
   const [status, setStatus] = useState('loading')
-  const profile = data.collectorProfile
+  const profile = data.driverProfile
   const district = profile?.district
   const districtLabel = [district?.name, district?.city].filter(Boolean).join(', ') || 'Wilayah belum diatur'
 
   useEffect(() => {
     let isMounted = true
 
-    getCollectorDashboard()
+    getDriverDashboard()
       .then((response) => {
         if (!isMounted) return
         setData(response.data || fallbackData)
@@ -60,19 +59,19 @@ function CollectorDashboardPage() {
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <section className="grid gap-6 lg:grid-cols-[1fr_0.42fr]">
         <div className="rounded-[1.75rem] border border-moss/10 bg-[#fff8e8] p-6 shadow-[0_22px_70px_rgba(32,58,37,0.10)] sm:p-8 lg:p-10">
-          <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Dashboard collector</p>
+          <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Dashboard driver</p>
           <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] text-leaf-900 sm:text-5xl lg:text-6xl">
-            Halo, {user?.name || 'Collector'}.
+            Halo, {user?.name || 'Driver'}.
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-8 text-moss/70 sm:text-lg">
-            Pantau wilayah angkut, rumah user, dan tujuan pengolahan tanpa fitur user seperti Leafy, scan, atau EcoPoints.
+            Pantau wilayah angkut, rumah user yang sudah mengisi alamat, dan tujuan TPS tanpa fitur user seperti Leafy, scan, atau EcoPoints.
           </p>
           {status === 'error' ? (
             <p className="mt-5 rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800">
-              Data dashboard belum bisa dimuat. Pastikan akun collector memiliki profile wilayah.
+              Data dashboard belum bisa dimuat. Pastikan akun driver memiliki profile wilayah.
             </p>
           ) : null}
-          {status === 'loading' ? <p className="mt-5 text-sm font-bold text-moss/55">Memuat ringkasan collector...</p> : null}
+          {status === 'loading' ? <p className="mt-5 text-sm font-bold text-moss/55">Memuat ringkasan driver...</p> : null}
         </div>
 
         <AppCard tone="leaf" className="p-6 sm:p-7">
@@ -92,7 +91,7 @@ function CollectorDashboardPage() {
       </section>
 
       <section className="mt-6 grid gap-5 sm:grid-cols-2">
-        <StatCard label="Rumah dalam wilayah" value={data.stats?.housesInDistrict ?? 0} helper="Total alamat user yang masuk district collector aktif." />
+        <StatCard label="Rumah dalam wilayah" value={data.stats?.housesInDistrict ?? 0} helper="Total alamat user yang masuk district driver aktif." />
         <StatCard label="Tempat pengolahan" value={data.stats?.processingSites ?? 0} helper="Tujuan operasional yang tersedia untuk wilayah ini atau umum." />
       </section>
 
@@ -100,15 +99,15 @@ function CollectorDashboardPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Akses cepat</p>
-            <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-leaf-900">Operasional collector</h2>
+            <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-leaf-900">Operasional driver</h2>
           </div>
-          <Link className="text-sm font-black text-leaf-800 hover:text-leaf-950" to="/collector/profile">Lihat profil</Link>
+          <Link className="text-sm font-black text-leaf-800 hover:text-leaf-950" to="/driver/profile">Lihat profil</Link>
         </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
           {(data.quickLinks || fallbackData.quickLinks).map((link) => (
             <Link key={link.path} className="rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-5 transition hover:-translate-y-0.5 hover:border-leaf-600/30 hover:shadow-[0_18px_38px_rgba(32,58,37,0.10)]" to={link.path}>
               <p className="text-lg font-black text-leaf-900">{link.label}</p>
-              <p className="mt-2 text-sm font-semibold leading-6 text-moss/60">Buka halaman collector untuk tahap operasional berikutnya.</p>
+              <p className="mt-2 text-sm font-semibold leading-6 text-moss/60">Buka fitur utama driver untuk operasional wilayah.</p>
             </Link>
           ))}
         </div>
@@ -117,4 +116,4 @@ function CollectorDashboardPage() {
   )
 }
 
-export default CollectorDashboardPage
+export default DriverDashboardPage

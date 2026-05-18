@@ -1,5 +1,5 @@
-import { getCurrentAuthUser, loginUser, registerCollector, registerUser } from '../services/auth.service.js'
-import { validateCollectorRegisterPayload, validateLoginPayload, validateRegisterPayload } from '../validators/auth.validator.js'
+import { getCurrentAuthUser, loginUser, registerDriver, registerUser } from '../services/auth.service.js'
+import { validateDriverRegisterPayload, validateLoginPayload, validateRegisterPayload } from '../validators/auth.validator.js'
 
 export async function register(request, response, next) {
   try {
@@ -31,14 +31,14 @@ export async function login(request, response, next) {
   }
 }
 
-export async function registerCollectorAccount(request, response, next) {
+export async function registerDriverAccount(request, response, next) {
   try {
-    const payload = validateCollectorRegisterPayload(request.body)
-    const data = await registerCollector(payload)
+    const payload = validateDriverRegisterPayload(request.body)
+    const data = await registerDriver(payload)
 
     response.status(201).json({
       success: true,
-      message: 'Registrasi collector berhasil',
+      message: 'Registrasi driver berhasil',
       data,
     })
   } catch (error) {

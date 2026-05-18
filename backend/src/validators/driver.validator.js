@@ -6,7 +6,7 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-export function validateCollectorProfileUpdatePayload(body) {
+export function validateDriverProfileUpdatePayload(body) {
   const payload = {}
   const name = normalizeString(body?.name)
   const email = normalizeString(body?.email).toLowerCase()
