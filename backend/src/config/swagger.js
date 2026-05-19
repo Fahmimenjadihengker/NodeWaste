@@ -527,7 +527,7 @@ export const swaggerDocument = {
                 type: "object",
                 required: ["wasteCategory", "pickupDay", "pickupTime"],
                 properties: {
-                  wasteCategory: { type: "string", enum: ["ORGANIK", "ANORGANIK", "B3", "DAUR_ULANG_RESIDU"] },
+                  wasteCategory: { type: "string", example: "Organik" },
                   pickupDay: { type: "string", example: "Senin" },
                   pickupTime: { type: "string", example: "08:00" },
                   instruction: { type: "string", example: "Letakkan sampah di depan rumah" },

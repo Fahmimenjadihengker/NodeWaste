@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { createScan } from '../services/scanApi.js'
 
 const categoryGuide = {
+  Organik: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
+  Anorganik: 'Kosongkan isi, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
+  B3: 'Jangan campur dengan sampah rumah tangga. Simpan kering, lalu bawa ke titik pengumpulan B3 atau e-waste.',
   ORGANIK: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
   ANORGANIK: 'Kosongkan isi, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
-  B3: 'Jangan campur dengan sampah rumah tangga. Simpan kering, lalu bawa ke titik pengumpulan B3 atau e-waste.',
 }
 
 function getConfidenceLabel(confidence) {

@@ -4,8 +4,8 @@ import { createAdminSchedule, getCachedAdminSchedules, loadAdminSchedules, updat
 import { sweetConfirm, sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 const inputClass = 'rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-700 focus:ring-4 focus:ring-leaf-900/10'
-const emptyForm = { wasteCategory: 'ORGANIK', pickupDay: '', pickupTime: '', instruction: '' }
-const categoryLabel = { ORGANIK: 'Organik', ANORGANIK: 'Anorganik', B3: 'B3' }
+const emptyForm = { wasteCategory: 'Organik', pickupDay: '', pickupTime: '', instruction: '' }
+const categoryLabel = { ORGANIK: 'Organik', ANORGANIK: 'Anorganik', DAUR_ULANG_RESIDU: 'Daur Ulang/Residu' }
 
 function formFromSchedule(schedule) {
   if (!schedule) return emptyForm

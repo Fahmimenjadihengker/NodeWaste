@@ -3,14 +3,14 @@ import prisma from '../config/prisma.js'
 const defaultSchedules = [
   {
     id: 'dummy-organik',
-    wasteCategory: 'ORGANIK',
+    wasteCategory: 'Organik',
     pickupDay: 'Senin, Rabu, Jumat',
     pickupTime: '07.00-09.00',
     instruction: 'Keluarkan sampah organik pada pagi hari sebelum pukul 07.00, bukan malam sebelumnya.',
   },
   {
     id: 'dummy-anorganik',
-    wasteCategory: 'ANORGANIK',
+    wasteCategory: 'Anorganik',
     pickupDay: 'Selasa dan Kamis',
     pickupTime: '08.00-10.00',
     instruction: 'Pastikan sampah anorganik sudah bersih, kering, dan dipisahkan dari organik.',
@@ -24,7 +24,7 @@ const defaultSchedules = [
   },
   {
     id: 'dummy-daur-ulang-residu',
-    wasteCategory: 'DAUR_ULANG_RESIDU',
+    wasteCategory: 'Daur Ulang/Residu',
     pickupDay: 'Sabtu minggu ketiga',
     pickupTime: '08.00-10.00',
     instruction: 'Pisahkan material daur ulang bernilai dan residu. Keluarkan pagi hari sebelum jadwal.',

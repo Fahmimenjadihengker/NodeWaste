@@ -141,7 +141,7 @@ model Pet {
 model Scan {
   id         String        @id @default(uuid())
   userId     String        @map("user_id")
-  category   WasteCategory
+  category   String
   label      String
   confidence Int
   isValid    Boolean       @default(false) @map("is_valid")
@@ -219,22 +219,14 @@ enum CapacityStatus {
   OVERLOADED
 }
 
-enum WasteCategory {
-  ORGANIK
-  ANORGANIK
-  B3
-}
-
 enum ActivityType {
   SCAN
   PET
-  PROFILE
 }
 
 enum PetActionType {
   FEED
   PLAY
-  BATH
 }
 
 enum FacilityType {

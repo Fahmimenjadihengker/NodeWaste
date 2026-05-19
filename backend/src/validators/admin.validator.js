@@ -2,7 +2,6 @@ import { validateDriverRegisterPayload } from './auth.validator.js'
 import { HttpError } from '../utils/http-error.js'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const wasteCategories = ['ORGANIK', 'ANORGANIK', 'B3']
 const roles = ['USER', 'DRIVER', 'ADMIN']
 
 function normalizeString(value) {
@@ -95,13 +94,13 @@ export function validateAdminDriverUpdatePayload(body) {
 
 export function validateSchedulePayload(body, partial = false) {
   const payload = {}
-  const wasteCategory = normalizeString(body?.wasteCategory).toUpperCase()
+  const wasteCategory = normalizeString(body?.wasteCategory)
   const pickupDay = normalizeString(body?.pickupDay)
   const pickupTime = normalizeString(body?.pickupTime)
   const instruction = normalizeString(body?.instruction)
 
   if (wasteCategory) {
-    if (!wasteCategories.includes(wasteCategory)) throw new HttpError(400, 'Kategori sampah tidak valid')
+    if (wasteCategory.length < 2 || wasteCategory.length > 40) throw new HttpError(400, 'Kategori sampah harus 2-40 karakter')
     payload.wasteCategory = wasteCategory
   } else if (!partial) throw new HttpError(400, 'Kategori sampah wajib diisi')
 

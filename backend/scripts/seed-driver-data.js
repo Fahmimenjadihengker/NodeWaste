@@ -131,10 +131,10 @@ async function main() {
   }
 
   const schedules = [
-    ['ORGANIK', 'Senin, Rabu, Jumat', '07.00-09.00', 'Keluarkan sampah organik pada pagi hari sebelum pukul 07.00.'],
-    ['ANORGANIK', 'Selasa dan Kamis', '08.00-10.00', 'Pastikan sampah anorganik bersih, kering, dan terpisah dari organik.'],
+    ['Organik', 'Senin, Rabu, Jumat', '07.00-09.00', 'Keluarkan sampah organik pada pagi hari sebelum pukul 07.00.'],
+    ['Anorganik', 'Selasa dan Kamis', '08.00-10.00', 'Pastikan sampah anorganik bersih, kering, dan terpisah dari organik.'],
     ['B3', 'Sabtu minggu pertama', '09.00-11.00', 'Simpan B3 dalam wadah tertutup dan jangan dicampur dengan sampah lain.'],
-    ['DAUR_ULANG_RESIDU', 'Sabtu minggu ketiga', '08.00-10.00', 'Pisahkan material daur ulang bernilai dan residu sebelum pagi hari.'],
+    ['Daur Ulang/Residu', 'Sabtu minggu ketiga', '08.00-10.00', 'Pisahkan material daur ulang bernilai dan residu sebelum pagi hari.'],
   ]
 
   for (const [wasteCategory, pickupDay, pickupTime, instruction] of schedules) {
@@ -160,7 +160,7 @@ async function main() {
       address: 'Jl. Pengolahan No. 21, Kota Hijau',
       latitude: -6.9142,
       longitude: 107.6251,
-      acceptedWasteCategories: ['ORGANIK', 'ANORGANIK', 'DAUR_ULANG_RESIDU'],
+      acceptedWasteCategories: ['Organik', 'Anorganik', 'Daur Ulang/Residu'],
       capacityStatus: 'AVAILABLE',
     },
     {

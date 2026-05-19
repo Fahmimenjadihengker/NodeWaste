@@ -18,6 +18,7 @@ NodeWaste/
 - Admin app: dashboard, manajemen akun/user/driver, dan jadwal pengangkutan.
 - Backend API: auth role-aware, profile, dashboard, pet, activity, schedules, scans, regions, recycling facilities, driver, dan admin.
 - Database: PostgreSQL lewat Prisma. Supabase dapat dipakai untuk deployment.
+- Kategori scan dan jadwal disimpan sebagai teks biasa agar fleksibel untuk admin dan classifier final.
 - PWA: frontend installable dengan app shell caching melalui `vite-plugin-pwa`.
 
 ## Menjalankan Project

@@ -10,14 +10,14 @@ export async function createScan(request, response, next) {
     // Mock AI Classifier Logic (Sesuai diskusi sebelumnya)
     const filename = request.file.originalname.toLowerCase();
     let mockResult = {
-      category: "ANORGANIK",
+      category: "Anorganik",
       label: "Botol Plastik",
       confidence: 95,
     };
 
     if (filename.includes("food")) {
       mockResult = {
-        category: "ORGANIK",
+        category: "Organik",
         label: "Sisa Makanan",
         confidence: 88,
       };

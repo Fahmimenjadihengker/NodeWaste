@@ -17,6 +17,14 @@ function buildCategories(categoryCounts) {
   ]
 }
 
+function normalizeCategoryKey(category) {
+  const key = String(category || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
+  if (key === 'organik') return 'organik'
+  if (key === 'anorganik') return 'anorganik'
+  if (key === 'b3') return 'b3'
+  return null
+}
+
 function buildScanActivity(scans) {
   const weekly = Array.from({ length: 7 }, (_, index) => {
     const date = new Date()
@@ -39,7 +47,8 @@ function buildScanActivity(scans) {
   for (const scan of scans) {
     if (!scan.isValid) continue
 
-    const category = scan.category.toLowerCase()
+    const category = normalizeCategoryKey(scan.category)
+    if (!category) continue
     const dateKey = scan.createdAt.toISOString().slice(0, 10)
     const weeklyItem = weekly.find((item) => item.dateKey === dateKey)
 
@@ -81,7 +90,8 @@ export async function getDashboard(userId) {
 
   const categoryCounts = emptyCategoryCounts()
   for (const group of categoryGroups) {
-    categoryCounts[group.category.toLowerCase()] = group._count._all
+    const category = normalizeCategoryKey(group.category)
+    if (category) categoryCounts[category] = group._count._all
   }
 
   return {

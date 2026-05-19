@@ -49,7 +49,6 @@ Scope implementasi saat ini mencakup auth role-aware, profile user dengan alamat
 - `GET /api/pet`
 - `POST /api/pet/feed`
 - `POST /api/pet/play`
-- `POST /api/pet/bath`
 - `GET /api/activities`
 - `GET /api/schedules`
 - `POST /api/scans`
@@ -87,6 +86,8 @@ Scope implementasi saat ini mencakup auth role-aware, profile user dengan alamat
 ## Catatan Data
 
 Data disimpan di PostgreSQL melalui Prisma. Pastikan `DATABASE_URL` di `.env` mengarah ke database PostgreSQL, lalu jalankan `npm run prisma:generate` dan `npm run prisma:migrate` sebelum menjalankan server pertama kali.
+
+Kategori jadwal (`waste_schedules.waste_category`) dan kategori scan (`scans.category`) sekarang disimpan sebagai teks biasa (`String`) agar label seperti `Organik`, `Anorganik`, `B3`, atau kategori lain dari classifier/admin tidak terkunci enum lama. Untuk database lama yang masih memakai enum Prisma `WasteCategory`, jalankan SQL manual `backend/prisma/category-to-text.sql` satu kali.
 
 Untuk deploy Vercel dengan Supabase, gunakan Supabase pooler connection string di environment variable `DATABASE_URL`, bukan direct host `db.<project-ref>.supabase.co:5432`. Direct host Supabase dapat gagal dari Vercel karena koneksi IPv6/pooling serverless. Format umumnya:
 
