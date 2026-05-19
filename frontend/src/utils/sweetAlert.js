@@ -36,10 +36,7 @@ export function sweetSuccess({ title = 'Berhasil', text = 'Data berhasil disimpa
     overlay.className = 'fixed inset-0 z-[9999] grid place-items-center bg-moss/25 px-5 backdrop-blur-sm'
     overlay.innerHTML = `
       <div class="w-full max-w-md rounded-[1.75rem] bg-[#fffdf4] p-6 text-center shadow-[0_30px_80px_rgba(32,58,37,0.25)] ring-1 ring-moss/10">
-        <div class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#edf5e4] text-leaf-700">
-          <span class="text-xl font-black">OK</span>
-        </div>
-        <h2 class="mt-5 text-3xl font-black tracking-[-0.04em] text-leaf-900">${title}</h2>
+        <h2 class="text-3xl font-black tracking-[-0.04em] text-leaf-900">${title}</h2>
         <p class="mt-3 text-sm font-semibold leading-6 text-moss/65">${text}</p>
         <div class="mt-6 flex justify-center">
           <button data-confirm class="rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900">${confirmText}</button>
@@ -58,4 +55,19 @@ export function sweetSuccess({ title = 'Berhasil', text = 'Data berhasil disimpa
     })
     document.body.appendChild(overlay)
   })
+}
+
+export function sweetLoading({ title = 'Memproses...', text = 'Mohon tunggu sebentar.' } = {}) {
+  const overlay = document.createElement('div')
+  overlay.className = 'fixed inset-0 z-[9999] grid place-items-center bg-moss/25 px-5 backdrop-blur-sm'
+  overlay.innerHTML = `
+    <div class="w-full max-w-sm rounded-[1.75rem] bg-[#fffdf4] p-6 text-center shadow-[0_30px_80px_rgba(32,58,37,0.25)] ring-1 ring-moss/10">
+      <div class="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-moss/10 border-t-leaf-600"></div>
+      <h2 class="mt-5 text-2xl font-black tracking-[-0.04em] text-leaf-900">${title}</h2>
+      <p class="mt-2 text-sm font-semibold leading-6 text-moss/65">${text}</p>
+    </div>
+  `
+
+  document.body.appendChild(overlay)
+  return () => overlay.remove()
 }

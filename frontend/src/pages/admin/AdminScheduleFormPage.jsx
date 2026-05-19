@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { createAdminSchedule, getCachedAdminSchedules, loadAdminSchedules, updateAdminSchedule } from '../../services/adminApi.js'
-import { sweetConfirm, sweetSuccess } from '../../utils/sweetAlert.js'
+import { sweetConfirm, sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 const inputClass = 'rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-700 focus:ring-4 focus:ring-leaf-900/10'
 const emptyForm = { wasteCategory: 'ORGANIK', pickupDay: '', pickupTime: '', instruction: '' }
@@ -36,12 +36,17 @@ function AdminScheduleFormPage() {
     const confirmed = await sweetConfirm({ title: isEdit ? 'Simpan perubahan jadwal?' : 'Buat jadwal?', text: isEdit ? 'Data jadwal akan diperbarui.' : 'Jadwal pickup baru akan ditambahkan.', confirmText: isEdit ? 'Simpan' : 'Buat' })
     if (!confirmed) return
 
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: isEdit ? 'Mengupdate jadwal...' : 'Membuat jadwal...', text: 'Mohon tunggu sampai proses selesai.' })
       if (isEdit) await updateAdminSchedule(id, form)
       else await createAdminSchedule(form)
+      closeLoading?.()
       await sweetSuccess({ text: isEdit ? 'Jadwal berhasil diupdate.' : 'Jadwal berhasil dibuat.' })
       navigate('/admin/schedules')
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { deleteAdminAccount, getCachedAdminUsers, loadAdminUsers, updateAdminAccount } from '../../services/adminApi.js'
-import { sweetConfirm, sweetSuccess } from '../../utils/sweetAlert.js'
+import { sweetConfirm, sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 function AdminUsersPage() {
   const [accounts, setAccounts] = useState(() => getCachedAdminUsers() || [])
@@ -34,13 +34,18 @@ function AdminUsersPage() {
     const confirmed = await sweetConfirm({ title: `${account.isActive ? 'Disable' : 'Enable'} akun?`, text: `Yakin ingin ${action} akun ${account.name}?`, confirmText: account.isActive ? 'Disable' : 'Enable', danger: account.isActive })
     if (!confirmed) return
 
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: 'Mengupdate akun...', text: 'Status akun sedang diproses.' })
       await updateAdminAccount(account.id, { isActive: !account.isActive })
       setFeedback(`Akun berhasil ${account.isActive ? 'dinonaktifkan' : 'diaktifkan'}.`)
+      closeLoading?.()
       await sweetSuccess({ text: `Akun berhasil ${account.isActive ? 'dinonaktifkan' : 'diaktifkan'}.` })
       setIsLoading(true)
       loadAccounts()
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }
@@ -49,13 +54,18 @@ function AdminUsersPage() {
     const confirmed = await sweetConfirm({ title: 'Hapus akun permanen?', text: `Akun ${account.name} akan dihapus permanen dan tidak bisa dibatalkan.`, confirmText: 'Delete', danger: true })
     if (!confirmed) return
 
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: 'Menghapus akun...', text: 'Mohon tunggu sampai proses selesai.' })
       await deleteAdminAccount(account.id)
       setFeedback('Akun berhasil dihapus permanen.')
+      closeLoading?.()
       await sweetSuccess({ text: 'Akun berhasil dihapus permanen.' })
       setIsLoading(true)
       loadAccounts()
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }

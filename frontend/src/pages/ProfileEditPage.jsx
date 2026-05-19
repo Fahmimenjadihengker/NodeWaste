@@ -4,7 +4,7 @@ import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
 import { SkeletonText } from '../components/Skeleton.jsx'
 import { getProfile, saveStoredUser, updateProfile, updateProfilePassword, updateProfilePhoto } from '../services/authApi.js'
-import { sweetConfirm, sweetSuccess } from '../utils/sweetAlert.js'
+import { sweetConfirm, sweetLoading, sweetSuccess } from '../utils/sweetAlert.js'
 
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
 
@@ -53,7 +53,10 @@ function ProfileEditPage() {
     const confirmed = await sweetConfirm({ title: 'Simpan profile?', text: 'Perubahan akun dan alamat akan disimpan.', confirmText: 'Simpan' })
     if (!confirmed) return
 
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: 'Menyimpan profile...', text: 'Data profile sedang diproses.' })
       let userResponse = null
       const hasAddress = Object.values(addressForm).some((value) => String(value).trim())
       const response = await updateProfile({ ...form, ...(hasAddress ? { address: addressForm } : {}) })
@@ -65,9 +68,11 @@ function ProfileEditPage() {
       }
 
       saveStoredUser(userResponse)
+      closeLoading?.()
       await sweetSuccess({ text: 'Profile berhasil diupdate.' })
       navigate('/profile')
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }
@@ -82,12 +87,17 @@ function ProfileEditPage() {
       return
     }
 
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: 'Mengubah password...', text: 'Mohon tunggu sebentar.' })
       await updateProfilePassword({ currentPassword: password.current, newPassword: password.next })
       setPassword({ current: '', next: '', confirm: '' })
       setFeedback('Password berhasil diperbarui.')
+      closeLoading?.()
       await sweetSuccess({ text: 'Password berhasil diperbarui.' })
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }

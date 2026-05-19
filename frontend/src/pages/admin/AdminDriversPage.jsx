@@ -3,7 +3,7 @@ import AddressForm from '../../components/AddressForm.jsx'
 import AppCard from '../../components/AppCard.jsx'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { createAdminDriver, getAdminDrivers, updateAdminAccount } from '../../services/adminApi.js'
-import { sweetSuccess } from '../../utils/sweetAlert.js'
+import { sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 const emptyAddress = { address: '-', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' }
 
@@ -20,21 +20,27 @@ function AdminDriversPage() {
   }, [])
 
   const submit = async () => {
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: form.id ? 'Mengupdate driver...' : 'Membuat driver...', text: 'Mohon tunggu sampai proses selesai.' })
       const payload = { name: form.name, email: form.email, vehiclePlate: form.vehiclePlate, vehicleType: form.vehicleType, district: { districtName: district.districtName, city: district.city, province: district.province, provinceCode: district.provinceCode, cityCode: district.cityCode, districtCode: district.districtCode } }
       if (form.id) {
         await updateAdminAccount(form.id, { ...payload, isActive: form.isActive })
         setFeedback('Driver berhasil diperbarui.')
+        closeLoading?.()
         await sweetSuccess({ text: 'Driver berhasil diupdate.' })
       } else {
         await createAdminDriver({ ...payload, password: form.password, districtName: district.districtName, city: district.city, province: district.province, provinceCode: district.provinceCode, cityCode: district.cityCode, districtCode: district.districtCode })
         setFeedback('Driver berhasil dibuat.')
+        closeLoading?.()
         await sweetSuccess({ text: 'Driver berhasil dibuat.' })
       }
       setForm({ id: '', name: '', email: '', password: 'password123', vehiclePlate: '', vehicleType: 'pickup', isActive: true })
       setDistrict(emptyAddress)
       loadDrivers()
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }
@@ -46,11 +52,16 @@ function AdminDriversPage() {
   }
 
   const toggleActive = async (row) => {
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: 'Mengupdate driver...', text: 'Status driver sedang diproses.' })
       await updateAdminAccount(row.user.id, { isActive: !row.user.isActive })
+      closeLoading?.()
       await sweetSuccess({ text: `Driver berhasil ${row.user.isActive ? 'dinonaktifkan' : 'diaktifkan'}.` })
       loadDrivers()
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }

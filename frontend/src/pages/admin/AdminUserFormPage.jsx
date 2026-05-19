@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import AddressForm from '../../components/AddressForm.jsx'
 import { createAdminAccount, getCachedAdminUsers, loadAdminUsers, updateAdminAccount } from '../../services/adminApi.js'
-import { sweetConfirm, sweetSuccess } from '../../utils/sweetAlert.js'
+import { sweetConfirm, sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 const emptyForm = { name: '', email: '', password: 'password123', role: 'USER', vehiclePlate: '', vehicleType: 'pickup', isActive: true }
 const emptyDistrict = { address: '-', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' }
@@ -57,13 +57,18 @@ function AdminUserFormPage() {
     const confirmed = await sweetConfirm({ title: isEdit ? 'Simpan perubahan akun?' : 'Buat akun baru?', text: isEdit ? 'Data akun akan diperbarui.' : 'Akun baru akan dibuat.', confirmText: isEdit ? 'Simpan' : 'Buat' })
     if (!confirmed) return
 
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: isEdit ? 'Mengupdate akun...' : 'Membuat akun...', text: 'Mohon tunggu sampai proses selesai.' })
       const driverPayload = form.role === 'DRIVER' ? getDriverPayload() : {}
       if (isEdit) await updateAdminAccount(id, { name: form.name, email: form.email, role: form.role, isActive: form.isActive, ...driverPayload })
       else await createAdminAccount({ name: form.name, email: form.email, password: form.password, role: form.role, ...driverPayload })
+      closeLoading?.()
       await sweetSuccess({ text: isEdit ? 'Data berhasil diupdate.' : 'Akun berhasil dibuat.' })
       navigate('/admin/users')
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }

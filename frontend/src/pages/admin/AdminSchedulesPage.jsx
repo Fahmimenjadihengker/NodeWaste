@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { deleteAdminSchedule, getCachedAdminSchedules, loadAdminSchedules } from '../../services/adminApi.js'
-import { sweetConfirm, sweetSuccess } from '../../utils/sweetAlert.js'
+import { sweetConfirm, sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 function AdminSchedulesPage() {
   const [schedules, setSchedules] = useState(() => getCachedAdminSchedules() || [])
@@ -22,13 +22,18 @@ function AdminSchedulesPage() {
     const confirmed = await sweetConfirm({ title: 'Hapus jadwal?', text: `Hapus jadwal ${schedule.wasteCategory} hari ${schedule.pickupDay}?`, confirmText: 'Hapus', danger: true })
     if (!confirmed) return
 
+    let closeLoading = null
+
     try {
+      closeLoading = sweetLoading({ title: 'Menghapus jadwal...', text: 'Mohon tunggu sampai proses selesai.' })
       await deleteAdminSchedule(schedule.id)
       setFeedback('Jadwal berhasil dihapus.')
+      closeLoading?.()
       await sweetSuccess({ text: 'Jadwal berhasil dihapus.' })
       setIsLoading(true)
       loadSchedules()
     } catch (error) {
+      closeLoading?.()
       setFeedback(error.message)
     }
   }

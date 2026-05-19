@@ -149,6 +149,34 @@ export async function getDriverProfile(userId) {
   }
 }
 
+async function resolveDistrict(tx, payload) {
+  if (payload.districtId) {
+    const district = await tx.district.findUnique({ where: { id: payload.districtId } })
+    if (!district) throw new HttpError(400, 'District tidak ditemukan')
+    return district
+  }
+
+  const existing = await tx.district.findFirst({
+    where: payload.districtCode ? { districtCode: payload.districtCode } : {
+      name: { equals: payload.districtName, mode: 'insensitive' },
+      city: payload.city,
+    },
+  })
+
+  if (existing) return existing
+
+  return tx.district.create({
+    data: {
+      name: payload.districtName,
+      city: payload.city,
+      province: payload.province,
+      provinceCode: payload.provinceCode,
+      cityCode: payload.cityCode,
+      districtCode: payload.districtCode,
+    },
+  })
+}
+
 export async function updateDriverProfile(userId, payload) {
   const context = await getDriverContext(userId)
   const driverProfile = context.driverProfile
@@ -161,14 +189,10 @@ export async function updateDriverProfile(userId, payload) {
     }
   }
 
-  if (payload.districtId) {
-    const district = await prisma.district.findUnique({ where: { id: payload.districtId } })
-
-    if (!district) throw new HttpError(400, 'District tidak ditemukan')
-  }
-
   try {
     await prisma.$transaction(async (tx) => {
+      const district = payload.district ? await resolveDistrict(tx, payload.district) : null
+
       if (payload.name || payload.email) {
         await tx.user.update({
           where: { id: userId },
@@ -179,16 +203,16 @@ export async function updateDriverProfile(userId, payload) {
         })
       }
 
-      if (payload.vehiclePlate || Object.prototype.hasOwnProperty.call(payload, 'vehicleType') || payload.districtId) {
+      if (payload.vehiclePlate || Object.prototype.hasOwnProperty.call(payload, 'vehicleType') || payload.districtId || district) {
         if (!driverProfile) {
-          if (!payload.vehiclePlate || !payload.districtId) return
+          if (!payload.vehiclePlate || !district) return
 
           await tx.driverProfile.create({
             data: {
               userId,
               vehiclePlate: payload.vehiclePlate,
               vehicleType: payload.vehicleType || null,
-              districtId: payload.districtId,
+              districtId: district.id,
             },
           })
           return
@@ -199,7 +223,7 @@ export async function updateDriverProfile(userId, payload) {
           data: {
             ...(payload.vehiclePlate ? { vehiclePlate: payload.vehiclePlate } : {}),
             ...(Object.prototype.hasOwnProperty.call(payload, 'vehicleType') ? { vehicleType: payload.vehicleType } : {}),
-            ...(payload.districtId ? { districtId: payload.districtId } : {}),
+            ...(district ? { districtId: district.id } : {}),
           },
         })
       }

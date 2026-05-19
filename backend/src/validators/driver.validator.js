@@ -6,6 +6,27 @@ function normalizeString(value) {
   return typeof value === 'string' ? value.trim() : ''
 }
 
+function normalizeDistrict(body) {
+  if (!body || typeof body !== 'object') return null
+
+  const districtId = normalizeString(body.districtId)
+  const districtName = normalizeString(body.districtName)
+  const city = normalizeString(body.city)
+  const districtCode = normalizeString(body.districtCode)
+
+  if (districtId) return { districtId }
+  if (!districtName || !city || !districtCode) throw new HttpError(400, 'Data wilayah wajib lengkap')
+
+  return {
+    districtName,
+    city,
+    province: normalizeString(body.province) || null,
+    provinceCode: normalizeString(body.provinceCode) || null,
+    cityCode: normalizeString(body.cityCode) || null,
+    districtCode,
+  }
+}
+
 export function validateDriverProfileUpdatePayload(body) {
   const payload = {}
   const name = normalizeString(body?.name)
@@ -13,6 +34,7 @@ export function validateDriverProfileUpdatePayload(body) {
   const vehiclePlate = normalizeString(body?.vehiclePlate).toUpperCase()
   const vehicleType = normalizeString(body?.vehicleType)
   const districtId = normalizeString(body?.districtId)
+  const district = normalizeDistrict(body?.district)
 
   if (name) {
     if (name.length < 2) throw new HttpError(400, 'Nama minimal 2 karakter')
@@ -34,6 +56,7 @@ export function validateDriverProfileUpdatePayload(body) {
   }
 
   if (districtId) payload.districtId = districtId
+  if (district) payload.district = district
 
   if (!Object.keys(payload).length) {
     throw new HttpError(400, 'Tidak ada data profile yang diubah')
