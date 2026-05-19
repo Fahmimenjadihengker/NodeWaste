@@ -1,15 +1,8 @@
 import { saveScanResult } from "../stores/scan.store.js";
 
 export async function processScan(user, file, mockResult) {
-  // Logika poin berdasarkan kategori sampah
-  const pointMap = {
-    ORGANIK: 10,
-    ANORGANIK: 15,
-    B3: 20,
-  };
-
-  const ecoPoints = pointMap[mockResult.category] || 0;
-  const xpReward = 10; // Standar XP per scan
+  const ecoPoints = 50;
+  const xpReward = 30;
 
   // Gambar belum disimpan permanen sampai storage/Path AI final tersedia.
   const imageUrl = null;

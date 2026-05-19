@@ -19,8 +19,8 @@ function ScheduleDesktopTable({ schedules }) {
       <table className="w-full border-collapse text-left">
         <thead className="bg-[#f5f1df] text-xs font-black uppercase tracking-[0.18em] text-leaf-900">
           <tr>
-            <th className="px-5 py-4">Kategori</th>
             <th className="px-5 py-4">Hari</th>
+            <th className="px-5 py-4">Kategori</th>
             <th className="px-5 py-4">Jam</th>
             <th className="px-5 py-4">Instruksi</th>
           </tr>
@@ -28,8 +28,8 @@ function ScheduleDesktopTable({ schedules }) {
         <tbody className="divide-y divide-leaf-900/10 text-sm text-moss/75">
           {schedules.map((schedule) => (
             <tr key={schedule.id}>
-              <td className="px-5 py-5 font-black text-leaf-900">{getCategoryLabel(schedule.wasteCategory)}</td>
               <td className="px-5 py-5 font-semibold">{schedule.pickupDay}</td>
+              <td className="px-5 py-5 font-black text-leaf-900">{getCategoryLabel(schedule.wasteCategory)}</td>
               <td className="px-5 py-5 font-semibold">{schedule.pickupTime}</td>
               <td className="px-5 py-5 leading-6">{schedule.instruction}</td>
             </tr>
