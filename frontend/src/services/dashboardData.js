@@ -2,7 +2,7 @@ export const dashboardData = {
   stats: {
     ecoPoints: 165,
     xp: 130,
-    nextLevelXp: 250,
+    nextLevelXp: 100,
     level: 2,
     streak: 3,
     totalScans: 12,

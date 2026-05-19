@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { appNavItems } from './appNavItems.js'
 import { floatingNavbarClass, navbarFrameClass, transparentNavbarClass } from './navbarStyles.js'
+import { sweetConfirm } from '../utils/sweetAlert.js'
 
 function getInitial(name) {
   return (name?.trim()?.charAt(0) || 'E').toUpperCase()
@@ -18,6 +19,11 @@ function AppTopNavbar({ user, onLogout, navItems = appNavItems, homePath = '/das
 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const confirmLogout = async () => {
+    const confirmed = await sweetConfirm({ title: 'Keluar akun?', text: 'Sesi kamu akan diakhiri dari perangkat ini.', confirmText: 'Logout', danger: true })
+    if (confirmed) onLogout()
+  }
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 hidden px-4 py-4 sm:px-6 md:block">
@@ -45,7 +51,7 @@ function AppTopNavbar({ user, onLogout, navItems = appNavItems, homePath = '/das
             </span>
             <span className="max-w-28 truncate">{user?.name || userFallback}</span>
           </Link>
-          <button className="rounded-full px-5 py-2.5 text-sm font-black text-moss transition hover:bg-red-700 hover:text-white" type="button" onClick={onLogout}>
+          <button className="rounded-full px-5 py-2.5 text-sm font-black text-moss transition hover:bg-red-700 hover:text-white" type="button" onClick={confirmLogout}>
             Logout
           </button>
         </div>

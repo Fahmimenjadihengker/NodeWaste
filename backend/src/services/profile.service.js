@@ -84,7 +84,7 @@ export async function getProfile(user) {
     stats: {
       ecoPoints: user.ecoPoints,
       xp: user.xp,
-      nextLevelXp: 250,
+      nextLevelXp: 100,
       level: user.level,
       streak: user.streak,
       totalScans,

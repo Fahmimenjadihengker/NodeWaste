@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import AdminShell from './components/admin/AdminShell.jsx'
 import AppShell from './components/AppShell.jsx'
 import DriverShell from './components/driver/DriverShell.jsx'
@@ -13,7 +13,6 @@ const AdminScheduleFormPage = lazy(() => import('./pages/admin/AdminScheduleForm
 const AdminSchedulesPage = lazy(() => import('./pages/admin/AdminSchedulesPage.jsx'))
 const AdminUserFormPage = lazy(() => import('./pages/admin/AdminUserFormPage.jsx'))
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage.jsx'))
-const DriverDashboardPage = lazy(() => import('./pages/driver/DriverDashboardPage.jsx'))
 const DriverMapPage = lazy(() => import('./pages/driver/DriverMapPage.jsx'))
 const DriverProfilePage = lazy(() => import('./pages/driver/DriverProfilePage.jsx'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'))
@@ -41,9 +40,9 @@ function App() {
             <Route path="/admin/users/:id/edit" element={<AdminUserFormPage />} />
             <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
             <Route path="/admin/schedules/new" element={<AdminScheduleFormPage />} />
-          </Route>
-          <Route element={<ProtectedRoute allowedRoles={['DRIVER']}><DriverShell /></ProtectedRoute>}>
-            <Route path="/driver/dashboard" element={<DriverDashboardPage />} />
+        </Route>
+        <Route element={<ProtectedRoute allowedRoles={['DRIVER']}><DriverShell /></ProtectedRoute>}>
+            <Route path="/driver/dashboard" element={<Navigate replace to="/driver/map" />} />
             <Route path="/driver/map" element={<DriverMapPage />} />
             <Route path="/driver/profile" element={<DriverProfilePage />} />
           </Route>

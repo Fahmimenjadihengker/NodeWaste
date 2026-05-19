@@ -3,7 +3,7 @@ import AppNavIcon from './AppNavIcon.jsx'
 import { mobileAppNavItems } from './appNavItems.js'
 
 function MobileBottomNavbar({ navItems = mobileAppNavItems }) {
-  const gridClass = navItems.length === 3 ? 'grid-cols-3' : navItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'
+  const gridClass = navItems.length === 2 ? 'grid-cols-2' : navItems.length === 3 ? 'grid-cols-3' : navItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden" aria-label="Navigasi aplikasi mobile">

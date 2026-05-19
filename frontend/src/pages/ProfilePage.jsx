@@ -4,6 +4,7 @@ import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getActivities, getProfile, saveStoredUser } from '../services/authApi.js'
+import { sweetConfirm } from '../utils/sweetAlert.js'
 
 const historyFilters = [
   { label: 'Semua', value: 'all' },
@@ -14,7 +15,7 @@ const historyFilters = [
   { label: 'B3', value: 'b3' },
 ]
 
-const emptyStats = { ecoPoints: 0, xp: 0, level: 1, streak: 0, totalScans: 0, validScans: 0, nextLevelXp: 250 }
+const emptyStats = { ecoPoints: 0, xp: 0, level: 1, streak: 0, totalScans: 0, validScans: 0, nextLevelXp: 100 }
 
 function getInitial(name) {
   return (name?.trim()?.charAt(0) || 'E').toUpperCase()
@@ -105,6 +106,11 @@ function ProfilePage() {
     }
   }, [activeFilter])
 
+  const confirmLogout = async () => {
+    const confirmed = await sweetConfirm({ title: 'Keluar akun?', text: 'Sesi kamu akan diakhiri dari perangkat ini.', confirmText: 'Logout', danger: true })
+    if (confirmed) onLogout()
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <AppCard className="rounded-[1.75rem] shadow-[0_22px_70px_rgba(32,58,37,0.1)] sm:p-8">
@@ -121,7 +127,7 @@ function ProfilePage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link className="rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900" to="/profile/edit">Edit akun</Link>
-            <button className="rounded-full border border-moss/20 px-6 py-3 text-sm font-black text-moss transition hover:border-red-700 hover:bg-red-700 hover:text-white" type="button" onClick={onLogout}>Logout</button>
+            <button className="rounded-full border border-moss/20 px-6 py-3 text-sm font-black text-moss transition hover:border-red-700 hover:bg-red-700 hover:text-white" type="button" onClick={confirmLogout}>Logout</button>
           </div>
         </div>
 

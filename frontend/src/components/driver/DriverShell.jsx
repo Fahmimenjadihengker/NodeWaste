@@ -19,7 +19,7 @@ function DriverShell() {
         user={user}
         onLogout={handleLogout}
         navItems={driverNavItems}
-        homePath="/driver/dashboard"
+        homePath="/driver/map"
         profilePath="/driver/profile"
         userFallback="Driver"
         brandSuffix="Driver"

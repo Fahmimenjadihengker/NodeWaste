@@ -50,11 +50,11 @@ export async function getCurrentPet(tx, userId) {
 
 function applyPetEffect(pet, action) {
   const nextXp = pet.xp + action.xpReward
-  const didLevelUp = nextXp >= pet.nextLevelXp
+  const levelGain = Math.floor(nextXp / 100)
 
   return {
-    level: didLevelUp ? pet.level + 1 : pet.level,
-    xp: didLevelUp ? nextXp - pet.nextLevelXp : nextXp,
+    level: pet.level + levelGain,
+    xp: nextXp % 100,
     happiness: clamp(pet.happiness + (action.effect.happiness || 0)),
     hunger: clamp(pet.hunger + (action.effect.hunger || 0)),
     mood: action.type === 'PLAY' ? 'excited' : 'happy',

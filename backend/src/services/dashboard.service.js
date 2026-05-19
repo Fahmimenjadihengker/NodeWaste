@@ -2,7 +2,7 @@ import prisma from '../config/prisma.js'
 import { getUserActivities } from './activity.service.js'
 import { getCurrentPet } from './pet.service.js'
 
-const nextLevelXp = 250
+const nextLevelXp = 100
 const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
 function emptyCategoryCounts() {

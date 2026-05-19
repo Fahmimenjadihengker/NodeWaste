@@ -6,7 +6,7 @@ import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard, SkeletonText } from '../components/Skeleton.jsx'
 import { getDashboard } from '../services/authApi.js'
 const emptyDashboardData = {
-  stats: { ecoPoints: 0, xp: 0, nextLevelXp: 250, level: 1, streak: 0, totalScans: 0, validScans: 0 },
+  stats: { ecoPoints: 0, xp: 0, nextLevelXp: 100, level: 1, streak: 0, totalScans: 0, validScans: 0 },
   pet: { name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0 },
   categories: [
     { label: 'Organik', value: 0, color: 'bg-leaf-600' },

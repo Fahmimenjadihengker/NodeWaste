@@ -3,6 +3,7 @@ import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
 import { getProfile, saveStoredUser, updateProfile, updateProfilePassword, updateProfilePhoto } from '../services/authApi.js'
+import { sweetConfirm } from '../utils/sweetAlert.js'
 
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
 
@@ -43,6 +44,9 @@ function ProfileEditPage() {
   }, [])
 
   const saveProfile = async () => {
+    const confirmed = await sweetConfirm({ title: 'Simpan profile?', text: 'Perubahan akun dan alamat akan disimpan.', confirmText: 'Simpan' })
+    if (!confirmed) return
+
     try {
       let userResponse = null
       const hasAddress = Object.values(addressForm).some((value) => String(value).trim())

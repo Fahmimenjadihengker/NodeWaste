@@ -96,7 +96,7 @@ export function getStoredUser() {
 }
 
 export function getRoleHomePath(user) {
-  if (user?.role === 'DRIVER') return '/driver/dashboard'
+  if (user?.role === 'DRIVER') return '/driver/map'
   if (user?.role === 'ADMIN') return '/admin/dashboard'
 
   return '/dashboard'

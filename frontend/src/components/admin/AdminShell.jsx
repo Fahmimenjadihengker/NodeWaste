@@ -3,12 +3,15 @@ import { clearAuthSession, getStoredUser } from '../../services/authApi.js'
 import AppNavIcon from '../AppNavIcon.jsx'
 import MobileBottomNavbar from '../MobileBottomNavbar.jsx'
 import { adminNavItems, mobileAdminNavItems } from './adminNavItems.js'
+import { sweetConfirm } from '../../utils/sweetAlert.js'
 
 function AdminShell() {
   const user = getStoredUser()
   const navigate = useNavigate()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const confirmed = await sweetConfirm({ title: 'Keluar akun?', text: 'Sesi admin akan diakhiri dari perangkat ini.', confirmText: 'Logout', danger: true })
+    if (!confirmed) return
     clearAuthSession()
     navigate('/')
   }

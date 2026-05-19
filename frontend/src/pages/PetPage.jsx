@@ -4,6 +4,7 @@ import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getPet, runPetAction } from '../services/authApi.js'
+import { sweetConfirm } from '../utils/sweetAlert.js'
 
 const petActions = [
   {
@@ -11,7 +12,7 @@ const petActions = [
     label: 'Makan',
     cost: 20,
     mood: 'happy',
-    helper: 'Naikkan kenyang Leafy.',
+    helper: 'Jika lapar, beri makan.',
     effect: { hunger: -28 },
   },
   {
@@ -19,7 +20,7 @@ const petActions = [
     label: 'Main',
     cost: 15,
     mood: 'excited',
-    helper: 'Naikkan happiness dan tambah XP Leafy.',
+    helper: 'Jika tidak bahagia, ajak main.',
     effect: { happiness: 18, hunger: 8, xp: 15 },
   },
 ]
@@ -114,7 +115,7 @@ function PetPage() {
 
   const statusItems = useMemo(() => [
     { label: 'Happiness', value: pet.happiness, helper: 'Naik saat diajak main' },
-    { label: 'Kenyang', value: satiety, helper: 'Makin tinggi makin tidak lapar' },
+    { label: 'Kenyang', value: satiety, helper: 'Makin rendah makin lapar' },
   ], [pet, satiety])
 
   useEffect(() => {
@@ -162,6 +163,9 @@ function PetPage() {
       setFeedback(`EcoPoints belum cukup untuk ${action.label.toLowerCase()}.`)
       return
     }
+
+    const confirmed = await sweetConfirm({ title: `${action.label} Leafy?`, text: `Aksi ini memakai ${action.cost} EcoPoints.`, confirmText: action.label })
+    if (!confirmed) return
 
     try {
       const response = await runPetAction(action.id)
@@ -231,10 +235,10 @@ function PetPage() {
       <section className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
         <AppCard as="div" tone="yellow" className="self-start">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
-          <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Prioritas perawatan</h2>
+          <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Cara merawat</h2>
           <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
-            <p>Jika Kenyang rendah, pilih Makan terlebih dahulu.</p>
-            <p>Jika Happiness rendah, ajak Leafy Main.</p>
+            <p>Jika lapar, beri makan.</p>
+            <p>Jika tidak bahagia, ajak main.</p>
           </div>
         </AppCard>
         <ActivityLog items={logs} />
