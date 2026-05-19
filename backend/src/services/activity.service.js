@@ -5,8 +5,16 @@ function normalizeFilter(filter) {
   return ['scan', 'pet', 'organik', 'anorganik', 'b3'].includes(filter) ? filter : 'all'
 }
 
+function normalizeCategoryKey(category) {
+  const key = String(category || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
+  if (key === 'organik') return 'organik'
+  if (key === 'anorganik') return 'anorganik'
+  if (key === 'b3') return 'b3'
+  return key
+}
+
 function toActivityItem(activity) {
-  const category = activity.scan?.category?.toLowerCase() || (activity.type === 'PET' ? 'pet' : activity.type.toLowerCase())
+  const category = normalizeCategoryKey(activity.scan?.category) || (activity.type === 'PET' ? 'pet' : activity.type.toLowerCase())
 
   return {
     id: activity.id,
@@ -28,12 +36,20 @@ export async function getUserActivities(userId, options = {}) {
   if (filter === 'pet') where.type = 'PET'
   if (['organik', 'anorganik', 'b3'].includes(filter)) {
     where.type = 'SCAN'
-    where.scan = { is: { category: filter.toUpperCase() } }
+    where.scan = { is: { category: { equals: filter === 'b3' ? 'B3' : filter, mode: 'insensitive' } } }
   }
 
   const activities = await prisma.activity.findMany({
     where,
-    include: { scan: true },
+    select: {
+      id: true,
+      type: true,
+      title: true,
+      meta: true,
+      detail: true,
+      createdAt: true,
+      scan: { select: { category: true } },
+    },
     orderBy: { createdAt: 'desc' },
     take: limit,
   })

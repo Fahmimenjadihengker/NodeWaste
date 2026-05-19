@@ -2,7 +2,7 @@ export const appNavItems = [
   { label: 'Beranda', to: '/dashboard', icon: 'home' },
   { label: 'Scan', to: '/scan', icon: 'scan', featured: true },
   { label: 'Pet', to: '/pet', icon: 'pet' },
-  { label: 'Peta', to: '/map', icon: 'map' },
+  { label: 'Jadwal', to: '/schedule', icon: 'schedule' },
 ]
 
 export const mobileAppNavItems = [

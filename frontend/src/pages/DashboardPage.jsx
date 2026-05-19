@@ -1,10 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
-import { getDashboard } from '../services/authApi.js'
-import { dashboardData } from '../services/dashboardData.js'
+import { SkeletonCard, SkeletonText } from '../components/Skeleton.jsx'
+import { useCachedResource } from '../hooks/useCachedResource.js'
+import { getCachedDashboard, getDashboard } from '../services/authApi.js'
+const emptyDashboardData = {
+  stats: { ecoPoints: 0, xp: 0, nextLevelXp: 100, level: 1, streak: 0, totalScans: 0, validScans: 0 },
+  pet: { name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0 },
+  categories: [
+    { label: 'Organik', value: 0, color: 'bg-leaf-600' },
+    { label: 'Anorganik', value: 0, color: 'bg-[#7fa765]' },
+    { label: 'B3', value: 0, color: 'bg-honey' },
+  ],
+  activities: [],
+  scanActivity: { weekly: [], monthly: [] },
+}
 
 const scanCategorySegments = [
   { key: 'organik', label: 'Organik', colorClass: 'bg-leaf-600' },
@@ -149,27 +161,12 @@ function ScanActivityChart({ data, categories }) {
 
 function DashboardPage() {
   const { user } = useOutletContext()
-  const [data, setData] = useState(dashboardData)
+  const { data, error: feedback, isLoading } = useCachedResource({ getCached: getCachedDashboard, load: getDashboard, fallback: emptyDashboardData })
   const { stats, pet, categories, activities, scanActivity } = data
   const [leafyMood, setLeafyMood] = useState('idle')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
   const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
-
-  useEffect(() => {
-    let isMounted = true
-
-    getDashboard()
-      .then((response) => {
-        if (isMounted) setData(response.data)
-      })
-      .catch(() => {})
-
-    return () => {
-      isMounted = false
-      window.clearTimeout(moodTimerRef.current)
-    }
-  }, [])
 
   const handleLeafyClick = () => {
     const now = Date.now()
@@ -195,15 +192,14 @@ function DashboardPage() {
           <p className="mt-5 max-w-2xl text-base leading-8 text-moss/70 sm:text-lg">
             Ini ringkasan kebiasaan memilahmu. Mulai scan berikutnya untuk menambah EcoPoints, XP, dan menjaga Leafy tetap bahagia.
           </p>
+          {feedback ? <p className="mt-4 rounded-2xl bg-[#fff3cf] p-4 text-sm font-bold text-moss">{feedback}</p> : null}
 
           <Link className="mt-8 inline-flex w-full justify-center rounded-full bg-leaf-600 px-7 py-4 font-black text-white transition hover:bg-leaf-900 sm:w-auto" to="/scan">
             Scan Sampah
           </Link>
 
           <div className="mt-10 grid gap-5 border-y border-moss/15 py-7 sm:grid-cols-3">
-            <StatBlock label="EcoPoints" value={stats.ecoPoints} helper="Siap dipakai merawat Leafy" />
-            <StatBlock label="Streak" value={`${stats.streak} hari`} helper="Pertahankan hari ini" />
-            <StatBlock label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} />
+            {isLoading ? <><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /></> : <><StatBlock label="EcoPoints" value={stats.ecoPoints} helper="Siap dipakai merawat Leafy" /><StatBlock label="Streak" value={`${stats.streak} hari`} helper="Pertahankan hari ini" /><StatBlock label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} /></>}
           </div>
 
         </section>
@@ -218,21 +214,14 @@ function DashboardPage() {
               <span className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
             </div>
             <LeafyAvatar mood={leafyMood} onClick={handleLeafyClick} />
-            <div className="mt-5 space-y-4">
-              <ProgressLine label="Health" value={pet.health} />
-              <ProgressLine label="Happiness" value={pet.happiness} />
-              <ProgressLine label="Cleanliness" value={pet.cleanliness} />
-            </div>
+            {isLoading ? <div className="mt-5 space-y-4"><SkeletonText className="h-8 w-full" /><SkeletonText className="h-8 w-full" /></div> : <div className="mt-5 space-y-4"><ProgressLine label="Happiness" value={pet.happiness} /><ProgressLine label="Kenyang" value={100 - pet.hunger} /></div>}
           </section>
         </div>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
           <AppCard>
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Progress level</h2>
-            <p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p>
-            <div className="mt-8">
-              <ProgressLine label="XP menuju level berikutnya" value={xpProgress} />
-            </div>
+            {isLoading ? <div className="mt-4 space-y-4"><SkeletonText className="w-2/3" /><SkeletonText className="h-8 w-full" /></div> : <><p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p><div className="mt-8"><ProgressLine label="XP menuju level berikutnya" value={xpProgress} /></div></>}
           </AppCard>
 
           <AppCard>

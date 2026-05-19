@@ -239,7 +239,7 @@ export const swaggerDocument = {
         tags: ["Virtual Pet"],
         summary: "Melakukan interaksi dengan pet",
         description:
-          "Menukar EcoPoints untuk melakukan aksi: feed (makan), play (main), atau bath (mandi).",
+          "Menukar EcoPoints untuk melakukan aksi: feed (makan) atau play (main).",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -249,7 +249,7 @@ export const swaggerDocument = {
             description: "Jenis aksi yang akan dilakukan",
             schema: {
               type: "string",
-              enum: ["feed", "play", "bath"],
+              enum: ["feed", "play"],
             },
           },
         ],
@@ -261,6 +261,310 @@ export const swaggerDocument = {
           400: {
             description: "Aksi tidak valid atau EcoPoints tidak mencukupi",
           },
+        },
+      },
+    },
+
+    // --- SCHEDULES ---
+    "/api/schedules": {
+      get: {
+        tags: ["Schedules"],
+        summary: "Mengambil jadwal angkut global untuk user",
+        description:
+          "Mengembalikan jadwal angkut aktif. Jadwal saat ini bersifat global dan tidak dibatasi wilayah user.",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Jadwal berhasil diambil" },
+          401: { description: "Unauthorized" },
+          403: { description: "Hanya role USER yang dapat mengakses endpoint ini" },
+        },
+      },
+    },
+
+    // --- REGIONS ---
+    "/api/regions/provinces": {
+      get: {
+        tags: ["Regions"],
+        summary: "Daftar provinsi dari proxy wilayah.id",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Provinsi berhasil diambil" },
+          401: { description: "Unauthorized" },
+        },
+      },
+    },
+    "/api/regions/regencies/{provinceCode}": {
+      get: {
+        tags: ["Regions"],
+        summary: "Daftar kabupaten/kota berdasarkan kode provinsi",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "provinceCode",
+            in: "path",
+            required: true,
+            schema: { type: "string", example: "34" },
+          },
+        ],
+        responses: {
+          200: { description: "Kabupaten/kota berhasil diambil" },
+          401: { description: "Unauthorized" },
+        },
+      },
+    },
+    "/api/regions/districts/{regencyCode}": {
+      get: {
+        tags: ["Regions"],
+        summary: "Daftar kecamatan berdasarkan kode kabupaten/kota",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "regencyCode",
+            in: "path",
+            required: true,
+            schema: { type: "string", example: "34.71" },
+          },
+        ],
+        responses: {
+          200: { description: "Kecamatan berhasil diambil" },
+          401: { description: "Unauthorized" },
+        },
+      },
+    },
+
+    // --- DRIVER ---
+    "/api/driver/dashboard": {
+      get: {
+        tags: ["Driver"],
+        summary: "Mengambil ringkasan dashboard driver",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Dashboard driver berhasil diambil" },
+          403: { description: "Hanya role DRIVER yang dapat mengakses endpoint ini" },
+        },
+      },
+    },
+    "/api/driver/profile": {
+      get: {
+        tags: ["Driver"],
+        summary: "Mengambil profil driver saat ini",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Profile driver berhasil diambil" },
+          403: { description: "Hanya role DRIVER yang dapat mengakses endpoint ini" },
+        },
+      },
+      put: {
+        tags: ["Driver"],
+        summary: "Memperbarui profil dan kendaraan driver",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: { type: "string", example: "Driver Demo" },
+                  email: { type: "string", example: "driver.demo@nodewaste.test" },
+                  vehiclePlate: { type: "string", example: "AB1234CD" },
+                  vehicleType: { type: "string", example: "Motor bak" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Profile driver berhasil diperbarui" },
+          400: { description: "Payload tidak valid" },
+          403: { description: "Hanya role DRIVER yang dapat mengakses endpoint ini" },
+        },
+      },
+    },
+    "/api/driver/map": {
+      get: {
+        tags: ["Driver"],
+        summary: "Mengambil titik rumah user untuk map driver",
+        description:
+          "Mengembalikan user yang memiliki alamat dan koordinat untuk wilayah kerja driver.",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Map driver berhasil diambil" },
+          403: { description: "Hanya role DRIVER yang dapat mengakses endpoint ini" },
+        },
+      },
+    },
+
+    // --- ADMIN ---
+    "/api/admin/dashboard": {
+      get: {
+        tags: ["Admin"],
+        summary: "Mengambil ringkasan dashboard admin",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Dashboard admin berhasil diambil" },
+          403: { description: "Hanya role ADMIN yang dapat mengakses endpoint ini" },
+        },
+      },
+    },
+    "/api/admin/accounts": {
+      get: {
+        tags: ["Admin"],
+        summary: "Daftar akun semua role",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Daftar akun berhasil diambil" },
+          403: { description: "Hanya role ADMIN yang dapat mengakses endpoint ini" },
+        },
+      },
+      post: {
+        tags: ["Admin"],
+        summary: "Membuat akun USER, DRIVER, atau ADMIN",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name", "email", "password", "role"],
+                properties: {
+                  name: { type: "string", example: "Admin Baru" },
+                  email: { type: "string", example: "admin.baru@example.com" },
+                  password: { type: "string", example: "password123" },
+                  role: { type: "string", enum: ["USER", "DRIVER", "ADMIN"] },
+                  vehiclePlate: { type: "string", example: "AB1234CD" },
+                  vehicleType: { type: "string", example: "Motor bak" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Akun berhasil dibuat" },
+          400: { description: "Payload tidak valid" },
+        },
+      },
+    },
+    "/api/admin/accounts/{id}": {
+      put: {
+        tags: ["Admin"],
+        summary: "Memperbarui akun atau status aktif akun",
+        description: "Admin dapat mengubah nama, email, dan isActive. Admin tidak dapat menonaktifkan akun sendiri.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: { type: "string", example: "Nama Baru" },
+                  email: { type: "string", example: "akun.baru@example.com" },
+                  isActive: { type: "boolean", example: true },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Akun berhasil diperbarui" },
+          400: { description: "Payload tidak valid" },
+          404: { description: "Akun tidak ditemukan" },
+        },
+      },
+    },
+    "/api/admin/drivers": {
+      get: {
+        tags: ["Admin"],
+        summary: "Daftar akun driver",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Daftar driver berhasil diambil" } },
+      },
+      post: {
+        tags: ["Admin"],
+        summary: "Membuat akun driver beserta profil kendaraan dan wilayah kerja",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          201: { description: "Driver berhasil dibuat" },
+          400: { description: "Payload tidak valid" },
+        },
+      },
+    },
+    "/api/admin/drivers/{id}": {
+      put: {
+        tags: ["Admin"],
+        summary: "Memperbarui data driver",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: {
+          200: { description: "Driver berhasil diperbarui" },
+          404: { description: "Driver tidak ditemukan" },
+        },
+      },
+    },
+    "/api/admin/schedules": {
+      get: {
+        tags: ["Admin"],
+        summary: "Daftar jadwal angkut global",
+        security: [{ bearerAuth: [] }],
+        responses: { 200: { description: "Jadwal berhasil diambil" } },
+      },
+      post: {
+        tags: ["Admin"],
+        summary: "Membuat jadwal angkut global",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["wasteCategory", "pickupDay", "pickupTime"],
+                properties: {
+                  wasteCategory: { type: "string", example: "Organik" },
+                  pickupDay: { type: "string", example: "Senin" },
+                  pickupTime: { type: "string", example: "08:00" },
+                  instruction: { type: "string", example: "Letakkan sampah di depan rumah" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Jadwal berhasil dibuat" },
+          400: { description: "Payload tidak valid" },
+        },
+      },
+    },
+    "/api/admin/schedules/{id}": {
+      put: {
+        tags: ["Admin"],
+        summary: "Memperbarui jadwal angkut global",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: {
+          200: { description: "Jadwal berhasil diperbarui" },
+          404: { description: "Jadwal tidak ditemukan" },
+        },
+      },
+      delete: {
+        tags: ["Admin"],
+        summary: "Menghapus jadwal angkut global",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: {
+          200: { description: "Jadwal berhasil dihapus" },
+          404: { description: "Jadwal tidak ditemukan" },
         },
       },
     },

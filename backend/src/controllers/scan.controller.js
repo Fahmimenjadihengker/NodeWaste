@@ -47,6 +47,22 @@ export async function createScan(request, response, next) {
         500,
         "Gagal terhubung ke service AI. Pastikan server ML berjalan.",
       );
+    // Mock AI Classifier Logic (Sesuai diskusi sebelumnya)
+    const filename = request.file.originalname.toLowerCase();
+    let mockResult = {
+      category: "Anorganik",
+      label: "Botol Plastik",
+      confidence: 95,
+    };
+
+    if (filename.includes("food")) {
+      mockResult = {
+        category: "Organik",
+        label: "Sisa Makanan",
+        confidence: 88,
+      };
+    } else if (filename.includes("battery")) {
+      mockResult = { category: "B3", label: "Baterai Bekas", confidence: 92 };
     }
 
     const aiData = aiResponse.data;

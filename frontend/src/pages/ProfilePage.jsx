@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
-import { getActivities, getProfile, saveStoredUser, updateProfile, updateProfilePassword } from '../services/authApi.js'
-import { dashboardData } from '../services/dashboardData.js'
+import { SkeletonCard } from '../components/Skeleton.jsx'
+import { getActivities, getCachedActivities, getCachedProfile, getProfile, saveStoredUser } from '../services/authApi.js'
+import { sweetConfirm } from '../utils/sweetAlert.js'
 
 const historyFilters = [
   { label: 'Semua', value: 'all' },
@@ -14,120 +15,18 @@ const historyFilters = [
   { label: 'B3', value: 'b3' },
 ]
 
-const mockHistory = [
-  { id: 1, type: 'scan', category: 'anorganik', title: 'Scan Botol Plastik', meta: '+15 EcoPoints, +10 XP', time: 'Hari ini', detail: 'Anorganik, confidence 92%' },
-  { id: 2, type: 'pet', category: 'pet', title: 'Leafy diberi makan', meta: '-20 EcoPoints', time: 'Kemarin', detail: 'Health Leafy naik dan hunger turun.' },
-  { id: 3, type: 'scan', category: 'organik', title: 'Scan Sisa Makanan', meta: '+10 EcoPoints, +10 XP', time: '2 hari lalu', detail: 'Organik, confidence 88%' },
-  { id: 4, type: 'pet', category: 'pet', title: 'Leafy diajak main', meta: '-15 EcoPoints, +15 Pet XP', time: '3 hari lalu', detail: 'Happiness Leafy meningkat.' },
-  { id: 5, type: 'scan', category: 'b3', title: 'Scan Baterai Bekas', meta: '+20 EcoPoints, +10 XP', time: '4 hari lalu', detail: 'B3, confidence 84%' },
-  { id: 6, type: 'scan', category: 'anorganik', title: 'Scan Kaleng Minuman', meta: '+15 EcoPoints, +10 XP', time: '5 hari lalu', detail: 'Anorganik, confidence 90%' },
-]
+const emptyStats = { ecoPoints: 0, xp: 0, level: 1, streak: 0, totalScans: 0, validScans: 0, nextLevelXp: 100 }
 
 function getInitial(name) {
   return (name?.trim()?.charAt(0) || 'E').toUpperCase()
 }
 
-function StatCard({ label, value, helper }) {
+function InfoItem({ label, value }) {
   return (
-    <AppCard as="div" tone="softCream" className="min-h-44 bg-[#fff8e8]/75 shadow-[0_18px_42px_rgba(32,58,37,0.08)]">
-      <p className="text-sm font-black uppercase tracking-[0.2em] text-moss/45">{label}</p>
-      <p className="mt-4 text-4xl font-black tracking-[-0.04em] text-leaf-900">{value}</p>
-      {helper ? <p className="mt-3 text-base font-semibold text-moss/60">{helper}</p> : null}
-    </AppCard>
-  )
-}
-
-function ProfileHero({ user, xpProgress }) {
-  return (
-    <AppCard className="rounded-[1.5rem] shadow-[0_22px_70px_rgba(32,58,37,0.1)] sm:p-8">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-        <div className="mx-auto grid h-32 w-32 shrink-0 place-items-center rounded-full bg-[#f5f1df] text-5xl font-black text-leaf-900 shadow-inner shadow-moss/10 sm:mx-0">
-          {getInitial(user?.name)}
-        </div>
-
-        <div className="flex-1 text-center sm:text-left">
-          <h1 className="text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{user?.name || 'Eco Hero'}</h1>
-          <div className="mt-5 flex flex-col gap-3 rounded-[1.25rem] bg-[#fff8e8]/80 p-3 sm:flex-row sm:items-center">
-            <span className="inline-flex shrink-0 items-center justify-center rounded-full border border-moss/10 bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Level {dashboardData.stats.level}</span>
-            <ProgressBar value={xpProgress} className="h-3 flex-1" trackClassName="bg-[#e8e7fb]" />
-            <span className="shrink-0 text-sm font-bold text-moss/65">{dashboardData.stats.xp} / {dashboardData.stats.nextLevelXp} XP</span>
-          </div>
-        </div>
-      </div>
-
-      <button className="mt-6 w-full rounded-full border border-moss/15 px-5 py-3 text-sm font-black text-moss/50 sm:w-auto" type="button" disabled>
-        Ubah foto segera hadir
-      </button>
-    </AppCard>
-  )
-}
-
-function SettingsCard({ form, password, settingsFeedback, passwordFeedback, onFormChange, onSave, onPasswordChange, onPasswordSubmit }) {
-  return (
-    <AppCard tone="softCream">
-      <div>
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Pengaturan akun</p>
-        <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Data dan preferensi</h2>
-        <p className="mt-2 text-sm leading-6 text-moss/65">Nama dan email masih divalidasi lokal sampai endpoint update profile tersedia.</p>
-      </div>
-
-      <div className="mt-6 grid gap-4">
-        <label className="block">
-          <span className="text-sm font-black text-moss/70">Nama</span>
-          <input className="mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600" value={form.name} onChange={(event) => onFormChange('name', event.target.value)} />
-        </label>
-        <label className="block">
-          <span className="text-sm font-black text-moss/70">Email</span>
-          <input className="mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600" type="email" value={form.email} onChange={(event) => onFormChange('email', event.target.value)} />
-        </label>
-      </div>
-
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <button className="rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900" type="button" onClick={onSave}>
-          Simpan perubahan
-        </button>
-        {settingsFeedback ? <p className="text-sm font-bold text-leaf-900">{settingsFeedback}</p> : null}
-      </div>
-
-      <div className="mt-8 border-t border-moss/10 pt-8">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Keamanan akun</p>
-        <h3 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Ubah password</h3>
-        <p className="mt-2 text-sm leading-6 text-moss/65">Validasi masih lokal untuk persiapan integrasi endpoint keamanan.</p>
-
-        <div className="mt-6 grid gap-4">
-          {[
-            ['current', 'Password lama'],
-            ['next', 'Password baru'],
-            ['confirm', 'Konfirmasi password'],
-          ].map(([key, label]) => (
-            <label key={key} className="block min-w-0">
-              <span className="whitespace-nowrap text-sm font-black text-moss/70">{label}</span>
-              <input className="mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600" type="password" value={password[key]} onChange={(event) => onPasswordChange(key, event.target.value)} />
-            </label>
-          ))}
-        </div>
-
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button className="rounded-full border border-moss/20 px-6 py-3 text-sm font-black text-moss transition hover:border-leaf-600 hover:text-leaf-700" type="button" onClick={onPasswordSubmit}>
-            Validasi password
-          </button>
-          {passwordFeedback ? <p className="text-sm font-bold text-leaf-900">{passwordFeedback}</p> : null}
-        </div>
-      </div>
-    </AppCard>
-  )
-}
-
-function AccountActionCard({ onLogout }) {
-  return (
-    <AppCard tone="yellow" className="shadow-[0_18px_42px_rgba(32,58,37,0.08)]">
-      <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Aksi akun</p>
-      <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Keluar dari sesi</h2>
-      <p className="mt-2 text-sm leading-6 text-moss/65">Logout tersedia di Profile agar mudah diakses dari mobile PWA.</p>
-      <button className="mt-5 w-full rounded-full border border-moss/20 px-5 py-3 text-sm font-black text-moss transition hover:border-red-700 hover:bg-red-700 hover:text-white" type="button" onClick={onLogout}>
-        Logout
-      </button>
-    </AppCard>
+    <div className="rounded-[1.25rem] bg-[#f5f1df] p-4">
+      <p className="text-xs font-black uppercase tracking-[0.16em] text-moss/45">{label}</p>
+      <p className="mt-2 font-black text-leaf-900">{value || '-'}</p>
+    </div>
   )
 }
 
@@ -138,7 +37,6 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Riwayat lengkap</p>
           <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Aktivitas pengguna</h2>
-          <p className="mt-2 text-sm leading-6 text-moss/65">Riwayat scan dan perawatan pet ditampilkan di Profile sampai halaman History dibuat.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {historyFilters.map((filter) => (
@@ -154,20 +52,14 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
           <article key={item.id} className="py-5 first:pt-0 last:pb-0">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-[#f8f4e6] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-moss/50">{item.type === 'scan' ? 'Scan' : 'Pet'}</span>
-                  <span className="rounded-full bg-leaf-100 px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-leaf-900">{item.category}</span>
-                </div>
-                <h3 className="mt-3 text-xl font-black tracking-[-0.03em] text-leaf-900">{item.title}</h3>
+                <h3 className="text-xl font-black tracking-[-0.03em] text-leaf-900">{item.title}</h3>
                 <p className="mt-1 text-sm font-semibold text-moss/60">{item.meta}</p>
                 <p className="mt-2 text-sm leading-6 text-moss/55">{item.detail}</p>
               </div>
               <span className="shrink-0 text-xs font-black uppercase tracking-[0.14em] text-moss/40">{item.time}</span>
             </div>
           </article>
-        )) : (
-          <p className="rounded-[1.25rem] bg-[#f8f4e6] p-5 text-sm font-semibold text-moss/65">Belum ada aktivitas untuk filter ini.</p>
-        )}
+        )) : <p className="rounded-[1.25rem] bg-[#f8f4e6] p-5 text-sm font-semibold text-moss/65">Belum ada aktivitas untuk filter ini.</p>}
       </div>
     </AppCard>
   )
@@ -175,35 +67,31 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
 
 function ProfilePage() {
   const { user, onLogout } = useOutletContext()
-  const xpProgress = Math.min(Math.round((dashboardData.stats.xp / dashboardData.stats.nextLevelXp) * 100), 100)
-  const [form, setForm] = useState({ name: user?.name || 'Eco Hero', email: user?.email || '' })
-  const [settingsFeedback, setSettingsFeedback] = useState('')
-  const [password, setPassword] = useState({ current: '', next: '', confirm: '' })
-  const [passwordFeedback, setPasswordFeedback] = useState('')
+  const cachedProfile = getCachedProfile()
+  const [profile, setProfile] = useState(() => cachedProfile?.data || { user, address: null, stats: emptyStats })
+  const [isLoading, setIsLoading] = useState(!cachedProfile)
   const [activeFilter, setActiveFilter] = useState('all')
-  const [history, setHistory] = useState(mockHistory)
+  const [history, setHistory] = useState(() => getCachedActivities('all')?.data?.activities || [])
+  const stats = { ...emptyStats, ...profile.stats }
+  const currentUser = profile.user || user
+  const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
+  const address = profile.address
+  const district = address?.district
   const filteredHistory = useMemo(() => {
     if (activeFilter === 'all') return history
     if (activeFilter === 'scan' || activeFilter === 'pet') return history.filter((item) => item.type === activeFilter)
-
     return history.filter((item) => item.category === activeFilter)
   }, [activeFilter, history])
 
   useEffect(() => {
     let isMounted = true
-
-    getProfile()
-      .then((response) => {
-        if (!isMounted) return
-
-        const nextUser = response.data.user
-        setForm({ name: nextUser.name, email: nextUser.email })
-        saveStoredUser(nextUser)
-      })
-      .catch((error) => {
-        if (isMounted) setSettingsFeedback(error.message)
-      })
-
+    getProfile().then((response) => {
+      if (!isMounted) return
+      setProfile(response.data)
+      saveStoredUser(response.data.user)
+    }).catch(() => {}).finally(() => {
+      if (isMounted) setIsLoading(false)
+    })
     return () => {
       isMounted = false
     }
@@ -211,92 +99,64 @@ function ProfilePage() {
 
   useEffect(() => {
     let isMounted = true
+    const cached = getCachedActivities(activeFilter)
+    if (cached?.data?.activities) queueMicrotask(() => setHistory(cached.data.activities))
 
-    getActivities(activeFilter)
-      .then((response) => {
-        if (isMounted) setHistory(response.data.activities)
-      })
-      .catch(() => {})
-
+    getActivities(activeFilter).then((response) => {
+      if (isMounted) setHistory(response.data.activities)
+    }).catch(() => {})
     return () => {
       isMounted = false
     }
   }, [activeFilter])
 
-  const handleFormChange = (key, value) => {
-    setForm((current) => ({ ...current, [key]: value }))
-  }
-
-  const handleSaveSettings = async () => {
-    if (!form.name.trim()) {
-      setSettingsFeedback('Nama tidak boleh kosong.')
-      return
-    }
-
-    if (!form.email.includes('@')) {
-      setSettingsFeedback('Email harus valid.')
-      return
-    }
-
-    try {
-      const response = await updateProfile(form)
-      saveStoredUser(response.data.user)
-      setSettingsFeedback('Profile berhasil diperbarui.')
-    } catch (error) {
-      setSettingsFeedback(error.message)
-    }
-  }
-
-  const handlePasswordChange = (key, value) => {
-    setPassword((current) => ({ ...current, [key]: value }))
-  }
-
-  const handlePasswordSubmit = async () => {
-    if (!password.current || !password.next || !password.confirm) {
-      setPasswordFeedback('Semua field password wajib diisi.')
-      return
-    }
-
-    if (password.next.length < 8) {
-      setPasswordFeedback('Password baru minimal 8 karakter.')
-      return
-    }
-
-    if (password.next !== password.confirm) {
-      setPasswordFeedback('Konfirmasi password belum sama.')
-      return
-    }
-
-    try {
-      await updateProfilePassword({
-        currentPassword: password.current,
-        newPassword: password.next,
-      })
-      setPasswordFeedback('Password berhasil diperbarui.')
-      setPassword({ current: '', next: '', confirm: '' })
-    } catch (error) {
-      setPasswordFeedback(error.message)
-    }
+  const confirmLogout = async () => {
+    const confirmed = await sweetConfirm({ title: 'Keluar akun?', text: 'Sesi kamu akan diakhiri dari perangkat ini.', confirmText: 'Logout', danger: true })
+    if (confirmed) onLogout()
   }
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
-      <section>
-        <ProfileHero user={{ ...user, ...form }} xpProgress={xpProgress} />
-      </section>
-
-      <section className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <SettingsCard form={form} password={password} settingsFeedback={settingsFeedback} passwordFeedback={passwordFeedback} onFormChange={handleFormChange} onSave={handleSaveSettings} onPasswordChange={handlePasswordChange} onPasswordSubmit={handlePasswordSubmit} />
-        <div className="space-y-6">
-          <div className="grid gap-5 sm:grid-cols-2">
-            <StatCard label="EcoPoints" value={dashboardData.stats.ecoPoints} helper="Siap dipakai merawat Leafy" />
-            <StatCard label="Level" value={dashboardData.stats.level} helper={`${dashboardData.stats.xp}/${dashboardData.stats.nextLevelXp} XP`} />
-            <StatCard label="Total scan" value={dashboardData.stats.totalScans} helper={`${dashboardData.stats.validScans} scan valid`} />
-            <StatCard label="Streak" value={`${dashboardData.stats.streak} hari`} helper="Pertahankan hari ini" />
+      <AppCard className="rounded-[1.75rem] shadow-[0_22px_70px_rgba(32,58,37,0.1)] sm:p-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+            <div className="mx-auto grid h-32 w-32 shrink-0 place-items-center overflow-hidden rounded-full bg-[#f5f1df] text-5xl font-black text-leaf-900 shadow-inner shadow-moss/10 sm:mx-0">
+              {currentUser?.profilePhotoUrl ? <img className="h-full w-full object-cover" src={currentUser.profilePhotoUrl} alt="Foto profile" /> : getInitial(currentUser?.name)}
+            </div>
+            <div className="text-center sm:text-left">
+              <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Profile akun</p>
+              <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{currentUser?.name || 'Eco Hero'}</h1>
+              <p className="mt-3 text-base font-semibold text-moss/60">{currentUser?.email || '-'}</p>
+            </div>
           </div>
-          <AccountActionCard onLogout={onLogout} />
+          <div className="flex flex-wrap gap-3">
+            <Link className="rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900" to="/profile/edit">Edit akun</Link>
+            <button className="rounded-full border border-moss/20 px-6 py-3 text-sm font-black text-moss transition hover:border-red-700 hover:bg-red-700 hover:text-white" type="button" onClick={confirmLogout}>Logout</button>
+          </div>
         </div>
-      </section>
+
+        {isLoading ? <SkeletonCard className="mt-8 min-h-64" /> : <>
+        <div className="mt-8 rounded-[1.25rem] bg-[#f5f1df] p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <span className="text-sm font-black text-leaf-900">Progress level</span>
+            <ProgressBar value={xpProgress} className="h-3 flex-1" trackClassName="bg-[#e8e7fb]" />
+            <span className="text-sm font-bold text-moss/65">{xpProgress}%</span>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <InfoItem label="EcoPoints" value={stats.ecoPoints} />
+          <InfoItem label="Level" value={`${stats.level} (${stats.xp}/${stats.nextLevelXp} XP)`} />
+          <InfoItem label="Total scan" value={`${stats.totalScans} scan, ${stats.validScans} valid`} />
+          <InfoItem label="Streak" value={`${stats.streak} hari`} />
+        </div>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          <InfoItem label="Alamat rumah" value={address?.address || 'Belum diisi'} />
+          <InfoItem label="Wilayah" value={[district?.name, district?.city, district?.province].filter(Boolean).join(', ') || 'Belum diisi'} />
+        </div>
+        </>}
+      </AppCard>
 
       <div className="mt-8">
         <HistorySection activeFilter={activeFilter} items={filteredHistory} onFilterChange={setActiveFilter} />

@@ -20,6 +20,10 @@ export async function authMiddleware(request, _response, next) {
       throw new HttpError(401, 'User tidak ditemukan')
     }
 
+    if (!user.isActive) {
+      throw new HttpError(403, 'Akun dinonaktifkan')
+    }
+
     request.user = user
     next()
   } catch (error) {
@@ -29,5 +33,21 @@ export async function authMiddleware(request, _response, next) {
     }
 
     next(error)
+  }
+}
+
+export function requireRole(...allowedRoles) {
+  return function roleMiddleware(request, _response, next) {
+    if (!request.user) {
+      next(new HttpError(401, 'Token tidak ditemukan'))
+      return
+    }
+
+    if (!allowedRoles.includes(request.user.role)) {
+      next(new HttpError(403, 'Akses role tidak diizinkan'))
+      return
+    }
+
+    next()
   }
 }
