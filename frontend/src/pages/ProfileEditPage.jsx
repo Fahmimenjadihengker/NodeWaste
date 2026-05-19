@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
+import { SkeletonText } from '../components/Skeleton.jsx'
 import { getProfile, saveStoredUser, updateProfile, updateProfilePassword, updateProfilePhoto } from '../services/authApi.js'
 import { sweetConfirm } from '../utils/sweetAlert.js'
 
@@ -15,6 +16,7 @@ function ProfileEditPage() {
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' })
   const [photo, setPhoto] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(user?.profilePhotoUrl || '')
+  const [isLoading, setIsLoading] = useState(true)
   const [feedback, setFeedback] = useState('')
 
   useEffect(() => {
@@ -37,7 +39,11 @@ function ProfileEditPage() {
           longitude: String(response.data.address.longitude ?? ''),
         })
       }
-    }).catch((error) => setFeedback(error.message))
+      setIsLoading(false)
+    }).catch((error) => {
+      setFeedback(error.message)
+      setIsLoading(false)
+    })
     return () => {
       isMounted = false
     }
@@ -95,6 +101,7 @@ function ProfileEditPage() {
         <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Edit akun</p>
         <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Perbarui profile.</h1>
 
+        {isLoading ? <div className="mt-8 space-y-6"><div className="flex flex-col gap-5 sm:flex-row sm:items-center"><SkeletonText className="h-28 w-28 rounded-full" /><div className="flex-1 space-y-3"><SkeletonText className="h-4 w-32" /><SkeletonText className="h-12 w-full" /></div></div><div className="grid gap-4 sm:grid-cols-2"><SkeletonText className="h-16 w-full" /><SkeletonText className="h-16 w-full" /></div><SkeletonText className="h-52 w-full rounded-[1.25rem]" /></div> : <>
         <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-center">
           <div className="grid h-28 w-28 shrink-0 place-items-center overflow-hidden rounded-full bg-[#f5f1df] text-4xl font-black text-leaf-900 shadow-inner shadow-moss/10">
             {photoPreview ? <img className="h-full w-full object-cover" src={photoPreview} alt="Preview foto profile" /> : (form.name.trim().charAt(0) || 'E').toUpperCase()}
@@ -110,6 +117,7 @@ function ProfileEditPage() {
         <div className="mt-8 rounded-[1.25rem] bg-[#edf5e4] p-5">
           <AddressForm value={addressForm} onChange={setAddressForm} description="Isi alamat dan koordinat agar rumahmu tampil di map driver wilayahmu. Alamat tidak wajib." />
         </div>
+        </>}
 
         <div className="mt-8 border-t border-moss/10 pt-8">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Keamanan akun</p>
@@ -122,7 +130,7 @@ function ProfileEditPage() {
         </div>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <button className="rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900" type="button" onClick={saveProfile}>Simpan profile</button>
+          <button className="rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900 disabled:cursor-not-allowed disabled:opacity-60" type="button" onClick={saveProfile} disabled={isLoading}>Simpan profile</button>
           <Link className="rounded-full border border-moss/20 px-6 py-3 text-sm font-black text-moss" to="/profile">Batal</Link>
         </div>
         {feedback ? <p className="mt-4 rounded-2xl bg-[#fff3cf] p-4 text-sm font-bold text-moss">{feedback}</p> : null}

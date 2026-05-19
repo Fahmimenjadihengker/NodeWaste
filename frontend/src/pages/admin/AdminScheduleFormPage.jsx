@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { createAdminSchedule } from '../../services/adminApi.js'
+import { sweetConfirm } from '../../utils/sweetAlert.js'
 
 const inputClass = 'rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-700 focus:ring-4 focus:ring-leaf-900/10'
 
@@ -10,6 +11,9 @@ function AdminScheduleFormPage() {
   const [feedback, setFeedback] = useState('')
 
   const submit = async () => {
+    const confirmed = await sweetConfirm({ title: 'Buat jadwal?', text: 'Jadwal pickup baru akan ditambahkan.', confirmText: 'Buat' })
+    if (!confirmed) return
+
     try {
       await createAdminSchedule(form)
       navigate('/admin/schedules')

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { deleteAdminSchedule, getCachedAdminSchedules, loadAdminSchedules } from '../../services/adminApi.js'
+import { sweetConfirm } from '../../utils/sweetAlert.js'
 
 function AdminSchedulesPage() {
   const [schedules, setSchedules] = useState(() => getCachedAdminSchedules() || [])
@@ -18,7 +19,8 @@ function AdminSchedulesPage() {
   }, [])
 
   const removeSchedule = async (schedule) => {
-    if (!window.confirm(`Hapus jadwal ${schedule.wasteCategory} hari ${schedule.pickupDay}?`)) return
+    const confirmed = await sweetConfirm({ title: 'Hapus jadwal?', text: `Hapus jadwal ${schedule.wasteCategory} hari ${schedule.pickupDay}?`, confirmText: 'Hapus', danger: true })
+    if (!confirmed) return
 
     try {
       await deleteAdminSchedule(schedule.id)

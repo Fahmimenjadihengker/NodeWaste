@@ -14,6 +14,7 @@ const AdminSchedulesPage = lazy(() => import('./pages/admin/AdminSchedulesPage.j
 const AdminUserFormPage = lazy(() => import('./pages/admin/AdminUserFormPage.jsx'))
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage.jsx'))
 const DriverMapPage = lazy(() => import('./pages/driver/DriverMapPage.jsx'))
+const DriverProfileEditPage = lazy(() => import('./pages/driver/DriverProfileEditPage.jsx'))
 const DriverProfilePage = lazy(() => import('./pages/driver/DriverProfilePage.jsx'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx'))
 const LandingPage = lazy(() => import('./pages/LandingPage.jsx'))
@@ -45,6 +46,7 @@ function App() {
             <Route path="/driver/dashboard" element={<Navigate replace to="/driver/map" />} />
             <Route path="/driver/map" element={<DriverMapPage />} />
             <Route path="/driver/profile" element={<DriverProfilePage />} />
+            <Route path="/driver/profile/edit" element={<DriverProfileEditPage />} />
           </Route>
           <Route element={<ProtectedRoute allowedRoles={['USER']}><AppShell /></ProtectedRoute>}>
             <Route path="/dashboard" element={<DashboardPage />} />

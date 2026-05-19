@@ -20,3 +20,15 @@ export function updateDriverProfile(data) {
     body: JSON.stringify(data),
   })
 }
+
+export function updateDriverProfilePhoto(file) {
+  const formData = new FormData()
+  formData.append('photo', file)
+
+  clearApiCache('/driver/profile')
+  clearApiCache('/driver/dashboard')
+  return apiRequest('/driver/profile/photo', {
+    method: 'PUT',
+    body: formData,
+  })
+}

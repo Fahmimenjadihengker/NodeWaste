@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import AddressForm from '../../components/AddressForm.jsx'
 import { createAdminAccount, getCachedAdminUsers, loadAdminUsers, updateAdminAccount } from '../../services/adminApi.js'
+import { sweetConfirm } from '../../utils/sweetAlert.js'
 
 const emptyForm = { name: '', email: '', password: 'password123', role: 'USER', vehiclePlate: '', vehicleType: 'pickup', isActive: true }
 const emptyDistrict = { address: '-', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' }
@@ -53,6 +54,9 @@ function AdminUserFormPage() {
   })
 
   const submit = async () => {
+    const confirmed = await sweetConfirm({ title: isEdit ? 'Simpan perubahan akun?' : 'Buat akun baru?', text: isEdit ? 'Data akun akan diperbarui.' : 'Akun baru akan dibuat.', confirmText: isEdit ? 'Simpan' : 'Buat' })
+    if (!confirmed) return
+
     try {
       const driverPayload = form.role === 'DRIVER' ? getDriverPayload() : {}
       if (isEdit) await updateAdminAccount(id, { name: form.name, email: form.email, isActive: form.isActive, ...driverPayload })

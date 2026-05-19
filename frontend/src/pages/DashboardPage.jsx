@@ -235,10 +235,7 @@ function DashboardPage() {
               <span className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
             </div>
             <LeafyAvatar mood={leafyMood} onClick={handleLeafyClick} />
-            <div className="mt-5 space-y-4">
-              <ProgressLine label="Happiness" value={pet.happiness} />
-              <ProgressLine label="Kenyang" value={100 - pet.hunger} />
-            </div>
+            {isLoading ? <div className="mt-5 space-y-4"><SkeletonText className="h-8 w-full" /><SkeletonText className="h-8 w-full" /></div> : <div className="mt-5 space-y-4"><ProgressLine label="Happiness" value={pet.happiness} /><ProgressLine label="Kenyang" value={100 - pet.hunger} /></div>}
           </section>
         </div>
 

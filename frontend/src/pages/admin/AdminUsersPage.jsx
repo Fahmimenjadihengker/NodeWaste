@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { deleteAdminAccount, getCachedAdminUsers, loadAdminUsers, updateAdminAccount } from '../../services/adminApi.js'
+import { sweetConfirm } from '../../utils/sweetAlert.js'
 
 function AdminUsersPage() {
   const [accounts, setAccounts] = useState(() => getCachedAdminUsers() || [])
@@ -30,7 +31,8 @@ function AdminUsersPage() {
 
   const toggleActive = async (account) => {
     const action = account.isActive ? 'menonaktifkan' : 'mengaktifkan'
-    if (!window.confirm(`Yakin ingin ${action} akun ${account.name}?`)) return
+    const confirmed = await sweetConfirm({ title: `${account.isActive ? 'Disable' : 'Enable'} akun?`, text: `Yakin ingin ${action} akun ${account.name}?`, confirmText: account.isActive ? 'Disable' : 'Enable', danger: account.isActive })
+    if (!confirmed) return
 
     try {
       await updateAdminAccount(account.id, { isActive: !account.isActive })
@@ -43,7 +45,8 @@ function AdminUsersPage() {
   }
 
   const removeAccount = async (account) => {
-    if (!window.confirm(`Hapus permanen akun ${account.name}? Aksi ini tidak bisa dibatalkan.`)) return
+    const confirmed = await sweetConfirm({ title: 'Hapus akun permanen?', text: `Akun ${account.name} akan dihapus permanen dan tidak bisa dibatalkan.`, confirmText: 'Delete', danger: true })
+    if (!confirmed) return
 
     try {
       await deleteAdminAccount(account.id)
