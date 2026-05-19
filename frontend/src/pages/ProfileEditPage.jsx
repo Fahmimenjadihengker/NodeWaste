@@ -4,7 +4,7 @@ import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
 import { SkeletonText } from '../components/Skeleton.jsx'
 import { getProfile, saveStoredUser, updateProfile, updateProfilePassword, updateProfilePhoto } from '../services/authApi.js'
-import { sweetConfirm } from '../utils/sweetAlert.js'
+import { sweetConfirm, sweetSuccess } from '../utils/sweetAlert.js'
 
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
 
@@ -65,6 +65,7 @@ function ProfileEditPage() {
       }
 
       saveStoredUser(userResponse)
+      await sweetSuccess({ text: 'Profile berhasil diupdate.' })
       navigate('/profile')
     } catch (error) {
       setFeedback(error.message)
@@ -85,6 +86,7 @@ function ProfileEditPage() {
       await updateProfilePassword({ currentPassword: password.current, newPassword: password.next })
       setPassword({ current: '', next: '', confirm: '' })
       setFeedback('Password berhasil diperbarui.')
+      await sweetSuccess({ text: 'Password berhasil diperbarui.' })
     } catch (error) {
       setFeedback(error.message)
     }

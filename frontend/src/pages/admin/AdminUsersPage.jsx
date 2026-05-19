@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { deleteAdminAccount, getCachedAdminUsers, loadAdminUsers, updateAdminAccount } from '../../services/adminApi.js'
-import { sweetConfirm } from '../../utils/sweetAlert.js'
+import { sweetConfirm, sweetSuccess } from '../../utils/sweetAlert.js'
 
 function AdminUsersPage() {
   const [accounts, setAccounts] = useState(() => getCachedAdminUsers() || [])
@@ -37,6 +37,7 @@ function AdminUsersPage() {
     try {
       await updateAdminAccount(account.id, { isActive: !account.isActive })
       setFeedback(`Akun berhasil ${account.isActive ? 'dinonaktifkan' : 'diaktifkan'}.`)
+      await sweetSuccess({ text: `Akun berhasil ${account.isActive ? 'dinonaktifkan' : 'diaktifkan'}.` })
       setIsLoading(true)
       loadAccounts()
     } catch (error) {
@@ -51,6 +52,7 @@ function AdminUsersPage() {
     try {
       await deleteAdminAccount(account.id)
       setFeedback('Akun berhasil dihapus permanen.')
+      await sweetSuccess({ text: 'Akun berhasil dihapus permanen.' })
       setIsLoading(true)
       loadAccounts()
     } catch (error) {

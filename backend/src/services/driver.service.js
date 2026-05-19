@@ -59,7 +59,7 @@ function toProcessingSite(site) {
 
 async function getDriverContext(userId) {
   const user = await prisma.user.findUnique({
-    where: { userId },
+    where: { id: userId },
     include: {
       driver: { include: { district: true } },
     },

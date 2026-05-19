@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { deleteAdminSchedule, getCachedAdminSchedules, loadAdminSchedules } from '../../services/adminApi.js'
-import { sweetConfirm } from '../../utils/sweetAlert.js'
+import { sweetConfirm, sweetSuccess } from '../../utils/sweetAlert.js'
 
 function AdminSchedulesPage() {
   const [schedules, setSchedules] = useState(() => getCachedAdminSchedules() || [])
@@ -25,6 +25,7 @@ function AdminSchedulesPage() {
     try {
       await deleteAdminSchedule(schedule.id)
       setFeedback('Jadwal berhasil dihapus.')
+      await sweetSuccess({ text: 'Jadwal berhasil dihapus.' })
       setIsLoading(true)
       loadSchedules()
     } catch (error) {

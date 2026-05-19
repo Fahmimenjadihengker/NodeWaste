@@ -4,7 +4,7 @@ import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getPet, runPetAction } from '../services/authApi.js'
-import { sweetConfirm } from '../utils/sweetAlert.js'
+import { sweetConfirm, sweetSuccess } from '../utils/sweetAlert.js'
 
 const petActions = [
   {
@@ -178,6 +178,7 @@ function PetPage() {
         { title: `Leafy ${action.label.toLowerCase()}`, meta: `-${action.cost} EcoPoints`, time: 'Baru saja' },
         ...current.slice(0, 3),
       ])
+      await sweetSuccess({ text: `${action.label} Leafy berhasil.` })
     } catch (error) {
       setFeedback(error.message)
     }

@@ -3,6 +3,7 @@ import AddressForm from '../../components/AddressForm.jsx'
 import AppCard from '../../components/AppCard.jsx'
 import AdminTable from '../../components/admin/AdminTable.jsx'
 import { createAdminDriver, getAdminDrivers, updateAdminAccount } from '../../services/adminApi.js'
+import { sweetSuccess } from '../../utils/sweetAlert.js'
 
 const emptyAddress = { address: '-', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' }
 
@@ -24,9 +25,11 @@ function AdminDriversPage() {
       if (form.id) {
         await updateAdminAccount(form.id, { ...payload, isActive: form.isActive })
         setFeedback('Driver berhasil diperbarui.')
+        await sweetSuccess({ text: 'Driver berhasil diupdate.' })
       } else {
         await createAdminDriver({ ...payload, password: form.password, districtName: district.districtName, city: district.city, province: district.province, provinceCode: district.provinceCode, cityCode: district.cityCode, districtCode: district.districtCode })
         setFeedback('Driver berhasil dibuat.')
+        await sweetSuccess({ text: 'Driver berhasil dibuat.' })
       }
       setForm({ id: '', name: '', email: '', password: 'password123', vehiclePlate: '', vehicleType: 'pickup', isActive: true })
       setDistrict(emptyAddress)
@@ -45,6 +48,7 @@ function AdminDriversPage() {
   const toggleActive = async (row) => {
     try {
       await updateAdminAccount(row.user.id, { isActive: !row.user.isActive })
+      await sweetSuccess({ text: `Driver berhasil ${row.user.isActive ? 'dinonaktifkan' : 'diaktifkan'}.` })
       loadDrivers()
     } catch (error) {
       setFeedback(error.message)

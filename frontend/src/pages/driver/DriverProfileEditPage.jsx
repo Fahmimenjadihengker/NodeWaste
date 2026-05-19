@@ -4,7 +4,7 @@ import AppCard from '../../components/AppCard.jsx'
 import { SkeletonText } from '../../components/Skeleton.jsx'
 import { saveStoredUser } from '../../services/authApi.js'
 import { getDriverProfile, updateDriverProfile, updateDriverProfilePhoto } from '../../services/driverApi.js'
-import { sweetConfirm } from '../../utils/sweetAlert.js'
+import { sweetConfirm, sweetSuccess } from '../../utils/sweetAlert.js'
 
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
 
@@ -59,6 +59,7 @@ function DriverProfileEditPage() {
       }
 
       if (nextUser) saveStoredUser(nextUser)
+      await sweetSuccess({ text: 'Profile driver berhasil diupdate.' })
       navigate('/driver/profile')
     } catch (error) {
       setFeedback(error.message)
