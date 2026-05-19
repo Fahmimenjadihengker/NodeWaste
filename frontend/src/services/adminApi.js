@@ -1,10 +1,10 @@
-import { apiRequest } from './apiClient.js'
+import { apiRequest, cachedApiRequest, clearApiCache, getCachedApiPayload } from './apiClient.js'
 
 let accountsCache = null
 let schedulesCache = null
 
 export function getAdminDashboard() {
-  return apiRequest('/admin/dashboard')
+  return cachedApiRequest('/admin/dashboard')
 }
 
 export function getAdminUsers() {
@@ -12,27 +12,33 @@ export function getAdminUsers() {
 }
 
 export function getCachedAdminUsers() {
-  return accountsCache
+  return accountsCache || getCachedApiPayload('/admin/accounts')?.data?.accounts || null
 }
 
 export async function loadAdminUsers() {
-  const response = await apiRequest('/admin/accounts')
+  const response = await cachedApiRequest('/admin/accounts')
   accountsCache = response.data.accounts || response.data.users || []
   return response
 }
 
 export function createAdminAccount(data) {
   accountsCache = null
+  clearApiCache('/admin/accounts')
+  clearApiCache('/admin/dashboard')
   return apiRequest('/admin/accounts', { method: 'POST', body: JSON.stringify(data) })
 }
 
 export function updateAdminAccount(id, data) {
   accountsCache = null
+  clearApiCache('/admin/accounts')
+  clearApiCache('/admin/dashboard')
   return apiRequest(`/admin/accounts/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 export function deleteAdminAccount(id) {
   accountsCache = null
+  clearApiCache('/admin/accounts')
+  clearApiCache('/admin/dashboard')
   return apiRequest(`/admin/accounts/${id}`, { method: 'DELETE' })
 }
 
@@ -49,26 +55,32 @@ export function getAdminSchedules() {
 }
 
 export function getCachedAdminSchedules() {
-  return schedulesCache
+  return schedulesCache || getCachedApiPayload('/admin/schedules')?.data?.schedules || null
 }
 
 export async function loadAdminSchedules() {
-  const response = await apiRequest('/admin/schedules')
+  const response = await cachedApiRequest('/admin/schedules')
   schedulesCache = response.data.schedules || []
   return response
 }
 
 export function createAdminSchedule(data) {
   schedulesCache = null
+  clearApiCache('/admin/schedules')
+  clearApiCache('/admin/dashboard')
   return apiRequest('/admin/schedules', { method: 'POST', body: JSON.stringify(data) })
 }
 
 export function updateAdminSchedule(id, data) {
   schedulesCache = null
+  clearApiCache('/admin/schedules')
+  clearApiCache('/admin/dashboard')
   return apiRequest(`/admin/schedules/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 export function deleteAdminSchedule(id) {
   schedulesCache = null
+  clearApiCache('/admin/schedules')
+  clearApiCache('/admin/dashboard')
   return apiRequest(`/admin/schedules/${id}`, { method: 'DELETE' })
 }

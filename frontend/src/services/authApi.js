@@ -1,4 +1,4 @@
-import { apiRequest, getAuthToken } from './apiClient.js'
+import { apiRequest, cachedApiRequest, clearApiCache, getAuthToken } from './apiClient.js'
 
 export function registerUser(data) {
   return apiRequest('/auth/register', {
@@ -15,10 +15,11 @@ export function loginUser(data) {
 }
 
 export function getProfile() {
-  return apiRequest('/profile')
+  return cachedApiRequest('/profile')
 }
 
 export function updateProfile(data) {
+  clearApiCache('/profile')
   return apiRequest('/profile', {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -36,6 +37,7 @@ export function updateProfilePhoto(file) {
   const formData = new FormData()
   formData.append('photo', file)
 
+  clearApiCache('/profile')
   return apiRequest('/profile/photo', {
     method: 'PUT',
     body: formData,
@@ -43,25 +45,27 @@ export function updateProfilePhoto(file) {
 }
 
 export function getDashboard() {
-  return apiRequest('/dashboard')
+  return cachedApiRequest('/dashboard')
 }
 
 export function getPet() {
-  return apiRequest('/pet')
+  return cachedApiRequest('/pet')
 }
 
 export function runPetAction(action) {
+  clearApiCache('/pet')
+  clearApiCache('/dashboard')
   return apiRequest(`/pet/${action}`, {
     method: 'POST',
   })
 }
 
 export function getActivities(filter = 'all') {
-  return apiRequest(`/activities?filter=${encodeURIComponent(filter)}`)
+  return cachedApiRequest(`/activities?filter=${encodeURIComponent(filter)}`)
 }
 
 export function getSchedules() {
-  return apiRequest('/schedules')
+  return cachedApiRequest('/schedules')
 }
 
 export function getRecyclingFacilities() {
@@ -101,6 +105,7 @@ export function getRoleHomePath(user) {
 export function clearAuthSession() {
   localStorage.removeItem('nodewaste_token')
   localStorage.removeItem('nodewaste_user')
+  clearApiCache()
 }
 
 export { getAuthToken }

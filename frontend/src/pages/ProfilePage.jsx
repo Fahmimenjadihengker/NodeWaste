@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
+import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getActivities, getProfile, saveStoredUser } from '../services/authApi.js'
 
 const historyFilters = [
@@ -66,6 +67,7 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
 function ProfilePage() {
   const { user, onLogout } = useOutletContext()
   const [profile, setProfile] = useState({ user, address: null, stats: emptyStats })
+  const [isLoading, setIsLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('all')
   const [history, setHistory] = useState([])
   const stats = { ...emptyStats, ...profile.stats }
@@ -85,7 +87,9 @@ function ProfilePage() {
       if (!isMounted) return
       setProfile(response.data)
       saveStoredUser(response.data.user)
-    }).catch(() => {})
+    }).catch(() => {}).finally(() => {
+      if (isMounted) setIsLoading(false)
+    })
     return () => {
       isMounted = false
     }
@@ -121,6 +125,7 @@ function ProfilePage() {
           </div>
         </div>
 
+        {isLoading ? <SkeletonCard className="mt-8 min-h-64" /> : <>
         <div className="mt-8 rounded-[1.25rem] bg-[#f5f1df] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <span className="text-sm font-black text-leaf-900">Progress level</span>
@@ -140,6 +145,7 @@ function ProfilePage() {
           <InfoItem label="Alamat rumah" value={address?.address || 'Belum diisi'} />
           <InfoItem label="Wilayah" value={[district?.name, district?.city, district?.province].filter(Boolean).join(', ') || 'Belum diisi'} />
         </div>
+        </>}
       </AppCard>
 
       <div className="mt-8">

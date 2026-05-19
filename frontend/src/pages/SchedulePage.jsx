@@ -2,37 +2,6 @@ import { useEffect, useState } from 'react'
 import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getSchedules } from '../services/authApi.js'
 
-const fallbackSchedules = [
-  {
-    id: 'fallback-organik',
-    wasteCategory: 'ORGANIK',
-    pickupDay: 'Senin, Rabu, Jumat',
-    pickupTime: '07.00-09.00',
-    instruction: 'Keluarkan sampah organik pada pagi hari sebelum pukul 07.00, bukan malam sebelumnya.',
-  },
-  {
-    id: 'fallback-anorganik',
-    wasteCategory: 'ANORGANIK',
-    pickupDay: 'Selasa dan Kamis',
-    pickupTime: '08.00-10.00',
-    instruction: 'Pastikan sampah anorganik sudah bersih, kering, dan dipisahkan dari organik.',
-  },
-  {
-    id: 'fallback-b3',
-    wasteCategory: 'B3',
-    pickupDay: 'Sabtu minggu pertama',
-    pickupTime: '09.00-11.00',
-    instruction: 'Simpan B3 seperti baterai atau lampu dalam wadah tertutup dan jangan dicampur dengan sampah lain.',
-  },
-  {
-    id: 'fallback-daur-ulang-residu',
-    wasteCategory: 'DAUR_ULANG_RESIDU',
-    pickupDay: 'Sabtu minggu ketiga',
-    pickupTime: '08.00-10.00',
-    instruction: 'Pisahkan material daur ulang bernilai dan residu. Keluarkan pagi hari sebelum jadwal.',
-  },
-]
-
 const categoryLabels = {
   ORGANIK: 'Organik',
   ANORGANIK: 'Anorganik',
@@ -109,9 +78,9 @@ function ScheduleTable({ schedules }) {
 
 function SchedulePage() {
   const [scheduleState, setScheduleState] = useState({
-    schedules: fallbackSchedules,
+    schedules: [],
     district: null,
-    isDummy: true,
+    isDummy: false,
     isFallback: false,
     isLoading: true,
     error: '',
@@ -125,7 +94,7 @@ function SchedulePage() {
         if (!isMounted) return
 
         setScheduleState({
-          schedules: response.data.schedules?.length ? response.data.schedules : fallbackSchedules,
+          schedules: response.data.schedules || [],
           district: response.data.district || null,
           isDummy: Boolean(response.data.isDummy),
           isFallback: false,
@@ -137,9 +106,9 @@ function SchedulePage() {
         if (!isMounted) return
 
         setScheduleState({
-          schedules: fallbackSchedules,
+          schedules: [],
           district: null,
-          isDummy: true,
+          isDummy: false,
           isFallback: true,
           isLoading: false,
           error: error.message,
@@ -165,7 +134,7 @@ function SchedulePage() {
       <section className="mt-8">
         {scheduleState.error ? (
           <p className="mb-4 rounded-2xl bg-[#fff3cf] p-4 text-sm font-semibold text-moss">
-            Jadwal dari server belum bisa dimuat. Menampilkan data sementara.
+            Jadwal dari server belum bisa dimuat. Coba refresh beberapa saat lagi.
           </p>
         ) : null}
         {scheduleState.isLoading ? (

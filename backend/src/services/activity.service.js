@@ -33,7 +33,15 @@ export async function getUserActivities(userId, options = {}) {
 
   const activities = await prisma.activity.findMany({
     where,
-    include: { scan: true },
+    select: {
+      id: true,
+      type: true,
+      title: true,
+      meta: true,
+      detail: true,
+      createdAt: true,
+      scan: { select: { category: true } },
+    },
     orderBy: { createdAt: 'desc' },
     take: limit,
   })

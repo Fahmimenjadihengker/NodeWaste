@@ -5,9 +5,10 @@ const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] p
 
 function RegionSelect({ label, value, options, disabled, placeholder, onChange }) {
   const selected = findByCode(options, value)
-  const listId = `${label.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-')}-options`
   const [query, setQuery] = useState(selected?.name || '')
+  const [isOpen, setIsOpen] = useState(false)
   const displayValue = query || selected?.name || ''
+  const filteredOptions = options.filter((option) => option.name.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 12)
 
   const commitSelection = () => {
     const keyword = query.trim().toLowerCase()
@@ -22,23 +23,51 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
     setQuery(selected?.name || '')
   }
 
+  const selectOption = (option) => {
+    setQuery(option.name)
+    setIsOpen(false)
+    onChange(option.code)
+  }
+
   return (
-    <label className="block">
-      <span className="text-sm font-black text-moss/70">{label}</span>
-      <input className={inputClass} list={listId} value={displayValue} disabled={disabled} placeholder={placeholder} onChange={(event) => {
-        const nextQuery = event.target.value
-        const keyword = nextQuery.trim().toLowerCase()
-        const option = options.find((item) => item.name.toLowerCase() === keyword)
-        setQuery(nextQuery)
-        if (option) onChange(option.code)
-      }} onBlur={commitSelection} onKeyDown={(event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault()
-          commitSelection()
-        }
-      }} />
-      <datalist id={listId}>{options.map((option) => <option key={option.code} value={option.name} />)}</datalist>
-    </label>
+    <div className="relative">
+      <label className="block">
+        <span className="text-sm font-black text-moss/70">{label}</span>
+        <div className="relative">
+          <input className={`${inputClass} pr-12`} value={displayValue} disabled={disabled} placeholder={placeholder} onFocus={() => setIsOpen(true)} onChange={(event) => {
+            setQuery(event.target.value)
+            setIsOpen(true)
+          }} onBlur={() => {
+            window.setTimeout(() => {
+              setIsOpen(false)
+              commitSelection()
+            }, 120)
+          }} onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              if (filteredOptions[0]) selectOption(filteredOptions[0])
+              else commitSelection()
+            }
+            if (event.key === 'Escape') {
+              setIsOpen(false)
+              setQuery(selected?.name || '')
+            }
+          }} />
+          <button className="absolute bottom-0 right-0 top-2 grid w-12 place-items-center rounded-r-2xl text-moss/70 disabled:opacity-40" type="button" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => setIsOpen((current) => !current)} aria-label={`Buka pilihan ${label}`}>
+            <span className={`text-lg transition ${isOpen ? 'rotate-180' : ''}`}>⌄</span>
+          </button>
+        </div>
+      </label>
+      {isOpen && !disabled ? (
+        <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-64 overflow-y-auto rounded-[1.1rem] border border-moss/25 bg-white py-2 shadow-[0_18px_40px_rgba(32,58,37,0.16)]">
+          {filteredOptions.length ? filteredOptions.map((option) => (
+            <button key={option.code} className={`block w-full px-5 py-3 text-left text-base font-semibold transition ${option.code === value ? 'bg-[#dce8cf] text-leaf-900' : 'text-moss hover:bg-moss/20'}`} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => selectOption(option)}>
+              {option.name}
+            </button>
+          )) : <p className="px-5 py-3 text-sm font-semibold text-moss/55">Tidak ada pilihan.</p>}
+        </div>
+      ) : null}
+    </div>
   )
 }
 
