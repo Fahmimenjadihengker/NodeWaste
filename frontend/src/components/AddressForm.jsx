@@ -5,9 +5,10 @@ const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] p
 
 function RegionSelect({ label, value, options, disabled, placeholder, onChange }) {
   const selected = findByCode(options, value)
-  const [query, setQuery] = useState(selected?.name || '')
+  const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
-  const displayValue = query || selected?.name || ''
+  const [isEditing, setIsEditing] = useState(false)
+  const displayValue = isEditing ? query : selected?.name || ''
   const filteredOptions = options.filter((option) => option.name.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 12)
 
   const commitSelection = () => {
@@ -17,14 +18,17 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
     if (option) {
       onChange(option.code)
       setQuery(option.name)
+      setIsEditing(false)
       return
     }
 
-    setQuery(selected?.name || '')
+    setQuery('')
+    setIsEditing(false)
   }
 
   const selectOption = (option) => {
     setQuery(option.name)
+    setIsEditing(false)
     setIsOpen(false)
     onChange(option.code)
   }
@@ -34,7 +38,12 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
       <label className="block">
         <span className="text-sm font-black text-moss/70">{label}</span>
         <div className="relative">
-          <input className={`${inputClass} pr-12`} value={displayValue} disabled={disabled} placeholder={placeholder} onFocus={() => setIsOpen(true)} onChange={(event) => {
+          <input className={`${inputClass} pr-12`} value={displayValue} disabled={disabled} placeholder={placeholder} onFocus={() => {
+            setIsEditing(true)
+            setQuery(selected?.name || '')
+            setIsOpen(true)
+          }} onChange={(event) => {
+            setIsEditing(true)
             setQuery(event.target.value)
             setIsOpen(true)
           }} onBlur={() => {
@@ -50,7 +59,8 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
             }
             if (event.key === 'Escape') {
               setIsOpen(false)
-              setQuery(selected?.name || '')
+              setQuery('')
+              setIsEditing(false)
             }
           }} />
           <button className="absolute bottom-0 right-0 top-2 grid w-12 place-items-center rounded-r-2xl text-moss/70 disabled:opacity-40" type="button" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => setIsOpen((current) => !current)} aria-label={`Buka pilihan ${label}`}>

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
+import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getPet, runPetAction } from '../services/authApi.js'
 
 const petActions = [
@@ -102,6 +103,7 @@ function PetPage() {
   const [lastMood, setLastMood] = useState('happy')
   const [avatarMood, setAvatarMood] = useState('idle')
   const [feedback, setFeedback] = useState('Memuat data Leafy...')
+  const [isLoading, setIsLoading] = useState(true)
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
   const [logs, setLogs] = useState([])
@@ -126,9 +128,13 @@ function PetPage() {
         setPet(response.data.pet)
         setLogs(response.data.activities)
         setFeedback('Leafy siap dirawat hari ini.')
+        setIsLoading(false)
       })
       .catch((error) => {
-        if (isMounted) setFeedback(error.message)
+        if (isMounted) {
+          setFeedback(error.message)
+          setIsLoading(false)
+        }
       })
 
     return () => {
@@ -210,7 +216,7 @@ function PetPage() {
           <div className="sm:col-span-2 rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-5 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <p className="text-sm font-black text-leaf-900">{feedback}</p>
           </div>
-          {statusItems.map((status) => (
+          {isLoading ? <><SkeletonCard className="min-h-48" /><SkeletonCard className="min-h-48" /></> : statusItems.map((status) => (
             <StatusMeter key={status.label} {...status} />
           ))}
         </div>
