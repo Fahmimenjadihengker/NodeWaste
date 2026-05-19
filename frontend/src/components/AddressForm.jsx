@@ -9,6 +9,19 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
   const [query, setQuery] = useState(selected?.name || '')
   const displayValue = query || selected?.name || ''
 
+  const commitSelection = () => {
+    const keyword = query.trim().toLowerCase()
+    const option = options.find((item) => item.name.toLowerCase() === keyword)
+
+    if (option) {
+      onChange(option.code)
+      setQuery(option.name)
+      return
+    }
+
+    setQuery(selected?.name || '')
+  }
+
   return (
     <label className="block">
       <span className="text-sm font-black text-moss/70">{label}</span>
@@ -18,6 +31,11 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
         const option = options.find((item) => item.name.toLowerCase() === keyword)
         setQuery(nextQuery)
         if (option) onChange(option.code)
+      }} onBlur={commitSelection} onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault()
+          commitSelection()
+        }
       }} />
       <datalist id={listId}>{options.map((option) => <option key={option.code} value={option.name} />)}</datalist>
     </label>
