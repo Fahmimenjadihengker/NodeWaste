@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js'
 import { getUserActivities } from './activity.service.js'
+import { getCurrentPet } from './pet.service.js'
 
 const nextLevelXp = 250
 const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
@@ -60,16 +61,27 @@ function buildScanActivity(scans) {
 }
 
 export async function getDashboard(userId) {
-  const [user, pet, scans, recentActivities] = await Promise.all([
+  const monthStart = new Date()
+  monthStart.setDate(1)
+  monthStart.setHours(0, 0, 0, 0)
+
+  const weekStart = new Date()
+  weekStart.setDate(weekStart.getDate() - 6)
+  weekStart.setHours(0, 0, 0, 0)
+
+  const [user, pet, totalScans, validScans, categoryGroups, chartScans, recentActivities] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
-    prisma.pet.upsert({ where: { userId }, update: {}, create: { userId } }),
-    prisma.scan.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } }),
+    getCurrentPet(prisma, userId),
+    prisma.scan.count({ where: { userId } }),
+    prisma.scan.count({ where: { userId, isValid: true } }),
+    prisma.scan.groupBy({ by: ['category'], where: { userId }, _count: { _all: true } }),
+    prisma.scan.findMany({ where: { userId, isValid: true, createdAt: { gte: monthStart } }, select: { category: true, isValid: true, createdAt: true }, orderBy: { createdAt: 'desc' } }),
     getUserActivities(userId, { limit: 5 }),
   ])
 
   const categoryCounts = emptyCategoryCounts()
-  for (const scan of scans) {
-    categoryCounts[scan.category.toLowerCase()] += 1
+  for (const group of categoryGroups) {
+    categoryCounts[group.category.toLowerCase()] = group._count._all
   }
 
   return {
@@ -79,12 +91,12 @@ export async function getDashboard(userId) {
       nextLevelXp,
       level: user.level,
       streak: user.streak,
-      totalScans: scans.length,
-      validScans: scans.filter((scan) => scan.isValid).length,
+      totalScans,
+      validScans,
     },
     pet,
     categories: buildCategories(categoryCounts),
     activities: recentActivities,
-    scanActivity: buildScanActivity(scans),
+    scanActivity: buildScanActivity(chartScans.filter((scan) => scan.createdAt >= weekStart || scan.createdAt >= monthStart)),
   }
 }

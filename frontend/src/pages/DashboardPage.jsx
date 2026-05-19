@@ -7,7 +7,7 @@ import { SkeletonCard, SkeletonText } from '../components/Skeleton.jsx'
 import { getDashboard } from '../services/authApi.js'
 const emptyDashboardData = {
   stats: { ecoPoints: 0, xp: 0, nextLevelXp: 250, level: 1, streak: 0, totalScans: 0, validScans: 0 },
-  pet: { name: 'Leafy', level: 1, mood: 'happy', health: 80, happiness: 80, hunger: 30, cleanliness: 80 },
+  pet: { name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0 },
   categories: [
     { label: 'Organik', value: 0, color: 'bg-leaf-600' },
     { label: 'Anorganik', value: 0, color: 'bg-[#7fa765]' },
@@ -236,9 +236,8 @@ function DashboardPage() {
             </div>
             <LeafyAvatar mood={leafyMood} onClick={handleLeafyClick} />
             <div className="mt-5 space-y-4">
-              <ProgressLine label="Health" value={pet.health} />
               <ProgressLine label="Happiness" value={pet.happiness} />
-              <ProgressLine label="Cleanliness" value={pet.cleanliness} />
+              <ProgressLine label="Kenyang" value={100 - pet.hunger} />
             </div>
           </section>
         </div>

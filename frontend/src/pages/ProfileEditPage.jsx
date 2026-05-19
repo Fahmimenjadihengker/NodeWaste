@@ -13,6 +13,7 @@ function ProfileEditPage() {
   const [addressForm, setAddressForm] = useState({ address: '', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' })
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' })
   const [photo, setPhoto] = useState(null)
+  const [photoPreview, setPhotoPreview] = useState(user?.profilePhotoUrl || '')
   const [feedback, setFeedback] = useState('')
 
   useEffect(() => {
@@ -21,6 +22,7 @@ function ProfileEditPage() {
       if (!isMounted) return
       const nextUser = response.data.user
       setForm({ name: nextUser.name, email: nextUser.email })
+      setPhotoPreview(nextUser.profilePhotoUrl || '')
       if (response.data.address) {
         setAddressForm({
           address: response.data.address.address || '',
@@ -78,16 +80,27 @@ function ProfileEditPage() {
     }
   }
 
+  const handlePhotoChange = (file) => {
+    setPhoto(file)
+    if (file) setPhotoPreview(URL.createObjectURL(file))
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <AppCard className="rounded-[1.75rem] shadow-[0_22px_70px_rgba(32,58,37,0.1)] sm:p-8">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Edit akun</p>
         <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Perbarui profile.</h1>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-center">
+          <div className="grid h-28 w-28 shrink-0 place-items-center overflow-hidden rounded-full bg-[#f5f1df] text-4xl font-black text-leaf-900 shadow-inner shadow-moss/10">
+            {photoPreview ? <img className="h-full w-full object-cover" src={photoPreview} alt="Preview foto profile" /> : (form.name.trim().charAt(0) || 'E').toUpperCase()}
+          </div>
+          <label className="block flex-1"><span className="text-sm font-black text-moss/70">Foto profile</span><input className={inputClass} accept="image/*" type="file" onChange={(event) => handlePhotoChange(event.target.files?.[0] || null)} /></label>
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="block"><span className="text-sm font-black text-moss/70">Nama</span><input className={inputClass} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} /></label>
           <label className="block"><span className="text-sm font-black text-moss/70">Email</span><input className={inputClass} type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></label>
-          <label className="block sm:col-span-2"><span className="text-sm font-black text-moss/70">Foto profile</span><input className={inputClass} accept="image/*" type="file" onChange={(event) => setPhoto(event.target.files?.[0] || null)} /></label>
         </div>
 
         <div className="mt-8 rounded-[1.25rem] bg-[#edf5e4] p-5">

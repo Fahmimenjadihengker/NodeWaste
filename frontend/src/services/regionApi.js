@@ -1,8 +1,14 @@
 import { apiRequest } from './apiClient.js'
 
+const regionCache = new Map()
+
 async function fetchRegion(path) {
+  if (regionCache.has(path)) return regionCache.get(path)
+
   const payload = await apiRequest(path)
-  return payload?.data?.regions || []
+  const regions = payload?.data?.regions || []
+  regionCache.set(path, regions)
+  return regions
 }
 
 export function getProvinces() {

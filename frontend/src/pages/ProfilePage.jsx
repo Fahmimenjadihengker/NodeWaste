@@ -121,19 +121,19 @@ function ProfilePage() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <InfoItem label="EcoPoints" value={stats.ecoPoints} />
-          <InfoItem label="Level" value={`${stats.level} (${stats.xp}/${stats.nextLevelXp} XP)`} />
-          <InfoItem label="Total scan" value={`${stats.totalScans} scan, ${stats.validScans} valid`} />
-          <InfoItem label="Streak" value={`${stats.streak} hari`} />
-        </div>
-
-        <div className="mt-6 rounded-[1.25rem] bg-[#f5f1df] p-4">
+        <div className="mt-8 rounded-[1.25rem] bg-[#f5f1df] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <span className="text-sm font-black text-leaf-900">Progress level</span>
             <ProgressBar value={xpProgress} className="h-3 flex-1" trackClassName="bg-[#e8e7fb]" />
             <span className="text-sm font-bold text-moss/65">{xpProgress}%</span>
           </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <InfoItem label="EcoPoints" value={stats.ecoPoints} />
+          <InfoItem label="Level" value={`${stats.level} (${stats.xp}/${stats.nextLevelXp} XP)`} />
+          <InfoItem label="Total scan" value={`${stats.totalScans} scan, ${stats.validScans} valid`} />
+          <InfoItem label="Streak" value={`${stats.streak} hari`} />
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-2">

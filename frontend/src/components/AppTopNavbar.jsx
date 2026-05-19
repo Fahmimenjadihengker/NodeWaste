@@ -41,7 +41,7 @@ function AppTopNavbar({ user, onLogout, navItems = appNavItems, homePath = '/das
         <div className="flex items-center gap-3">
           <Link className="flex items-center gap-2 rounded-full px-3 py-2 text-sm font-black text-moss transition hover:bg-leaf-100 hover:text-leaf-900" to={profilePath}>
             <span className="grid h-8 w-8 place-items-center rounded-full bg-leaf-600 text-xs text-white shadow-[0_8px_18px_rgba(52,122,55,0.24)]">
-              {getInitial(user?.name)}
+              {user?.profilePhotoUrl ? <img className="h-full w-full rounded-full object-cover" src={user.profilePhotoUrl} alt="Foto profile" /> : getInitial(user?.name)}
             </span>
             <span className="max-w-28 truncate">{user?.name || userFallback}</span>
           </Link>

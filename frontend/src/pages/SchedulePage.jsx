@@ -44,16 +44,6 @@ function getCategoryLabel(category) {
   return categoryLabels[category] || category
 }
 
-function TemporaryDataBadge({ show }) {
-  if (!show) return null
-
-  return (
-    <span className="inline-flex rounded-full bg-[#fff3cf] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-moss">
-      Data sementara
-    </span>
-  )
-}
-
 function ScheduleDesktopTable({ schedules }) {
   return (
     <div className="hidden overflow-hidden rounded-[1.25rem] border border-moss/10 bg-white/70 md:block">
@@ -161,15 +151,11 @@ function SchedulePage() {
     }
   }, [])
 
-  const showTemporaryBadge = scheduleState.isDummy || scheduleState.isFallback
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <section>
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Jadwal sampah</p>
-            <TemporaryDataBadge show={showTemporaryBadge} />
-          </div>
+          <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Jadwal sampah</p>
           <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] text-leaf-900 sm:text-5xl lg:text-6xl">
             Keluarkan sampah di waktu yang tepat.
           </h1>

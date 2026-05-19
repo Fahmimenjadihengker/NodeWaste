@@ -12,10 +12,8 @@ export const dashboardData = {
     name: 'Leafy',
     level: 2,
     mood: 'Happy',
-    health: 86,
     happiness: 78,
     hunger: 34,
-    cleanliness: 72,
   },
   categories: [
     { label: 'Organik', value: 4, color: 'bg-leaf-600' },

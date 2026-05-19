@@ -62,11 +62,10 @@ async function resolveDistrict(tx, payload) {
 }
 
 export async function getProfile(user) {
-  const [scans, address] = await Promise.all([
-    prisma.scan.findMany({
-      where: { userId: user.id },
-      select: { category: true, isValid: true },
-    }),
+  const [totalScans, validScans, categoryGroups, address] = await Promise.all([
+    prisma.scan.count({ where: { userId: user.id } }),
+    prisma.scan.count({ where: { userId: user.id, isValid: true } }),
+    prisma.scan.groupBy({ by: ['category'], where: { userId: user.id }, _count: { _all: true } }),
     prisma.userAddress.findUnique({
       where: { userId: user.id },
       include: { district: true },
@@ -74,9 +73,9 @@ export async function getProfile(user) {
   ])
   const categoryCounts = emptyCategoryCounts()
 
-  for (const scan of scans) {
-    const key = scan.category.toLowerCase()
-    categoryCounts[key] = (categoryCounts[key] || 0) + 1
+  for (const group of categoryGroups) {
+    const key = group.category.toLowerCase()
+    categoryCounts[key] = group._count._all
   }
 
   return {
@@ -88,8 +87,8 @@ export async function getProfile(user) {
       nextLevelXp: 250,
       level: user.level,
       streak: user.streak,
-      totalScans: scans.length,
-      validScans: scans.filter((scan) => scan.isValid).length,
+      totalScans,
+      validScans,
       categories: categoryCounts,
     },
   }

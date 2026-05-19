@@ -239,7 +239,7 @@ export const swaggerDocument = {
         tags: ["Virtual Pet"],
         summary: "Melakukan interaksi dengan pet",
         description:
-          "Menukar EcoPoints untuk melakukan aksi: feed (makan), play (main), atau bath (mandi).",
+          "Menukar EcoPoints untuk melakukan aksi: feed (makan) atau play (main).",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -249,7 +249,7 @@ export const swaggerDocument = {
             description: "Jenis aksi yang akan dilakukan",
             schema: {
               type: "string",
-              enum: ["feed", "play", "bath"],
+              enum: ["feed", "play"],
             },
           },
         ],

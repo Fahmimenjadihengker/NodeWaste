@@ -10,8 +10,8 @@ const petActions = [
     label: 'Makan',
     cost: 20,
     mood: 'happy',
-    helper: 'Turunkan lapar dan bantu health pulih.',
-    effect: { hunger: -28, health: 8 },
+    helper: 'Naikkan kenyang Leafy.',
+    effect: { hunger: -28 },
   },
   {
     id: 'play',
@@ -19,32 +19,19 @@ const petActions = [
     cost: 15,
     mood: 'excited',
     helper: 'Naikkan happiness dan tambah XP Leafy.',
-    effect: { happiness: 18, hunger: 8, cleanliness: -4, xp: 15 },
-  },
-  {
-    id: 'bath',
-    label: 'Mandi',
-    cost: 10,
-    mood: 'fresh',
-    helper: 'Bersihkan Leafy dan naikkan health.',
-    effect: { cleanliness: 24, health: 6, happiness: 4 },
+    effect: { happiness: 18, hunger: 8, xp: 15 },
   },
 ]
 
 const moodCopy = {
   happy: { label: 'Bahagia', message: 'Leafy terlihat nyaman dan siap menemanimu memilah sampah.' },
   excited: { label: 'Semangat', message: 'Leafy makin aktif setelah diajak bermain.' },
-  fresh: { label: 'Segar', message: 'Leafy bersih dan terlihat lebih cerah.' },
   hungry: { label: 'Lapar', message: 'Leafy mulai lapar. Beri makan saat EcoPoints cukup.' },
-  dirty: { label: 'Kotor', message: 'Leafy butuh mandi agar cleanliness kembali naik.' },
-  sick: { label: 'Kurang sehat', message: 'Health Leafy rendah. Rawat pelan-pelan dengan makan atau mandi.' },
   lonely: { label: 'Butuh main', message: 'Ajak Leafy bermain agar happiness naik lagi.' },
 }
 
 function getPetMood(pet, fallbackMood) {
-  if (pet.health < 40) return 'sick'
   if (pet.hunger > 70) return 'hungry'
-  if (pet.cleanliness < 40) return 'dirty'
   if (pet.happiness < 40) return 'lonely'
 
   return fallbackMood
@@ -111,7 +98,7 @@ function ActivityLog({ items }) {
 
 function PetPage() {
   const [ecoPoints, setEcoPoints] = useState(0)
-  const [pet, setPet] = useState({ name: 'Leafy', level: 1, mood: 'happy', health: 80, happiness: 80, hunger: 30, cleanliness: 80, xp: 0, nextLevelXp: 100 })
+  const [pet, setPet] = useState({ name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0, xp: 0, nextLevelXp: 100 })
   const [lastMood, setLastMood] = useState('happy')
   const [avatarMood, setAvatarMood] = useState('idle')
   const [feedback, setFeedback] = useState('Memuat data Leafy...')
@@ -124,10 +111,8 @@ function PetPage() {
   const petXpProgress = Math.min(Math.round((pet.xp / pet.nextLevelXp) * 100), 100)
 
   const statusItems = useMemo(() => [
-    { label: 'Health', value: pet.health, helper: 'Kondisi umum Leafy' },
     { label: 'Happiness', value: pet.happiness, helper: 'Naik saat diajak main' },
     { label: 'Kenyang', value: satiety, helper: 'Makin tinggi makin tidak lapar' },
-    { label: 'Cleanliness', value: pet.cleanliness, helper: 'Naik saat Leafy mandi' },
   ], [pet, satiety])
 
   useEffect(() => {
@@ -196,7 +181,7 @@ function PetPage() {
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Virtual pet</p>
               <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Rawat {pet.name}.</h1>
-              <p className="mt-4 max-w-xl text-base leading-8 text-moss/70">Gunakan EcoPoints untuk menjaga Leafy tetap sehat, kenyang, bersih, dan bahagia.</p>
+              <p className="mt-4 max-w-xl text-base leading-8 text-moss/70">Gunakan EcoPoints untuk menjaga Leafy tetap kenyang dan bahagia.</p>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
           </div>
@@ -231,7 +216,7 @@ function PetPage() {
         </div>
       </section>
 
-      <section className="mt-8 grid gap-5 lg:grid-cols-3">
+      <section className="mt-8 grid gap-5 lg:grid-cols-2">
         {petActions.map((action) => (
           <ActionCard key={action.id} action={action} disabled={ecoPoints < action.cost} onAction={handleAction} />
         ))}
@@ -244,7 +229,6 @@ function PetPage() {
           <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
             <p>Jika Kenyang rendah, pilih Makan terlebih dahulu.</p>
             <p>Jika Happiness rendah, ajak Leafy Main.</p>
-            <p>Jika Cleanliness rendah, gunakan Mandi untuk menjaga health.</p>
           </div>
         </AppCard>
         <ActivityLog items={logs} />
