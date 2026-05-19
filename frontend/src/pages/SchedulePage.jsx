@@ -15,9 +15,9 @@ function getCategoryLabel(category) {
 
 function ScheduleDesktopTable({ schedules }) {
   return (
-    <div className="hidden overflow-hidden rounded-[1.25rem] border border-moss/10 bg-white/70 md:block">
+    <div className="hidden overflow-hidden rounded-[1.25rem] border border-leaf-900/10 bg-[#fbf7e8] shadow-[0_18px_55px_rgba(32,58,37,0.08)] md:block">
       <table className="w-full border-collapse text-left">
-        <thead className="bg-[#dce8cf] text-xs font-black uppercase tracking-[0.18em] text-leaf-900">
+        <thead className="bg-[#f5f1df] text-xs font-black uppercase tracking-[0.18em] text-leaf-900">
           <tr>
             <th className="px-5 py-4">Kategori</th>
             <th className="px-5 py-4">Hari</th>
@@ -25,7 +25,7 @@ function ScheduleDesktopTable({ schedules }) {
             <th className="px-5 py-4">Instruksi</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-moss/10 text-sm text-moss/75">
+        <tbody className="divide-y divide-leaf-900/10 text-sm text-moss/75">
           {schedules.map((schedule) => (
             <tr key={schedule.id}>
               <td className="px-5 py-5 font-black text-leaf-900">{getCategoryLabel(schedule.wasteCategory)}</td>
@@ -44,7 +44,7 @@ function ScheduleMobileRows({ schedules }) {
   return (
     <div className="space-y-4 md:hidden">
       {schedules.map((schedule) => (
-        <article key={schedule.id} className="rounded-[1.25rem] border border-moss/10 bg-white/75 p-5 shadow-[0_16px_45px_rgba(32,58,37,0.08)]">
+        <article key={schedule.id} className="rounded-[1.25rem] border border-leaf-900/10 bg-[#fbf7e8] p-5 shadow-[0_16px_45px_rgba(32,58,37,0.08)]">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Kategori</p>
           <h2 className="mt-2 text-2xl font-black tracking-[-0.03em] text-leaf-900">{getCategoryLabel(schedule.wasteCategory)}</h2>
           <div className="mt-5 grid gap-3 text-sm font-semibold text-moss/70">

@@ -18,6 +18,7 @@ export async function createUser(user, options = {}) {
   return prisma.user.create({
     data: {
       ...user,
+      ...(user.role === 'USER' && user.ecoPoints === undefined ? { ecoPoints: 100 } : {}),
       ...(withPet ? { pet: { create: {} } } : {}),
     },
   })

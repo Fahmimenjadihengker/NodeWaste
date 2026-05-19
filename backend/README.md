@@ -94,7 +94,9 @@ Untuk deploy Vercel dengan Supabase, gunakan Supabase pooler connection string d
 DATABASE_URL="postgresql://postgres.<project-ref>:<password>@<region>.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1&sslmode=require"
 ```
 
-Saat user register, backend membuat row `users` dan pet default di `pets` lewat nested write Prisma yang atomic. User dapat mengisi alamat rumah lewat `PUT /api/profile`; alamat ini memakai kode wilayah dari wilayah.id, masuk ke `user_addresses`, dan menjadi titik rumah pada map driver jika district-nya sesuai. Saat driver dibuat, backend membuat row `users` role `DRIVER` dan `DriverProfile` tanpa membuat pet. Model `DriverProfile` masih memetakan tabel lama `collector_profiles` untuk migrasi aman.
+Saat user register, backend membuat row `users` dengan 100 EcoPoints awal dan pet default di `pets` lewat nested write Prisma yang atomic. Pet baru dimulai dengan happiness 100% dan hunger 0% sehingga indikator kenyang tampil 100%. User dapat mengisi alamat rumah lewat `PUT /api/profile`; alamat ini memakai kode wilayah dari wilayah.id, masuk ke `user_addresses`, dan menjadi titik rumah pada map driver jika district-nya sesuai. Saat driver dibuat, backend membuat row `users` role `DRIVER` dan `DriverProfile` tanpa membuat pet. Model `DriverProfile` masih memetakan tabel lama `collector_profiles` untuk migrasi aman.
+
+Status Leafy mengalami decay harian saat data pet dibuka: happiness berkurang 3 poin per hari dan hunger naik 5 poin per hari. Frontend menampilkan hunger sebagai indikator kenyang (`100 - hunger`).
 
 Seed driver/admin tidak berjalan otomatis. Jalankan `npm run seed:driver` atau `npm run seed:admin` hanya saat membutuhkan data demo. Akun demo driver adalah `driver.demo@nodewaste.test`; akun demo admin adalah `admin.demo@nodewaste.test`. Keduanya memakai password `password123`.
 

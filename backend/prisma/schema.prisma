@@ -13,7 +13,7 @@ model User {
   email        String      @unique
   passwordHash String      @map("password_hash")
   role         UserRole    @default(USER)
-  ecoPoints    Int         @default(0) @map("eco_points")
+  ecoPoints    Int         @default(100) @map("eco_points")
   xp           Int         @default(0)
   level        Int         @default(1)
   streak       Int         @default(0)

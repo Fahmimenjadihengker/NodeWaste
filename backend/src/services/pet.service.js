@@ -31,8 +31,8 @@ function applyDailyDecay(pet) {
 
   return {
     ...pet,
-    hunger: clamp(pet.hunger + elapsedDays * 3),
-    happiness: clamp(pet.happiness - elapsedDays),
+    hunger: clamp(pet.hunger + elapsedDays * 5),
+    happiness: clamp(pet.happiness - elapsedDays * 3),
   }
 }
 
@@ -78,47 +78,45 @@ export async function performPetAction(userId, actionId) {
     throw new HttpError(404, 'Aksi pet tidak ditemukan')
   }
 
-  return prisma.$transaction(async (tx) => {
-    const user = await tx.user.findUnique({ where: { id: userId } })
-    const pet = await getCurrentPet(tx, userId)
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  const pet = await getCurrentPet(prisma, userId)
 
-    if (!pet) throw new HttpError(404, 'Pet tidak ditemukan')
-    if (user.ecoPoints < action.cost) throw new HttpError(400, 'EcoPoints belum cukup')
+  if (!pet) throw new HttpError(404, 'Pet tidak ditemukan')
+  if (user.ecoPoints < action.cost) throw new HttpError(400, 'EcoPoints belum cukup')
 
-    const updatedPet = await tx.pet.update({
-      where: { id: pet.id },
-      data: applyPetEffect(pet, action),
-    })
-
-    const updatedUser = await tx.user.update({
-      where: { id: userId },
-      data: { ecoPoints: { decrement: action.cost } },
-    })
-
-    const petAction = await tx.petAction.create({
-      data: {
-        userId,
-        petId: pet.id,
-        actionType: action.type,
-        ecoCost: action.cost,
-        xpReward: action.xpReward,
-      },
-    })
-
-    await tx.activity.create({
-      data: {
-        userId,
-        petActionId: petAction.id,
-        type: 'PET',
-        title: `Leafy ${action.label}`,
-        meta: `-${action.cost} EcoPoints${action.xpReward ? `, +${action.xpReward} Pet XP` : ''}`,
-        detail: `Aksi ${action.label} berhasil dilakukan.`,
-      },
-    })
-
-    return {
-      ecoPoints: updatedUser.ecoPoints,
-      pet: updatedPet,
-    }
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: { ecoPoints: { decrement: action.cost } },
   })
+
+  const updatedPet = await prisma.pet.update({
+    where: { id: pet.id },
+    data: applyPetEffect(pet, action),
+  })
+
+  const petAction = await prisma.petAction.create({
+    data: {
+      userId,
+      petId: pet.id,
+      actionType: action.type,
+      ecoCost: action.cost,
+      xpReward: action.xpReward,
+    },
+  })
+
+  await prisma.activity.create({
+    data: {
+      userId,
+      petActionId: petAction.id,
+      type: 'PET',
+      title: `Leafy ${action.label}`,
+      meta: `-${action.cost} EcoPoints${action.xpReward ? `, +${action.xpReward} Pet XP` : ''}`,
+      detail: `Aksi ${action.label} berhasil dilakukan.`,
+    },
+  })
+
+  return {
+    ecoPoints: updatedUser.ecoPoints,
+    pet: updatedPet,
+  }
 }

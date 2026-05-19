@@ -39,7 +39,7 @@ function getPetMood(pet, fallbackMood) {
   return fallbackMood
 }
 
-function StatusMeter({ label, value, helper }) {
+function StatusMeter({ label, value, helper, barClassName }) {
   return (
     <div className="rounded-[1.25rem] bg-[#f8f4e6]/70 p-5">
       <div className="flex items-center justify-between gap-4">
@@ -49,9 +49,17 @@ function StatusMeter({ label, value, helper }) {
         </div>
         <span className="text-lg font-black text-leaf-900">{value}%</span>
       </div>
-      <ProgressBar value={value} className="mt-4 h-2" />
+      <ProgressBar value={value} className="mt-4 h-2" barClassName={barClassName} />
     </div>
   )
+}
+
+function getSatietyStatus(satiety) {
+  if (satiety < 30) return { label: 'Leafy sekarat', helper: 'Segera beri makan Leafy.', barClassName: 'bg-red-700' }
+  if (satiety <= 50) return { label: 'Leafy lapar', helper: 'Leafy butuh makan hari ini.', barClassName: 'bg-[#d99a35]' }
+  if (satiety <= 80) return { label: 'Leafy agak lapar', helper: 'Kenyang mulai turun.', barClassName: 'bg-honey' }
+
+  return { label: 'Kenyang', helper: 'Leafy masih kenyang.', barClassName: 'bg-leaf-600' }
 }
 
 function ActionCard({ action, disabled, onAction }) {
@@ -111,12 +119,13 @@ function PetPage() {
   const mood = getPetMood(pet, lastMood)
   const moodInfo = moodCopy[mood]
   const satiety = 100 - pet.hunger
+  const satietyStatus = getSatietyStatus(satiety)
   const petXpProgress = Math.min(Math.round((pet.xp / pet.nextLevelXp) * 100), 100)
 
   const statusItems = useMemo(() => [
     { label: 'Happiness', value: pet.happiness, helper: 'Naik saat diajak main' },
-    { label: 'Kenyang', value: satiety, helper: 'Makin rendah makin lapar' },
-  ], [pet, satiety])
+    { label: satietyStatus.label, value: satiety, helper: satietyStatus.helper, barClassName: satietyStatus.barClassName },
+  ], [pet.happiness, satiety, satietyStatus.barClassName, satietyStatus.helper, satietyStatus.label])
 
   useEffect(() => {
     let isMounted = true

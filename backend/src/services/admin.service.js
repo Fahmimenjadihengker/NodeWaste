@@ -134,6 +134,7 @@ export async function createAdminAccount(payload) {
       email: payload.email,
       passwordHash,
       role: payload.role,
+      ...(payload.role === 'USER' ? { ecoPoints: 100 } : {}),
       ...(payload.role === 'USER' ? { pet: { create: {} } } : {}),
     },
     include: { address: { include: { district: true } }, driver: { include: { district: true } } },
@@ -205,6 +206,10 @@ export async function updateAdminAccount(id, payload, actorId) {
     if (user.driver) await tx.driverProfile.delete({ where: { id: user.driver.id } })
     if (nextRole === 'USER' && !user.pet) {
       await tx.pet.create({ data: { userId: id } }).catch(() => null)
+    }
+
+    if (nextRole === 'USER' && user.role !== 'USER' && user.ecoPoints < 100) {
+      await tx.user.update({ where: { id }, data: { ecoPoints: 100 } })
     }
 
     if (nextRole !== 'USER' && user.pet) {
