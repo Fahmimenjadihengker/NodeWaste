@@ -1,4 +1,4 @@
-import { apiRequest, cachedApiRequest, clearApiCache } from './apiClient.js'
+import { apiRequest, cachedApiRequest, clearApiCache, getCachedApiPayload } from './apiClient.js'
 
 export function getDriverDashboard() {
   return cachedApiRequest('/driver/dashboard')
@@ -8,8 +8,16 @@ export function getDriverMap() {
   return cachedApiRequest('/driver/map')
 }
 
+export function getCachedDriverMap() {
+  return getCachedApiPayload('/driver/map')
+}
+
 export function getDriverProfile() {
   return cachedApiRequest('/driver/profile')
+}
+
+export function getCachedDriverProfile() {
+  return getCachedApiPayload('/driver/profile')
 }
 
 export function updateDriverProfile(data) {

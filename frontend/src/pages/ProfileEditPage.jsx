@@ -3,7 +3,7 @@ import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
 import { SkeletonText } from '../components/Skeleton.jsx'
-import { getProfile, saveStoredUser, updateProfile, updateProfilePassword, updateProfilePhoto } from '../services/authApi.js'
+import { getCachedProfile, getProfile, saveStoredUser, updateProfile, updateProfilePassword, updateProfilePhoto } from '../services/authApi.js'
 import { sweetConfirm, sweetLoading, sweetSuccess } from '../utils/sweetAlert.js'
 
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
@@ -11,12 +11,14 @@ const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] p
 function ProfileEditPage() {
   const { user } = useOutletContext()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: user?.name || '', email: user?.email || '' })
-  const [addressForm, setAddressForm] = useState({ address: '', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' })
+  const cachedProfile = getCachedProfile()?.data
+  const cachedAddress = cachedProfile?.address
+  const [form, setForm] = useState({ name: cachedProfile?.user?.name || user?.name || '', email: cachedProfile?.user?.email || user?.email || '' })
+  const [addressForm, setAddressForm] = useState({ address: cachedAddress?.address || '', districtName: cachedAddress?.district?.name || '', city: cachedAddress?.district?.city || '', province: cachedAddress?.district?.province || '', provinceCode: cachedAddress?.district?.provinceCode || '', cityCode: cachedAddress?.district?.cityCode || '', districtCode: cachedAddress?.district?.districtCode || '', latitude: String(cachedAddress?.latitude ?? ''), longitude: String(cachedAddress?.longitude ?? '') })
   const [password, setPassword] = useState({ current: '', next: '', confirm: '' })
   const [photo, setPhoto] = useState(null)
-  const [photoPreview, setPhotoPreview] = useState(user?.profilePhotoUrl || '')
-  const [isLoading, setIsLoading] = useState(true)
+  const [photoPreview, setPhotoPreview] = useState(cachedProfile?.user?.profilePhotoUrl || user?.profilePhotoUrl || '')
+  const [isLoading, setIsLoading] = useState(!cachedProfile)
   const [feedback, setFeedback] = useState('')
 
   useEffect(() => {

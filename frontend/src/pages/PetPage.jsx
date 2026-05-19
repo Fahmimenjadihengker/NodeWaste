@@ -3,7 +3,8 @@ import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard } from '../components/Skeleton.jsx'
-import { getPet, runPetAction } from '../services/authApi.js'
+import { useCachedResource } from '../hooks/useCachedResource.js'
+import { getCachedPet, getPet, runPetAction } from '../services/authApi.js'
 import { sweetConfirm, sweetLoading, sweetSuccess } from '../utils/sweetAlert.js'
 
 const petActions = [
@@ -112,10 +113,14 @@ function PetPage() {
   const [lastMood, setLastMood] = useState('happy')
   const [avatarMood, setAvatarMood] = useState('idle')
   const [feedback, setFeedback] = useState('Memuat data Leafy...')
-  const [isLoading, setIsLoading] = useState(true)
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
   const [logs, setLogs] = useState([])
+  const { data: petData, isLoading } = useCachedResource({
+    getCached: getCachedPet,
+    load: getPet,
+    fallback: { ecoPoints: 0, pet, activities: [] },
+  })
   const mood = getPetMood(pet, lastMood)
   const moodInfo = moodCopy[mood]
   const satiety = 100 - pet.hunger
@@ -128,30 +133,19 @@ function PetPage() {
   ], [pet.happiness, satiety, satietyStatus.barClassName, satietyStatus.helper, satietyStatus.label])
 
   useEffect(() => {
-    let isMounted = true
-
-    getPet()
-      .then((response) => {
-        if (!isMounted) return
-
-        setEcoPoints(response.data.ecoPoints)
-        setPet(response.data.pet)
-        setLogs(response.data.activities)
+    if (petData) {
+      queueMicrotask(() => {
+        setEcoPoints(petData.ecoPoints)
+        setPet(petData.pet)
+        setLogs(petData.activities)
         setFeedback('Leafy siap dirawat hari ini.')
-        setIsLoading(false)
       })
-      .catch((error) => {
-        if (isMounted) {
-          setFeedback(error.message)
-          setIsLoading(false)
-        }
-      })
+    }
 
     return () => {
-      isMounted = false
       window.clearTimeout(moodTimerRef.current)
     }
-  }, [])
+  }, [petData])
 
   const handleLeafyClick = () => {
     const now = Date.now()

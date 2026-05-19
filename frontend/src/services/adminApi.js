@@ -7,6 +7,10 @@ export function getAdminDashboard() {
   return cachedApiRequest('/admin/dashboard')
 }
 
+export function getCachedAdminDashboard() {
+  return getCachedApiPayload('/admin/dashboard')
+}
+
 export function getAdminUsers() {
   return apiRequest('/admin/accounts')
 }
@@ -57,10 +61,15 @@ export function subtractAdminUserPoints(id, amount) {
 }
 
 export function getAdminDrivers() {
-  return apiRequest('/admin/drivers')
+  return cachedApiRequest('/admin/drivers')
+}
+
+export function getCachedAdminDrivers() {
+  return getCachedApiPayload('/admin/drivers')?.data?.drivers || null
 }
 
 export function createAdminDriver(data) {
+  clearApiCache('/admin/drivers')
   return apiRequest('/admin/drivers', { method: 'POST', body: JSON.stringify(data) })
 }
 

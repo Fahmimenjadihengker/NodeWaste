@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard, SkeletonText } from '../components/Skeleton.jsx'
-import { getDashboard } from '../services/authApi.js'
+import { useCachedResource } from '../hooks/useCachedResource.js'
+import { getCachedDashboard, getDashboard } from '../services/authApi.js'
 const emptyDashboardData = {
   stats: { ecoPoints: 0, xp: 0, nextLevelXp: 100, level: 1, streak: 0, totalScans: 0, validScans: 0 },
   pet: { name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0 },
@@ -160,34 +161,12 @@ function ScanActivityChart({ data, categories }) {
 
 function DashboardPage() {
   const { user } = useOutletContext()
-  const [data, setData] = useState(emptyDashboardData)
-  const [feedback, setFeedback] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
+  const { data, error: feedback, isLoading } = useCachedResource({ getCached: getCachedDashboard, load: getDashboard, fallback: emptyDashboardData })
   const { stats, pet, categories, activities, scanActivity } = data
   const [leafyMood, setLeafyMood] = useState('idle')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
   const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
-
-  useEffect(() => {
-    let isMounted = true
-
-    getDashboard()
-      .then((response) => {
-        if (isMounted) setData(response.data)
-      })
-      .catch((error) => {
-        if (isMounted) setFeedback(error.message)
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false)
-      })
-
-    return () => {
-      isMounted = false
-      window.clearTimeout(moodTimerRef.current)
-    }
-  }, [])
 
   const handleLeafyClick = () => {
     const now = Date.now()

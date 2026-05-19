@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import AddressForm from '../../components/AddressForm.jsx'
 import AppCard from '../../components/AppCard.jsx'
 import AdminTable from '../../components/admin/AdminTable.jsx'
-import { createAdminDriver, getAdminDrivers, updateAdminAccount } from '../../services/adminApi.js'
+import { createAdminDriver, getAdminDrivers, getCachedAdminDrivers, updateAdminAccount } from '../../services/adminApi.js'
 import { sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 const emptyAddress = { address: '-', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' }
 
 function AdminDriversPage() {
-  const [drivers, setDrivers] = useState([])
+  const [drivers, setDrivers] = useState(() => getCachedAdminDrivers() || [])
   const [form, setForm] = useState({ id: '', name: '', email: '', password: 'password123', vehiclePlate: '', vehicleType: 'pickup', isActive: true })
   const [district, setDistrict] = useState(emptyAddress)
   const [feedback, setFeedback] = useState('')

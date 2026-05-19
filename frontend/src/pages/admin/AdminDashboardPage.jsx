@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
 import Skeleton from '../../components/Skeleton.jsx'
-import { getAdminDashboard } from '../../services/adminApi.js'
+import { useCachedResource } from '../../hooks/useCachedResource.js'
+import { getAdminDashboard, getCachedAdminDashboard } from '../../services/adminApi.js'
 
 const statCards = [
   { key: 'users', label: 'User', detail: 'Akun pengguna aplikasi' },
@@ -19,12 +19,8 @@ function StatCard({ label, value, detail, isLoading }) {
 }
 
 function AdminDashboardPage() {
-  const [stats, setStats] = useState({ users: 0, drivers: 0, admins: 0, schedules: 0, activeAccounts: 0, disabledAccounts: 0, usersWithAddress: 0 })
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    getAdminDashboard().then((response) => setStats(response.data.stats)).catch(() => {}).finally(() => setIsLoading(false))
-  }, [])
+  const { data, isLoading } = useCachedResource({ getCached: getCachedAdminDashboard, load: getAdminDashboard, fallback: { stats: { users: 0, drivers: 0, admins: 0, schedules: 0, activeAccounts: 0, disabledAccounts: 0, usersWithAddress: 0 } } })
+  const stats = data.stats
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">

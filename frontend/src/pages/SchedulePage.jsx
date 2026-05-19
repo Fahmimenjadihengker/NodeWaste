@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
 import { SkeletonCard } from '../components/Skeleton.jsx'
-import { getSchedules } from '../services/authApi.js'
+import { useCachedResource } from '../hooks/useCachedResource.js'
+import { getCachedSchedules, getSchedules } from '../services/authApi.js'
 
 const categoryLabels = {
   ORGANIK: 'Organik',
@@ -77,48 +77,19 @@ function ScheduleTable({ schedules }) {
 }
 
 function SchedulePage() {
-  const [scheduleState, setScheduleState] = useState({
+  const { data: scheduleState, error } = useCachedResource({
+    getCached: getCachedSchedules,
+    load: getSchedules,
+    fallback: {
     schedules: [],
     district: null,
     isDummy: false,
     isFallback: false,
     isLoading: true,
     error: '',
+    },
   })
-
-  useEffect(() => {
-    let isMounted = true
-
-    getSchedules()
-      .then((response) => {
-        if (!isMounted) return
-
-        setScheduleState({
-          schedules: response.data.schedules || [],
-          district: response.data.district || null,
-          isDummy: Boolean(response.data.isDummy),
-          isFallback: false,
-          isLoading: false,
-          error: '',
-        })
-      })
-      .catch((error) => {
-        if (!isMounted) return
-
-        setScheduleState({
-          schedules: [],
-          district: null,
-          isDummy: false,
-          isFallback: true,
-          isLoading: false,
-          error: error.message,
-        })
-      })
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  const isLoading = scheduleState.isLoading && !scheduleState.schedules.length
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
@@ -132,12 +103,12 @@ function SchedulePage() {
       </section>
 
       <section className="mt-8">
-        {scheduleState.error ? (
+        {error ? (
           <p className="mb-4 rounded-2xl bg-[#fff3cf] p-4 text-sm font-semibold text-moss">
             Jadwal dari server belum bisa dimuat. Coba refresh beberapa saat lagi.
           </p>
         ) : null}
-        {scheduleState.isLoading ? (
+        {isLoading ? (
           <SkeletonCard className="min-h-72" />
         ) : (
           <ScheduleTable schedules={scheduleState.schedules} />

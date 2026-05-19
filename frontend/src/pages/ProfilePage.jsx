@@ -3,7 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom'
 import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard } from '../components/Skeleton.jsx'
-import { getActivities, getProfile, saveStoredUser } from '../services/authApi.js'
+import { getActivities, getCachedActivities, getCachedProfile, getProfile, saveStoredUser } from '../services/authApi.js'
 import { sweetConfirm } from '../utils/sweetAlert.js'
 
 const historyFilters = [
@@ -67,10 +67,11 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
 
 function ProfilePage() {
   const { user, onLogout } = useOutletContext()
-  const [profile, setProfile] = useState({ user, address: null, stats: emptyStats })
-  const [isLoading, setIsLoading] = useState(true)
+  const cachedProfile = getCachedProfile()
+  const [profile, setProfile] = useState(() => cachedProfile?.data || { user, address: null, stats: emptyStats })
+  const [isLoading, setIsLoading] = useState(!cachedProfile)
   const [activeFilter, setActiveFilter] = useState('all')
-  const [history, setHistory] = useState([])
+  const [history, setHistory] = useState(() => getCachedActivities('all')?.data?.activities || [])
   const stats = { ...emptyStats, ...profile.stats }
   const currentUser = profile.user || user
   const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
@@ -98,6 +99,9 @@ function ProfilePage() {
 
   useEffect(() => {
     let isMounted = true
+    const cached = getCachedActivities(activeFilter)
+    if (cached?.data?.activities) queueMicrotask(() => setHistory(cached.data.activities))
+
     getActivities(activeFilter).then((response) => {
       if (isMounted) setHistory(response.data.activities)
     }).catch(() => {})

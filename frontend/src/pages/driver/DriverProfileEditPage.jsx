@@ -4,20 +4,21 @@ import AddressForm from '../../components/AddressForm.jsx'
 import AppCard from '../../components/AppCard.jsx'
 import { SkeletonText } from '../../components/Skeleton.jsx'
 import { saveStoredUser } from '../../services/authApi.js'
-import { getDriverProfile, updateDriverProfile, updateDriverProfilePhoto } from '../../services/driverApi.js'
+import { getCachedDriverProfile, getDriverProfile, updateDriverProfile, updateDriverProfilePhoto } from '../../services/driverApi.js'
 import { sweetConfirm, sweetLoading, sweetSuccess } from '../../utils/sweetAlert.js'
 
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
-const emptyDistrict = { address: '-', districtName: '', city: '', province: '', provinceCode: '', cityCode: '', districtCode: '', latitude: '', longitude: '' }
 
 function DriverProfileEditPage() {
   const { user: storedUser } = useOutletContext()
   const navigate = useNavigate()
-  const [form, setForm] = useState({ name: storedUser?.name || '', email: storedUser?.email || '', vehiclePlate: '', vehicleType: '' })
+  const cachedProfile = getCachedDriverProfile()?.data
+  const cachedDistrict = cachedProfile?.driverProfile?.district
+  const [form, setForm] = useState({ name: cachedProfile?.user?.name || storedUser?.name || '', email: cachedProfile?.user?.email || storedUser?.email || '', vehiclePlate: cachedProfile?.driverProfile?.vehiclePlate || '', vehicleType: cachedProfile?.driverProfile?.vehicleType || '' })
   const [photo, setPhoto] = useState(null)
-  const [photoPreview, setPhotoPreview] = useState(storedUser?.profilePhotoUrl || '')
-  const [district, setDistrict] = useState(emptyDistrict)
-  const [isLoading, setIsLoading] = useState(true)
+  const [photoPreview, setPhotoPreview] = useState(cachedProfile?.user?.profilePhotoUrl || storedUser?.profilePhotoUrl || '')
+  const [district, setDistrict] = useState({ address: '-', districtName: cachedDistrict?.name || '', city: cachedDistrict?.city || '', province: cachedDistrict?.province || '', provinceCode: cachedDistrict?.provinceCode || '', cityCode: cachedDistrict?.cityCode || '', districtCode: cachedDistrict?.districtCode || '', latitude: '', longitude: '' })
+  const [isLoading, setIsLoading] = useState(!cachedProfile)
   const [isSaving, setIsSaving] = useState(false)
   const [feedback, setFeedback] = useState('')
 

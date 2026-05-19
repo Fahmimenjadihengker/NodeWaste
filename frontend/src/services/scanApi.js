@@ -1,4 +1,4 @@
-import { apiRequest } from './apiClient.js'
+import { apiRequest, clearApiCache } from './apiClient.js'
 
 export function createScan(imageBlob) {
   const formData = new FormData()
@@ -7,5 +7,10 @@ export function createScan(imageBlob) {
   return apiRequest('/scans', {
     method: 'POST',
     body: formData,
+  }).then((response) => {
+    clearApiCache('/dashboard')
+    clearApiCache('/profile')
+    clearApiCache('/activities')
+    return response
   })
 }
