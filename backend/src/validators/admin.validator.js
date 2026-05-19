@@ -117,3 +117,13 @@ export function validateSchedulePayload(body, partial = false) {
   if (partial && !Object.keys(payload).length) throw new HttpError(400, 'Tidak ada data jadwal yang diubah')
   return payload
 }
+
+export function validatePointsPayload(body) {
+  const amount = Number(body?.amount)
+
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new HttpError(400, 'Jumlah poin harus berupa angka positif')
+  }
+
+  return { amount }
+}

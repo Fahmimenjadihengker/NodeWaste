@@ -241,6 +241,23 @@ export async function deleteAdminAccount(id, actorId) {
   return { deleted: true }
 }
 
+export async function adjustAdminUserPoints(id, payload) {
+  const user = await prisma.user.findUnique({ where: { id } })
+  if (!user) throw new HttpError(404, 'Akun tidak ditemukan')
+  if (user.role !== 'USER') throw new HttpError(400, 'Poin hanya bisa diubah untuk akun user')
+
+  const nextEcoPoints = user.ecoPoints + payload.amount
+  if (nextEcoPoints < 0) throw new HttpError(400, 'EcoPoints user tidak boleh kurang dari 0')
+
+  const updated = await prisma.user.update({
+    where: { id },
+    data: { ecoPoints: nextEcoPoints },
+    include: { address: { include: { district: true } }, driver: { include: { district: true } } },
+  })
+
+  return { account: toAccount(updated) }
+}
+
 export async function listAdminUsers() {
   const users = await prisma.user.findMany({
     include: { address: { include: { district: true } }, driver: { include: { district: true } } },

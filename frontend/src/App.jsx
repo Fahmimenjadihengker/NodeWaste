@@ -13,6 +13,7 @@ const AdminScheduleFormPage = lazy(() => import('./pages/admin/AdminScheduleForm
 const AdminSchedulesPage = lazy(() => import('./pages/admin/AdminSchedulesPage.jsx'))
 const AdminUserFormPage = lazy(() => import('./pages/admin/AdminUserFormPage.jsx'))
 const AdminUsersPage = lazy(() => import('./pages/admin/AdminUsersPage.jsx'))
+const AdminPointsPage = lazy(() => import('./pages/admin/AdminPointsPage.jsx'))
 const DriverMapPage = lazy(() => import('./pages/driver/DriverMapPage.jsx'))
 const DriverProfileEditPage = lazy(() => import('./pages/driver/DriverProfileEditPage.jsx'))
 const DriverProfilePage = lazy(() => import('./pages/driver/DriverProfilePage.jsx'))
@@ -39,6 +40,7 @@ function App() {
             <Route path="/admin/users" element={<AdminUsersPage />} />
             <Route path="/admin/users/new" element={<AdminUserFormPage />} />
             <Route path="/admin/users/:id/edit" element={<AdminUserFormPage />} />
+            <Route path="/admin/points" element={<AdminPointsPage />} />
             <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
             <Route path="/admin/schedules/new" element={<AdminScheduleFormPage />} />
             <Route path="/admin/schedules/:id/edit" element={<AdminScheduleFormPage />} />

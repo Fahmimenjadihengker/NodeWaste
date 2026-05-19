@@ -63,6 +63,8 @@ Scope implementasi saat ini mencakup auth role-aware, profile user dengan alamat
 - `POST /api/admin/accounts`
 - `PUT /api/admin/accounts/:id`
 - `DELETE /api/admin/accounts/:id`
+- `POST /api/admin/accounts/:id/points/add`
+- `POST /api/admin/accounts/:id/points/subtract`
 - `GET /api/admin/users`
 - `GET /api/admin/drivers`
 - `POST /api/admin/drivers`

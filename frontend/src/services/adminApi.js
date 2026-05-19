@@ -42,6 +42,20 @@ export function deleteAdminAccount(id) {
   return apiRequest(`/admin/accounts/${id}`, { method: 'DELETE' })
 }
 
+export function addAdminUserPoints(id, amount) {
+  accountsCache = null
+  clearApiCache('/admin/accounts')
+  clearApiCache('/admin/dashboard')
+  return apiRequest(`/admin/accounts/${id}/points/add`, { method: 'POST', body: JSON.stringify({ amount }) })
+}
+
+export function subtractAdminUserPoints(id, amount) {
+  accountsCache = null
+  clearApiCache('/admin/accounts')
+  clearApiCache('/admin/dashboard')
+  return apiRequest(`/admin/accounts/${id}/points/subtract`, { method: 'POST', body: JSON.stringify({ amount }) })
+}
+
 export function getAdminDrivers() {
   return apiRequest('/admin/drivers')
 }

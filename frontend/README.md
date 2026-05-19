@@ -16,7 +16,7 @@ Saat ini aplikasi berisi:
 - Public routes: `/`, `/login`, dan `/register`.
 - User routes: `/dashboard`, `/scan`, `/pet`, `/schedule`, `/profile`, dan `/profile/edit`.
 - Driver routes: `/driver/map`, `/driver/profile`, dan `/driver/profile/edit`.
-- Admin routes: `/admin/dashboard`, `/admin/users`, `/admin/users/new`, `/admin/users/:id/edit`, `/admin/schedules`, `/admin/schedules/new`, dan `/admin/schedules/:id/edit`.
+- Admin routes: `/admin/dashboard`, `/admin/users`, `/admin/users/new`, `/admin/users/:id/edit`, `/admin/points`, `/admin/schedules`, `/admin/schedules/new`, dan `/admin/schedules/:id/edit`.
 - Role redirect setelah login: `USER` ke `/dashboard`, `DRIVER` ke `/driver/map`, dan `ADMIN` ke `/admin/dashboard`.
 - PWA installable dengan app shell caching dan auto update service worker.
 

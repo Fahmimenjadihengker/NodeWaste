@@ -4,6 +4,7 @@ import {
   createAdminSchedule,
   deleteAdminAccount,
   deleteAdminSchedule,
+  adjustAdminUserPoints,
   getAdminDashboard,
   listAdminAccounts,
   listAdminDrivers,
@@ -13,7 +14,7 @@ import {
   updateAdminDriver,
   updateAdminSchedule,
 } from '../services/admin.service.js'
-import { validateAdminAccountCreatePayload, validateAdminAccountUpdatePayload, validateAdminDriverCreatePayload, validateAdminDriverUpdatePayload, validateSchedulePayload } from '../validators/admin.validator.js'
+import { validateAdminAccountCreatePayload, validateAdminAccountUpdatePayload, validateAdminDriverCreatePayload, validateAdminDriverUpdatePayload, validatePointsPayload, validateSchedulePayload } from '../validators/admin.validator.js'
 
 export async function getCurrentAdminDashboard(_request, response, next) {
   try {
@@ -60,6 +61,24 @@ export async function updateAccount(request, response, next) {
 export async function deleteAccount(request, response, next) {
   try {
     response.json({ success: true, message: 'Akun berhasil dihapus permanen', data: await deleteAdminAccount(request.params.id, request.user.id) })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function addAccountPoints(request, response, next) {
+  try {
+    const payload = validatePointsPayload(request.body)
+    response.json({ success: true, message: 'EcoPoints berhasil ditambahkan', data: await adjustAdminUserPoints(request.params.id, payload) })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function subtractAccountPoints(request, response, next) {
+  try {
+    const payload = validatePointsPayload(request.body)
+    response.json({ success: true, message: 'EcoPoints berhasil dikurangi', data: await adjustAdminUserPoints(request.params.id, { amount: -payload.amount }) })
   } catch (error) {
     next(error)
   }

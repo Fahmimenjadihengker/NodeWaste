@@ -18,15 +18,8 @@ function AdminShell() {
 
   return (
     <main className="min-h-screen bg-[#f5f1df] pb-28 text-moss md:pb-0">
-      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-72 border-r border-leaf-900/10 bg-[#edf5e4] px-5 py-6 shadow-[18px_0_50px_rgba(32,58,37,0.10)] md:flex md:flex-col">
-        <NavLink className="block rounded-[1.4rem] border border-leaf-900/10 bg-[#fbf7e8] p-4 shadow-[0_18px_40px_rgba(32,58,37,0.08)]" to="/admin/dashboard">
-          <span>
-            <span className="block text-lg font-black tracking-[-0.04em] text-leaf-950">NodeWaste</span>
-            <span className="text-xs font-bold text-moss/55">Admin Dashboard</span>
-          </span>
-        </NavLink>
-
-        <nav className="mt-8 grid gap-2" aria-label="Navigasi admin">
+      <aside className="fixed bottom-0 left-0 top-20 z-40 hidden w-72 border-r border-leaf-900/10 bg-[#edf5e4] px-5 py-6 shadow-[18px_0_50px_rgba(32,58,37,0.10)] md:flex md:flex-col">
+        <nav className="grid gap-2" aria-label="Navigasi admin">
           {adminNavItems.map((item) => (
             <NavLink
               key={item.to}
@@ -47,11 +40,11 @@ function AdminShell() {
         </div>
       </aside>
 
-      <header className="sticky top-0 z-30 border-b border-leaf-900/10 bg-[#fbf7e8]/90 px-5 py-4 shadow-sm backdrop-blur-xl md:ml-72 md:px-8">
+       <header className="sticky top-0 z-50 border-b border-leaf-900/10 bg-[#fbf7e8]/90 px-5 py-4 shadow-sm backdrop-blur-xl md:px-8">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-leaf-950">NodeWaste Admin</p>
-            <p className="text-sm font-semibold text-moss/60">Kelola operasional pengguna dan jadwal angkut.</p>
+            <p className="text-xl font-black tracking-[-0.04em] text-leaf-950">NodeWaste</p>
+            <p className="text-sm font-bold text-moss/55">Admin Dashboard</p>
           </div>
           <div className="hidden items-center gap-3 rounded-full px-3 py-2 transition hover:bg-leaf-100 md:flex">
             <span className="grid h-8 w-8 place-items-center rounded-full bg-leaf-600 text-xs font-black text-white shadow-[0_8px_18px_rgba(52,122,55,0.24)]">{(user?.name || 'A').slice(0, 1).toUpperCase()}</span>
