@@ -10,10 +10,15 @@ function toDistrict(district) {
     name: district.name,
     city: district.city,
     province: district.province,
+    provinceCode: district.provinceCode,
+    cityCode: district.cityCode,
+    districtCode: district.districtCode,
   }
 }
 
 function toDriverProfile(profile) {
+  if (!profile) return null
+
   return {
     id: profile.id,
     vehiclePlate: profile.vehiclePlate,
@@ -53,39 +58,38 @@ function toProcessingSite(site) {
 }
 
 async function getDriverContext(userId) {
-  const driverProfile = await prisma.driverProfile.findUnique({
+  const user = await prisma.user.findUnique({
     where: { userId },
     include: {
-      district: true,
-      user: true,
+      driver: { include: { district: true } },
     },
   })
 
-  if (!driverProfile) {
-    throw new HttpError(404, 'Profile driver tidak ditemukan')
+  if (!user || user.role !== 'DRIVER') {
+    throw new HttpError(404, 'Driver tidak ditemukan')
   }
 
-  return driverProfile
+  return { user, driverProfile: user.driver }
 }
 
 export async function getDriverDashboard(userId) {
-  const driverProfile = await getDriverContext(userId)
-  const districtId = driverProfile.districtId
+  const context = await getDriverContext(userId)
+  const districtId = context.driverProfile?.districtId
   const [houseCount, processingSiteCount] = await Promise.all([
-    prisma.userAddress.count({ where: { districtId } }),
+    districtId ? prisma.userAddress.count({ where: { districtId } }) : 0,
     prisma.processingSite.count({
-      where: {
+      where: districtId ? {
         OR: [
           { districtId },
           { districtId: null },
         ],
-      },
+      } : { districtId: null },
     }),
   ])
 
   return {
-    user: toPublicUser(driverProfile.user),
-    driverProfile: toDriverProfile(driverProfile),
+    user: toPublicUser(context.user),
+    driverProfile: toDriverProfile(context.driverProfile),
     stats: {
       housesInDistrict: houseCount,
       processingSites: processingSiteCount,
@@ -98,10 +102,11 @@ export async function getDriverDashboard(userId) {
 }
 
 export async function getDriverMap(userId) {
-  const driverProfile = await getDriverContext(userId)
+  const context = await getDriverContext(userId)
+  const districtId = context.driverProfile?.districtId
   const [houses, processingSites] = await Promise.all([
-    prisma.userAddress.findMany({
-      where: { districtId: driverProfile.districtId },
+    districtId ? prisma.userAddress.findMany({
+      where: { districtId },
       include: {
         district: true,
         user: {
@@ -114,14 +119,14 @@ export async function getDriverMap(userId) {
       },
       orderBy: { createdAt: 'desc' },
       take: 150,
-    }),
+    }) : [],
     prisma.processingSite.findMany({
-      where: {
+      where: districtId ? {
         OR: [
-          { districtId: driverProfile.districtId },
+          { districtId },
           { districtId: null },
         ],
-      },
+      } : { districtId: null },
       include: { district: true },
       orderBy: { name: 'asc' },
       take: 100,
@@ -129,23 +134,24 @@ export async function getDriverMap(userId) {
   ])
 
   return {
-    driverProfile: toDriverProfile(driverProfile),
+    driverProfile: toDriverProfile(context.driverProfile),
     houses: houses.map(toHouse),
     processingSites: processingSites.map(toProcessingSite),
   }
 }
 
 export async function getDriverProfile(userId) {
-  const driverProfile = await getDriverContext(userId)
+  const context = await getDriverContext(userId)
 
   return {
-    user: toPublicUser(driverProfile.user),
-    driverProfile: toDriverProfile(driverProfile),
+    user: toPublicUser(context.user),
+    driverProfile: toDriverProfile(context.driverProfile),
   }
 }
 
 export async function updateDriverProfile(userId, payload) {
-  const driverProfile = await getDriverContext(userId)
+  const context = await getDriverContext(userId)
+  const driverProfile = context.driverProfile
 
   if (payload.email) {
     const existingUser = await prisma.user.findUnique({ where: { email: payload.email } })
@@ -174,6 +180,20 @@ export async function updateDriverProfile(userId, payload) {
       }
 
       if (payload.vehiclePlate || Object.prototype.hasOwnProperty.call(payload, 'vehicleType') || payload.districtId) {
+        if (!driverProfile) {
+          if (!payload.vehiclePlate || !payload.districtId) return
+
+          await tx.driverProfile.create({
+            data: {
+              userId,
+              vehiclePlate: payload.vehiclePlate,
+              vehicleType: payload.vehicleType || null,
+              districtId: payload.districtId,
+            },
+          })
+          return
+        }
+
         await tx.driverProfile.update({
           where: { id: driverProfile.id },
           data: {

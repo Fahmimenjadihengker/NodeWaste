@@ -59,7 +59,7 @@ function AdminUserFormPage() {
 
     try {
       const driverPayload = form.role === 'DRIVER' ? getDriverPayload() : {}
-      if (isEdit) await updateAdminAccount(id, { name: form.name, email: form.email, isActive: form.isActive, ...driverPayload })
+      if (isEdit) await updateAdminAccount(id, { name: form.name, email: form.email, role: form.role, isActive: form.isActive, ...driverPayload })
       else await createAdminAccount({ name: form.name, email: form.email, password: form.password, role: form.role, ...driverPayload })
       navigate('/admin/users')
     } catch (error) {
@@ -77,7 +77,8 @@ function AdminUserFormPage() {
             <input className={inputClass} placeholder="Nama" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} />
             <input className={inputClass} placeholder="Email" type="email" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
             {!isEdit ? <input className={inputClass} placeholder="Password" type="password" value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} /> : null}
-            {!isEdit ? <select className={inputClass} value={form.role} onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))}>{['USER', 'DRIVER', 'ADMIN'].map((role) => <option key={role} value={role}>{role}</option>)}</select> : <label className="flex items-center gap-3 rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 text-sm font-black text-moss"><input type="checkbox" checked={form.isActive} onChange={(event) => setForm((current) => ({ ...current, isActive: event.target.checked }))} /> Akun aktif</label>}
+            <select className={inputClass} value={form.role} onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))}>{['USER', 'DRIVER', 'ADMIN'].map((role) => <option key={role} value={role}>{role}</option>)}</select>
+            {isEdit ? <label className="flex items-center gap-3 rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 text-sm font-black text-moss"><input type="checkbox" checked={form.isActive} onChange={(event) => setForm((current) => ({ ...current, isActive: event.target.checked }))} /> Akun aktif</label> : null}
           </div>
           {form.role === 'DRIVER' ? <div className="mt-4 rounded-[1.4rem] border border-leaf-900/10 bg-[#edf5e4] p-4"><div className="grid gap-4 lg:grid-cols-2"><input className={inputClass} placeholder="Plat kendaraan" value={form.vehiclePlate} onChange={(event) => setForm((current) => ({ ...current, vehiclePlate: event.target.value }))} /><input className={inputClass} placeholder="Tipe kendaraan" value={form.vehicleType} onChange={(event) => setForm((current) => ({ ...current, vehicleType: event.target.value }))} /></div><div className="mt-4 rounded-[1.2rem] bg-[#fffdf4] p-4"><AddressForm value={district} onChange={setDistrict} title="Wilayah kerja" heading="Wilayah driver" description="Pilih wilayah kerja driver." /></div></div> : null}
           <div className="mt-6 flex flex-wrap gap-3">

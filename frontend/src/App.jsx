@@ -41,6 +41,7 @@ function App() {
             <Route path="/admin/users/:id/edit" element={<AdminUserFormPage />} />
             <Route path="/admin/schedules" element={<AdminSchedulesPage />} />
             <Route path="/admin/schedules/new" element={<AdminScheduleFormPage />} />
+            <Route path="/admin/schedules/:id/edit" element={<AdminScheduleFormPage />} />
         </Route>
         <Route element={<ProtectedRoute allowedRoles={['DRIVER']}><DriverShell /></ProtectedRoute>}>
             <Route path="/driver/dashboard" element={<Navigate replace to="/driver/map" />} />

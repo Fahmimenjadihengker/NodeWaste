@@ -143,23 +143,54 @@ export async function createAdminAccount(payload) {
 }
 
 export async function updateAdminAccount(id, payload, actorId) {
-  const user = await prisma.user.findUnique({ where: { id }, include: { driver: true } })
+  const user = await prisma.user.findUnique({ where: { id }, include: { driver: true, pet: true } })
   if (!user) throw new HttpError(404, 'Akun tidak ditemukan')
   if (id === actorId && payload.isActive === false) throw new HttpError(400, 'Admin tidak bisa menonaktifkan akun sendiri')
+  if (id === actorId && payload.role && payload.role !== 'ADMIN') throw new HttpError(400, 'Admin tidak bisa mengubah role akun sendiri')
+
+  if (payload.email) {
+    const existing = await prisma.user.findUnique({ where: { email: payload.email } })
+    if (existing && existing.id !== id) throw new HttpError(409, 'Email sudah digunakan')
+  }
 
   await prisma.$transaction(async (tx) => {
-    const district = payload.district && user.role === 'DRIVER' ? await resolveDistrict(tx, payload.district) : null
+    const nextRole = payload.role || user.role
+    const district = payload.district && nextRole === 'DRIVER' ? await resolveDistrict(tx, payload.district) : null
+
+    if (nextRole === 'DRIVER' && !user.driver) {
+      if (!payload.vehiclePlate) throw new HttpError(400, 'Plat kendaraan wajib diisi untuk akun driver')
+      if (!district) throw new HttpError(400, 'Wilayah kerja wajib diisi untuk akun driver')
+    }
 
     await tx.user.update({
       where: { id },
       data: {
         ...(payload.name ? { name: payload.name } : {}),
         ...(payload.email ? { email: payload.email } : {}),
+        ...(payload.role ? { role: payload.role } : {}),
         ...(typeof payload.isActive === 'boolean' ? { isActive: payload.isActive } : {}),
       },
     })
 
-    if (user.role === 'DRIVER' && user.driver) {
+    if (nextRole === 'DRIVER') {
+      if (user.pet) {
+        await tx.activity.deleteMany({ where: { userId: id, type: 'PET' } })
+        await tx.petAction.deleteMany({ where: { userId: id } })
+        await tx.pet.delete({ where: { id: user.pet.id } })
+      }
+
+      if (!user.driver) {
+        await tx.driverProfile.create({
+          data: {
+            userId: id,
+            vehiclePlate: payload.vehiclePlate,
+            vehicleType: Object.prototype.hasOwnProperty.call(payload, 'vehicleType') ? payload.vehicleType : null,
+            districtId: district.id,
+          },
+        })
+        return
+      }
+
       await tx.driverProfile.update({
         where: { id: user.driver.id },
         data: {
@@ -168,6 +199,18 @@ export async function updateAdminAccount(id, payload, actorId) {
           ...(district ? { districtId: district.id } : {}),
         },
       })
+      return
+    }
+
+    if (user.driver) await tx.driverProfile.delete({ where: { id: user.driver.id } })
+    if (nextRole === 'USER' && !user.pet) {
+      await tx.pet.create({ data: { userId: id } }).catch(() => null)
+    }
+
+    if (nextRole !== 'USER' && user.pet) {
+      await tx.activity.deleteMany({ where: { userId: id, type: 'PET' } })
+      await tx.petAction.deleteMany({ where: { userId: id } })
+      await tx.pet.delete({ where: { id: user.pet.id } })
     }
   })
 

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { getDistricts, getProvinces, getRegencies } from '../services/regionApi.js'
+import { SkeletonText } from './Skeleton.jsx'
 
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
 
-function RegionSelect({ label, value, options, disabled, placeholder, onChange }) {
+function RegionSelect({ label, value, fallbackName = '', options, disabled, isLoading, placeholder, onChange }) {
   const selected = findByCode(options, value)
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const displayValue = isEditing ? query : selected?.name || ''
+  const displayValue = isEditing ? query : selected?.name || fallbackName || ''
   const filteredOptions = options.filter((option) => option.name.toLowerCase().includes(query.trim().toLowerCase())).slice(0, 12)
 
   const commitSelection = () => {
@@ -36,9 +37,9 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
   return (
     <div className="relative">
       <label className="block">
-        <span className="text-sm font-black text-moss/70">{label}</span>
+        <span className="flex items-center gap-2 text-sm font-black text-moss/70">{label}{isLoading ? <span className="text-xs font-bold text-moss/45">Memuat...</span> : null}</span>
         <div className="relative">
-          <input className={`${inputClass} pr-12`} value={displayValue} disabled={disabled} placeholder={placeholder} onFocus={() => {
+          <input className={`${inputClass} pr-12 ${isLoading ? 'animate-pulse' : ''}`} value={displayValue} disabled={disabled || isLoading} placeholder={isLoading ? 'Memuat data wilayah...' : placeholder} onFocus={() => {
             setIsEditing(true)
             setQuery(selected?.name || '')
             setIsOpen(true)
@@ -63,7 +64,7 @@ function RegionSelect({ label, value, options, disabled, placeholder, onChange }
               setIsEditing(false)
             }
           }} />
-          <button className="absolute bottom-0 right-0 top-2 grid w-12 place-items-center rounded-r-2xl text-moss/70 disabled:opacity-40" type="button" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={() => setIsOpen((current) => !current)} aria-label={`Buka pilihan ${label}`}>
+          <button className="absolute bottom-0 right-0 top-2 grid w-12 place-items-center rounded-r-2xl text-moss/70 disabled:opacity-40" type="button" disabled={disabled || isLoading} onMouseDown={(event) => event.preventDefault()} onClick={() => setIsOpen((current) => !current)} aria-label={`Buka pilihan ${label}`}>
             <span className={`text-lg transition ${isOpen ? 'rotate-180' : ''}`}>⌄</span>
           </button>
         </div>
@@ -90,17 +91,24 @@ function AddressForm({ value, onChange, title = 'Alamat rumah', heading = 'Titik
   const [regencies, setRegencies] = useState([])
   const [districts, setDistricts] = useState([])
   const [feedback, setFeedback] = useState('')
+  const [loading, setLoading] = useState({ provinces: true, regencies: false, districts: false })
 
   useEffect(() => {
     let isMounted = true
 
-    getProvinces()
-      .then((items) => {
+    async function loadProvinces() {
+      try {
+        setLoading((current) => ({ ...current, provinces: true }))
+        const items = await getProvinces()
         if (isMounted) setProvinces(items)
-      })
-      .catch((error) => {
+      } catch (error) {
         if (isMounted) setFeedback(error.message)
-      })
+      } finally {
+        if (isMounted) setLoading((current) => ({ ...current, provinces: false }))
+      }
+    }
+
+    loadProvinces()
 
     return () => {
       isMounted = false
@@ -110,13 +118,25 @@ function AddressForm({ value, onChange, title = 'Alamat rumah', heading = 'Titik
   useEffect(() => {
     let isMounted = true
 
-    getRegencies(value.provinceCode)
-      .then((items) => {
+    async function loadRegencies() {
+      if (!value.provinceCode) {
+        setRegencies([])
+        setLoading((current) => ({ ...current, regencies: false }))
+        return
+      }
+
+      try {
+        setLoading((current) => ({ ...current, regencies: true }))
+        const items = await getRegencies(value.provinceCode)
         if (isMounted) setRegencies(items)
-      })
-      .catch((error) => {
+      } catch (error) {
         if (isMounted) setFeedback(error.message)
-      })
+      } finally {
+        if (isMounted) setLoading((current) => ({ ...current, regencies: false }))
+      }
+    }
+
+    loadRegencies()
 
     return () => {
       isMounted = false
@@ -126,13 +146,25 @@ function AddressForm({ value, onChange, title = 'Alamat rumah', heading = 'Titik
   useEffect(() => {
     let isMounted = true
 
-    getDistricts(value.cityCode)
-      .then((items) => {
+    async function loadDistricts() {
+      if (!value.cityCode) {
+        setDistricts([])
+        setLoading((current) => ({ ...current, districts: false }))
+        return
+      }
+
+      try {
+        setLoading((current) => ({ ...current, districts: true }))
+        const items = await getDistricts(value.cityCode)
         if (isMounted) setDistricts(items)
-      })
-      .catch((error) => {
+      } catch (error) {
         if (isMounted) setFeedback(error.message)
-      })
+      } finally {
+        if (isMounted) setLoading((current) => ({ ...current, districts: false }))
+      }
+    }
+
+    loadDistricts()
 
     return () => {
       isMounted = false
@@ -166,13 +198,14 @@ function AddressForm({ value, onChange, title = 'Alamat rumah', heading = 'Titik
       </div>
 
       <div className="mt-6 grid gap-4">
+        {loading.provinces ? <div className="rounded-2xl border border-moss/10 bg-[#f8f4e6] p-4"><SkeletonText className="w-32" /><SkeletonText className="mt-3 h-10 w-full" /></div> : null}
         <label className="block">
           <span className="text-sm font-black text-moss/70">Alamat lengkap</span>
           <input className={inputClass} value={value.address} onChange={(event) => updateValue({ address: event.target.value })} />
         </label>
-        <RegionSelect key={`province-${value.provinceCode || 'empty'}`} label="Provinsi" value={value.provinceCode} options={provinces} placeholder="Pilih provinsi" onChange={handleProvinceChange} />
-        <RegionSelect key={`city-${value.provinceCode || 'empty'}-${value.cityCode || 'empty'}`} label="Kabupaten/kota" value={value.cityCode} options={regencies} placeholder="Pilih kabupaten/kota" disabled={!value.provinceCode} onChange={handleCityChange} />
-        <RegionSelect key={`district-${value.cityCode || 'empty'}-${value.districtCode || 'empty'}`} label="Kecamatan" value={value.districtCode} options={districts} placeholder="Pilih kecamatan" disabled={!value.cityCode} onChange={handleDistrictChange} />
+        <RegionSelect key={`province-${value.provinceCode || 'empty'}`} label="Provinsi" value={value.provinceCode} fallbackName={value.province} options={provinces} placeholder="Pilih provinsi" isLoading={loading.provinces} onChange={handleProvinceChange} />
+        <RegionSelect key={`city-${value.provinceCode || 'empty'}-${value.cityCode || 'empty'}`} label="Kabupaten/kota" value={value.cityCode} fallbackName={value.city} options={regencies} placeholder="Pilih kabupaten/kota" disabled={!value.provinceCode} isLoading={loading.regencies} onChange={handleCityChange} />
+        <RegionSelect key={`district-${value.cityCode || 'empty'}-${value.districtCode || 'empty'}`} label="Kecamatan" value={value.districtCode} fallbackName={value.districtName} options={districts} placeholder="Pilih kecamatan" disabled={!value.cityCode} isLoading={loading.districts} onChange={handleDistrictChange} />
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className="text-sm font-black text-moss/70">Latitude</span>

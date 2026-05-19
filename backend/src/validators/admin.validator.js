@@ -2,7 +2,7 @@ import { validateDriverRegisterPayload } from './auth.validator.js'
 import { HttpError } from '../utils/http-error.js'
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const wasteCategories = ['ORGANIK', 'ANORGANIK', 'B3', 'DAUR_ULANG_RESIDU']
+const wasteCategories = ['ORGANIK', 'ANORGANIK', 'B3']
 const roles = ['USER', 'DRIVER', 'ADMIN']
 
 function normalizeString(value) {
@@ -51,6 +51,7 @@ export function validateAdminAccountUpdatePayload(body) {
   const payload = {}
   const name = normalizeString(body?.name)
   const email = normalizeString(body?.email).toLowerCase()
+  const role = normalizeString(body?.role).toUpperCase()
   const vehiclePlate = normalizeString(body?.vehiclePlate).toUpperCase()
   const vehicleType = normalizeString(body?.vehicleType)
 
@@ -58,6 +59,10 @@ export function validateAdminAccountUpdatePayload(body) {
   if (email) {
     if (!emailRegex.test(email)) throw new HttpError(400, 'Format email tidak valid')
     payload.email = email
+  }
+  if (role) {
+    if (!roles.includes(role)) throw new HttpError(400, 'Role akun tidak valid')
+    payload.role = role
   }
   if (typeof body?.isActive === 'boolean') payload.isActive = body.isActive
   if (vehiclePlate) payload.vehiclePlate = vehiclePlate
