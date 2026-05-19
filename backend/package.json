@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "postinstall": "prisma generate",
     "check": "node --check src/server.js",
     "smoke:test": "node scripts/smoke-test.js",
     "prisma:generate": "prisma generate",
@@ -14,11 +15,13 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "axios": "^1.16.1",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "form-data": "^4.0.5",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
     "swagger-ui-express": "^5.0.1"

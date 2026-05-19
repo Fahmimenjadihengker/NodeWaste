@@ -1,47 +1,47 @@
 import { useEffect, useRef, useState } from 'react'
 
-const dummyResults = [
-  {
-    wasteName: 'Botol Plastik',
-    category: 'Anorganik',
-    confidence: 0.92,
-    points: 15,
-    xp: 10,
-    isValid: true,
-    guide: 'Kosongkan isi botol, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
-    impact: 'Botol plastik yang dipilah membantu mengurangi sampah sulit terurai di TPA.',
-  },
-  {
-    wasteName: 'Sisa Makanan',
-    category: 'Organik',
-    confidence: 0.88,
-    points: 10,
-    xp: 10,
-    isValid: true,
-    guide: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
-    impact: 'Sampah organik yang terolah bisa mengurangi bau dan menghasilkan kompos.',
-  },
-  {
-    wasteName: 'Baterai Bekas',
-    category: 'B3',
-    confidence: 0.84,
-    points: 20,
-    xp: 10,
-    isValid: true,
-    guide: 'Jangan campur dengan sampah rumah tangga. Simpan kering, lalu bawa ke titik pengumpulan B3 atau e-waste.',
-    impact: 'Baterai yang dipilah mencegah kontaminasi logam berat ke tanah dan air.',
-  },
-  {
-    wasteName: 'Objek belum jelas',
-    category: 'Unknown',
-    confidence: 0.58,
-    points: 0,
-    xp: 0,
-    isValid: false,
-    guide: 'Gambar kurang jelas. Coba dekatkan kamera, pastikan cahaya cukup, dan scan satu objek sampah saja.',
-    impact: 'Scan ulang membantu sistem memberi edukasi yang lebih akurat.',
-  },
-]
+// const dummyResults = [
+//   {
+//     wasteName: 'Botol Plastik',
+//     category: 'Anorganik',
+//     confidence: 0.92,
+//     points: 15,
+//     xp: 10,
+//     isValid: true,
+//     guide: 'Kosongkan isi botol, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
+//     impact: 'Botol plastik yang dipilah membantu mengurangi sampah sulit terurai di TPA.',
+//   },
+//   {
+//     wasteName: 'Sisa Makanan',
+//     category: 'Organik',
+//     confidence: 0.88,
+//     points: 10,
+//     xp: 10,
+//     isValid: true,
+//     guide: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
+//     impact: 'Sampah organik yang terolah bisa mengurangi bau dan menghasilkan kompos.',
+//   },
+//   {
+//     wasteName: 'Baterai Bekas',
+//     category: 'B3',
+//     confidence: 0.84,
+//     points: 20,
+//     xp: 10,
+//     isValid: true,
+//     guide: 'Jangan campur dengan sampah rumah tangga. Simpan kering, lalu bawa ke titik pengumpulan B3 atau e-waste.',
+//     impact: 'Baterai yang dipilah mencegah kontaminasi logam berat ke tanah dan air.',
+//   },
+//   {
+//     wasteName: 'Objek belum jelas',
+//     category: 'Unknown',
+//     confidence: 0.58,
+//     points: 0,
+//     xp: 0,
+//     isValid: false,
+//     guide: 'Gambar kurang jelas. Coba dekatkan kamera, pastikan cahaya cukup, dan scan satu objek sampah saja.',
+//     impact: 'Scan ulang membantu sistem memberi edukasi yang lebih akurat.',
+//   },
+// ]
 
 function getConfidenceLabel(confidence) {
   return `${Math.round(confidence * 100)}%`
