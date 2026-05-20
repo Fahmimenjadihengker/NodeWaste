@@ -2,10 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import AppCard from '../components/AppCard.jsx'
 import LeafyAvatar from '../components/LeafyAvatar.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
-import { SkeletonCard } from '../components/Skeleton.jsx'
-import { useCachedResource } from '../hooks/useCachedResource.js'
-import { getCachedPet, getPet, runPetAction } from '../services/authApi.js'
-import { sweetConfirm, sweetLoading, sweetSuccess } from '../utils/sweetAlert.js'
+import { getPet, runPetAction } from '../services/authApi.js'
+import { dashboardData } from '../services/dashboardData.js'
 
 const petActions = [
   {
@@ -13,34 +11,47 @@ const petActions = [
     label: 'Makan',
     cost: 20,
     mood: 'happy',
-    helper: 'Jika lapar, beri makan.',
-    effect: { hunger: -28 },
+    helper: 'Turunkan lapar dan bantu health pulih.',
+    effect: { hunger: -28, health: 8 },
   },
   {
     id: 'play',
     label: 'Main',
     cost: 15,
     mood: 'excited',
-    helper: 'Jika tidak bahagia, ajak main.',
-    effect: { happiness: 18, hunger: 8, xp: 15 },
+    helper: 'Naikkan happiness dan tambah XP Leafy.',
+    effect: { happiness: 18, hunger: 8, cleanliness: -4, xp: 15 },
+  },
+  {
+    id: 'bath',
+    label: 'Mandi',
+    cost: 10,
+    mood: 'fresh',
+    helper: 'Bersihkan Leafy dan naikkan health.',
+    effect: { cleanliness: 24, health: 6, happiness: 4 },
   },
 ]
 
 const moodCopy = {
   happy: { label: 'Bahagia', message: 'Leafy terlihat nyaman dan siap menemanimu memilah sampah.' },
   excited: { label: 'Semangat', message: 'Leafy makin aktif setelah diajak bermain.' },
+  fresh: { label: 'Segar', message: 'Leafy bersih dan terlihat lebih cerah.' },
   hungry: { label: 'Lapar', message: 'Leafy mulai lapar. Beri makan saat EcoPoints cukup.' },
+  dirty: { label: 'Kotor', message: 'Leafy butuh mandi agar cleanliness kembali naik.' },
+  sick: { label: 'Kurang sehat', message: 'Health Leafy rendah. Rawat pelan-pelan dengan makan atau mandi.' },
   lonely: { label: 'Butuh main', message: 'Ajak Leafy bermain agar happiness naik lagi.' },
 }
 
 function getPetMood(pet, fallbackMood) {
+  if (pet.health < 40) return 'sick'
   if (pet.hunger > 70) return 'hungry'
+  if (pet.cleanliness < 40) return 'dirty'
   if (pet.happiness < 40) return 'lonely'
 
   return fallbackMood
 }
 
-function StatusMeter({ label, value, helper, barClassName }) {
+function StatusMeter({ label, value, helper }) {
   return (
     <div className="rounded-[1.25rem] bg-[#f8f4e6]/70 p-5">
       <div className="flex items-center justify-between gap-4">
@@ -50,17 +61,9 @@ function StatusMeter({ label, value, helper, barClassName }) {
         </div>
         <span className="text-lg font-black text-leaf-900">{value}%</span>
       </div>
-      <ProgressBar value={value} className="mt-4 h-2" barClassName={barClassName} />
+      <ProgressBar value={value} className="mt-4 h-2" />
     </div>
   )
-}
-
-function getSatietyStatus(satiety) {
-  if (satiety < 30) return { label: 'Leafy sekarat', helper: 'Segera beri makan Leafy.', barClassName: 'bg-red-700' }
-  if (satiety <= 50) return { label: 'Leafy lapar', helper: 'Leafy butuh makan hari ini.', barClassName: 'bg-[#d99a35]' }
-  if (satiety <= 80) return { label: 'Leafy agak lapar', helper: 'Kenyang mulai turun.', barClassName: 'bg-honey' }
-
-  return { label: 'Kenyang', helper: 'Leafy masih kenyang.', barClassName: 'bg-leaf-600' }
 }
 
 function ActionCard({ action, disabled, onAction }) {
@@ -108,44 +111,47 @@ function ActivityLog({ items }) {
 }
 
 function PetPage() {
-  const [ecoPoints, setEcoPoints] = useState(0)
-  const [pet, setPet] = useState({ name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0, xp: 0, nextLevelXp: 100 })
+  const [ecoPoints, setEcoPoints] = useState(dashboardData.stats.ecoPoints)
+  const [pet, setPet] = useState({ ...dashboardData.pet, xp: 45, nextLevelXp: 100 })
   const [lastMood, setLastMood] = useState('happy')
   const [avatarMood, setAvatarMood] = useState('idle')
-  const [feedback, setFeedback] = useState('Memuat data Leafy...')
+  const [feedback, setFeedback] = useState('Leafy siap dirawat hari ini.')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
-  const [logs, setLogs] = useState([])
-  const { data: petData, isLoading } = useCachedResource({
-    getCached: getCachedPet,
-    load: getPet,
-    fallback: { ecoPoints: 0, pet, activities: [] },
-  })
+  const [logs, setLogs] = useState([
+    { title: 'Leafy diberi makan', meta: '-20 EcoPoints', time: 'Kemarin' },
+    { title: 'Leafy ikut progres scan', meta: '+10 XP dari aktivitas memilah', time: '2 hari lalu' },
+  ])
   const mood = getPetMood(pet, lastMood)
   const moodInfo = moodCopy[mood]
   const satiety = 100 - pet.hunger
-  const satietyStatus = getSatietyStatus(satiety)
   const petXpProgress = Math.min(Math.round((pet.xp / pet.nextLevelXp) * 100), 100)
 
   const statusItems = useMemo(() => [
+    { label: 'Health', value: pet.health, helper: 'Kondisi umum Leafy' },
     { label: 'Happiness', value: pet.happiness, helper: 'Naik saat diajak main' },
-    { label: satietyStatus.label, value: satiety, helper: satietyStatus.helper, barClassName: satietyStatus.barClassName },
-  ], [pet.happiness, satiety, satietyStatus.barClassName, satietyStatus.helper, satietyStatus.label])
+    { label: 'Kenyang', value: satiety, helper: 'Makin tinggi makin tidak lapar' },
+    { label: 'Cleanliness', value: pet.cleanliness, helper: 'Naik saat Leafy mandi' },
+  ], [pet, satiety])
 
   useEffect(() => {
-    if (petData) {
-      queueMicrotask(() => {
-        setEcoPoints(petData.ecoPoints)
-        setPet(petData.pet)
-        setLogs(petData.activities)
-        setFeedback('Leafy siap dirawat hari ini.')
+    let isMounted = true
+
+    getPet()
+      .then((response) => {
+        if (!isMounted) return
+
+        setEcoPoints(response.data.ecoPoints)
+        setPet(response.data.pet)
+        setLogs(response.data.activities)
       })
-    }
+      .catch(() => {})
 
     return () => {
+      isMounted = false
       window.clearTimeout(moodTimerRef.current)
     }
-  }, [petData])
+  }, [])
 
   const handleLeafyClick = () => {
     const now = Date.now()
@@ -167,13 +173,7 @@ function PetPage() {
       return
     }
 
-    const confirmed = await sweetConfirm({ title: `${action.label} Leafy?`, text: `Aksi ini memakai ${action.cost} EcoPoints.`, confirmText: action.label })
-    if (!confirmed) return
-
-    let closeLoading = null
-
     try {
-      closeLoading = sweetLoading({ title: `${action.label} Leafy...`, text: 'Aksi sedang diproses.' })
       const response = await runPetAction(action.id)
       setEcoPoints(response.data.ecoPoints)
       setPet(response.data.pet)
@@ -184,10 +184,7 @@ function PetPage() {
         { title: `Leafy ${action.label.toLowerCase()}`, meta: `-${action.cost} EcoPoints`, time: 'Baru saja' },
         ...current.slice(0, 3),
       ])
-      closeLoading?.()
-      await sweetSuccess({ text: `${action.label} Leafy berhasil.` })
     } catch (error) {
-      closeLoading?.()
       setFeedback(error.message)
     }
   }
@@ -200,7 +197,7 @@ function PetPage() {
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Virtual pet</p>
               <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Rawat {pet.name}.</h1>
-              <p className="mt-4 max-w-xl text-base leading-8 text-moss/70">Gunakan EcoPoints untuk menjaga Leafy tetap kenyang dan bahagia.</p>
+              <p className="mt-4 max-w-xl text-base leading-8 text-moss/70">Gunakan EcoPoints untuk menjaga Leafy tetap sehat, kenyang, bersih, dan bahagia.</p>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
           </div>
@@ -229,13 +226,13 @@ function PetPage() {
           <div className="sm:col-span-2 rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-5 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <p className="text-sm font-black text-leaf-900">{feedback}</p>
           </div>
-          {isLoading ? <><SkeletonCard className="min-h-48" /><SkeletonCard className="min-h-48" /></> : statusItems.map((status) => (
+          {statusItems.map((status) => (
             <StatusMeter key={status.label} {...status} />
           ))}
         </div>
       </section>
 
-      <section className="mt-8 grid gap-5 lg:grid-cols-2">
+      <section className="mt-8 grid gap-5 lg:grid-cols-3">
         {petActions.map((action) => (
           <ActionCard key={action.id} action={action} disabled={ecoPoints < action.cost} onAction={handleAction} />
         ))}
@@ -244,10 +241,11 @@ function PetPage() {
       <section className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
         <AppCard as="div" tone="yellow" className="self-start">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
-          <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Cara merawat</h2>
+          <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Prioritas perawatan</h2>
           <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
-            <p>Jika lapar, beri makan.</p>
-            <p>Jika tidak bahagia, ajak main.</p>
+            <p>Jika Kenyang rendah, pilih Makan terlebih dahulu.</p>
+            <p>Jika Happiness rendah, ajak Leafy Main.</p>
+            <p>Jika Cleanliness rendah, gunakan Mandi untuk menjaga health.</p>
           </div>
         </AppCard>
         <ActivityLog items={logs} />

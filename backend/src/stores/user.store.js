@@ -12,14 +12,13 @@ export async function findUserByIdWithPassword(id) {
   return prisma.user.findUnique({ where: { id } })
 }
 
-export async function createUser(user, options = {}) {
-  const withPet = options.withPet !== false
-
+export async function createUser(user) {
   return prisma.user.create({
     data: {
       ...user,
-      ...(user.role === 'USER' && user.ecoPoints === undefined ? { ecoPoints: 100 } : {}),
-      ...(withPet ? { pet: { create: {} } } : {}),
+      pet: {
+        create: {},
+      },
     },
   })
 }

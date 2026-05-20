@@ -2,7 +2,7 @@ export const dashboardData = {
   stats: {
     ecoPoints: 165,
     xp: 130,
-    nextLevelXp: 100,
+    nextLevelXp: 250,
     level: 2,
     streak: 3,
     totalScans: 12,
@@ -12,8 +12,10 @@ export const dashboardData = {
     name: 'Leafy',
     level: 2,
     mood: 'Happy',
+    health: 86,
     happiness: 78,
     hunger: 34,
+    cleanliness: 72,
   },
   categories: [
     { label: 'Organik', value: 4, color: 'bg-leaf-600' },

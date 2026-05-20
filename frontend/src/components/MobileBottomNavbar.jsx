@@ -2,13 +2,11 @@ import { NavLink } from 'react-router-dom'
 import AppNavIcon from './AppNavIcon.jsx'
 import { mobileAppNavItems } from './appNavItems.js'
 
-function MobileBottomNavbar({ navItems = mobileAppNavItems }) {
-  const gridClass = navItems.length === 2 ? 'grid-cols-2' : navItems.length === 3 ? 'grid-cols-3' : navItems.length === 4 ? 'grid-cols-4' : 'grid-cols-5'
-
+function MobileBottomNavbar() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:hidden" aria-label="Navigasi aplikasi mobile">
-      <div className={`mx-auto grid max-w-md ${gridClass} items-end gap-1 rounded-[2rem] border border-moss/10 bg-white/92 px-3 pb-3 pt-2 shadow-[0_-10px_34px_rgba(32,58,37,0.14)] backdrop-blur-xl`}>
-        {navItems.map((item) => (
+      <div className="mx-auto grid max-w-md grid-cols-5 items-end gap-1 rounded-[2rem] border border-moss/10 bg-white/92 px-3 pb-3 pt-2 shadow-[0_-10px_34px_rgba(32,58,37,0.14)] backdrop-blur-xl">
+        {mobileAppNavItems.map((item) => (
           <NavLink
             key={item.to}
             className={({ isActive }) => {

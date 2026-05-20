@@ -1,8 +1,7 @@
 import prisma from '../config/prisma.js'
 import { getUserActivities } from './activity.service.js'
-import { getCurrentPet } from './pet.service.js'
 
-const nextLevelXp = 100
+const nextLevelXp = 250
 const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
 function emptyCategoryCounts() {
@@ -15,14 +14,6 @@ function buildCategories(categoryCounts) {
     { label: 'Anorganik', value: categoryCounts.anorganik, color: 'bg-[#7fa765]' },
     { label: 'B3', value: categoryCounts.b3, color: 'bg-honey' },
   ]
-}
-
-function normalizeCategoryKey(category) {
-  const key = String(category || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
-  if (key === 'organik') return 'organik'
-  if (key === 'anorganik') return 'anorganik'
-  if (key === 'b3') return 'b3'
-  return null
 }
 
 function buildScanActivity(scans) {
@@ -47,8 +38,7 @@ function buildScanActivity(scans) {
   for (const scan of scans) {
     if (!scan.isValid) continue
 
-    const category = normalizeCategoryKey(scan.category)
-    if (!category) continue
+    const category = scan.category.toLowerCase()
     const dateKey = scan.createdAt.toISOString().slice(0, 10)
     const weeklyItem = weekly.find((item) => item.dateKey === dateKey)
 
@@ -70,28 +60,16 @@ function buildScanActivity(scans) {
 }
 
 export async function getDashboard(userId) {
-  const monthStart = new Date()
-  monthStart.setDate(1)
-  monthStart.setHours(0, 0, 0, 0)
-
-  const weekStart = new Date()
-  weekStart.setDate(weekStart.getDate() - 6)
-  weekStart.setHours(0, 0, 0, 0)
-
-  const [user, pet, totalScans, validScans, categoryGroups, chartScans, recentActivities] = await Promise.all([
+  const [user, pet, scans, recentActivities] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
-    getCurrentPet(prisma, userId),
-    prisma.scan.count({ where: { userId } }),
-    prisma.scan.count({ where: { userId, isValid: true } }),
-    prisma.scan.groupBy({ by: ['category'], where: { userId }, _count: { _all: true } }),
-    prisma.scan.findMany({ where: { userId, isValid: true, createdAt: { gte: monthStart } }, select: { category: true, isValid: true, createdAt: true }, orderBy: { createdAt: 'desc' } }),
+    prisma.pet.findUnique({ where: { userId } }),
+    prisma.scan.findMany({ where: { userId }, orderBy: { createdAt: 'desc' } }),
     getUserActivities(userId, { limit: 5 }),
   ])
 
   const categoryCounts = emptyCategoryCounts()
-  for (const group of categoryGroups) {
-    const category = normalizeCategoryKey(group.category)
-    if (category) categoryCounts[category] = group._count._all
+  for (const scan of scans) {
+    categoryCounts[scan.category.toLowerCase()] += 1
   }
 
   return {
@@ -101,12 +79,12 @@ export async function getDashboard(userId) {
       nextLevelXp,
       level: user.level,
       streak: user.streak,
-      totalScans,
-      validScans,
+      totalScans: scans.length,
+      validScans: scans.filter((scan) => scan.isValid).length,
     },
     pet,
     categories: buildCategories(categoryCounts),
     activities: recentActivities,
-    scanActivity: buildScanActivity(chartScans.filter((scan) => scan.createdAt >= weekStart || scan.createdAt >= monthStart)),
+    scanActivity: buildScanActivity(scans),
   }
 }
