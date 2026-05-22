@@ -141,7 +141,7 @@ model Pet {
 model Scan {
   id         String        @id @default(uuid())
   userId     String        @map("user_id")
-  category   String
+  category   WasteCategory
   label      String
   confidence Int
   isValid    Boolean       @default(false) @map("is_valid")
@@ -235,4 +235,10 @@ enum FacilityType {
   DROPBOX_B3
   KOMPOSTER
   LAINNYA
+}
+
+enum WasteCategory {
+  ORGANIK
+  ANORGANIK
+  B3
 }
