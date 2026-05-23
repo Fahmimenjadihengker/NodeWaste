@@ -1,6 +1,7 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredUser } from '../../services/authApi.js'
 import AppTopNavbar from '../AppTopNavbar.jsx'
+import Footer from '../Footer.jsx'
 import MobileBottomNavbar from '../MobileBottomNavbar.jsx'
 import { driverNavItems, mobileDriverNavItems } from './driverNavItems.js'
 
@@ -25,6 +26,7 @@ function DriverShell() {
         brandSuffix="Driver"
       />
       <Outlet context={{ user, onLogout: handleLogout }} />
+      <Footer className="pb-32 md:pb-10" />
       <MobileBottomNavbar navItems={mobileDriverNavItems} />
     </main>
   )

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Footer from '../components/Footer.jsx'
 import FeatureOverlaySection from '../components/landing/FeatureOverlaySection.jsx'
 import HeroSection from '../components/landing/HeroSection.jsx'
 import LandingCTA from '../components/landing/LandingCTA.jsx'
@@ -51,16 +51,7 @@ function LandingPage() {
       <FeatureOverlaySection features={features} />
       <WorkflowScrollSection steps={workflowSteps} />
       <LandingCTA />
-
-      <footer className="bg-[#f5f1df] px-5 py-8 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 border-t border-moss/15 pt-8 text-sm font-semibold text-moss/60 sm:flex-row">
-          <p>NodeWaste. Edukasi sampah, EcoPoints, dan Leafy dalam satu web app.</p>
-          <div className="flex gap-5">
-            <Link className="hover:text-leaf-700" to="/login">Login</Link>
-            <Link className="hover:text-leaf-700" to="/register">Register</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer variant="public" />
     </main>
   )
 }

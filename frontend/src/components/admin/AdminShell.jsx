@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredUser } from '../../services/authApi.js'
 import AppNavIcon from '../AppNavIcon.jsx'
+import Footer from '../Footer.jsx'
 import MobileBottomNavbar from '../MobileBottomNavbar.jsx'
 import { adminNavItems, mobileAdminNavItems } from './adminNavItems.js'
 import { sweetConfirm } from '../../utils/sweetAlert.js'
@@ -55,6 +56,7 @@ function AdminShell() {
 
       <section className="md:ml-72">
         <Outlet context={{ user, onLogout: handleLogout }} />
+        <Footer className="pb-32 md:pb-10" />
       </section>
       <MobileBottomNavbar navItems={mobileAdminNavItems} />
     </main>

@@ -42,7 +42,7 @@ function getPetMood(pet, fallbackMood) {
 
 function StatusMeter({ label, value, helper, barClassName }) {
   return (
-    <div className="rounded-[1.25rem] bg-[#f8f4e6]/70 p-5">
+    <div className="rounded-[1.25rem] bg-[#f8f4e6]/70 p-4">
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="font-black text-leaf-900">{label}</p>
@@ -73,9 +73,9 @@ function ActionCard({ action, disabled, onAction }) {
         </div>
         <span className="rounded-full bg-[#edf4e6] px-3 py-1.5 text-xs font-black text-leaf-900">-{action.cost} EcoPoints</span>
       </div>
-      <p className="mt-4 text-sm leading-6 text-moss/65">{action.helper}</p>
+      <p className="mt-3 text-sm leading-6 text-moss/65">{action.helper}</p>
       <button
-        className="mt-5 w-full rounded-full bg-leaf-600 px-5 py-3 text-sm font-black text-white transition hover:bg-leaf-900 disabled:cursor-not-allowed disabled:bg-moss/20 disabled:text-moss/45"
+        className="mt-4 w-full rounded-full bg-leaf-600 px-5 py-3 text-sm font-black text-white transition hover:bg-leaf-900 disabled:cursor-not-allowed disabled:bg-moss/20 disabled:text-moss/45"
         type="button"
         disabled={disabled}
         onClick={() => onAction(action)}
@@ -215,34 +215,33 @@ function PetPage() {
           </div>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <AppCard as="div" tone="softCream">
+        <div className="grid self-start gap-4 sm:grid-cols-2">
+          <AppCard as="div" tone="softCream" className="p-5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">EcoPoints</p>
             <p className="mt-2 text-4xl font-black text-leaf-900">{ecoPoints}</p>
             <p className="mt-2 text-sm font-semibold text-moss/60">Resource untuk perawatan Leafy.</p>
           </AppCard>
-          <AppCard as="div">
+          <AppCard as="div" className="p-5">
             <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Pet XP</p>
             <p className="mt-2 text-4xl font-black text-leaf-900">{pet.xp}/{pet.nextLevelXp}</p>
             <ProgressBar value={petXpProgress} className="mt-4 h-2" />
           </AppCard>
-          <div className="sm:col-span-2 rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-5 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
+          <div className="sm:col-span-2 rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-4 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
             <p className="text-sm font-black text-leaf-900">{feedback}</p>
           </div>
           {isLoading ? <><SkeletonCard className="min-h-48" /><SkeletonCard className="min-h-48" /></> : statusItems.map((status) => (
             <StatusMeter key={status.label} {...status} />
           ))}
+          <div className="sm:col-span-2 grid gap-4 lg:grid-cols-2">
+            {petActions.map((action) => (
+              <ActionCard key={action.id} action={action} disabled={ecoPoints < action.cost} onAction={handleAction} />
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="mt-8 grid gap-5 lg:grid-cols-2">
-        {petActions.map((action) => (
-          <ActionCard key={action.id} action={action} disabled={ecoPoints < action.cost} onAction={handleAction} />
-        ))}
-      </section>
-
       <section className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <AppCard as="div" tone="yellow" className="self-start">
+        <AppCard as="div" tone="softCream" className="self-start">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
           <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Cara merawat</h2>
           <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">

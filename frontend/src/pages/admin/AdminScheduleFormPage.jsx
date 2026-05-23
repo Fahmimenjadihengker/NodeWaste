@@ -56,8 +56,8 @@ function AdminScheduleFormPage() {
       <section className="rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">{isEdit ? 'Edit jadwal' : 'Tambah jadwal'}</p>
         <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{isEdit ? 'Perbarui jadwal.' : 'Jadwal baru.'}</h1>
-        <div className="mt-8 rounded-[1.5rem] border border-leaf-900/10 bg-[#f5f1df] p-5">
-          <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1.4fr]">
+        <div className="mt-8 max-w-2xl rounded-[1.5rem] border border-leaf-900/10 bg-[#f5f1df] p-5 sm:p-6">
+          <div className="grid gap-4">
             <input className={inputClass} placeholder="Kategori, contoh Organik" value={form.wasteCategory} onChange={(event) => setForm((current) => ({ ...current, wasteCategory: event.target.value }))} />
             <input className={inputClass} placeholder="Hari pickup" value={form.pickupDay} onChange={(event) => setForm((current) => ({ ...current, pickupDay: event.target.value }))} />
             <input className={inputClass} placeholder="Jam pickup, contoh 08:00" value={form.pickupTime} onChange={(event) => setForm((current) => ({ ...current, pickupTime: event.target.value }))} />
