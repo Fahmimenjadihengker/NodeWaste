@@ -1,24 +1,25 @@
 # NodeWaste
 
-NodeWaste adalah web app edukasi dan gamifikasi pengelolaan sampah. Aplikasi ini membantu user belajar memilah sampah, melakukan scan sampah, mengumpulkan EcoPoints/XP, merawat pet Leafy, melihat jadwal pengangkutan, serta menyediakan area khusus driver dan admin.
+NodeWaste adalah web app edukasi dan gamifikasi pengelolaan sampah. Aplikasi ini membantu user belajar memilah sampah, melakukan scan sampah dengan AI classifier, mengumpulkan EcoPoints/XP, merawat pet Leafy, melihat jadwal pengangkutan, serta menyediakan area khusus driver dan admin.
 
 Project memakai struktur monorepo sederhana:
 
 ```txt
 NodeWaste/
-|-- frontend/  # React + Vite + Tailwind CSS + PWA
-|-- backend/   # Express API + PostgreSQL + Prisma
+|-- frontend/  # React 19 + Vite + Tailwind CSS + React Router + PWA
+|-- backend/   # Express 5 API + PostgreSQL + Prisma
 ```
 
 ## Scope Saat Ini
 
 - Public app: landing page, login, dan register.
-- User app: dashboard, scan sampah, pet Leafy, jadwal, profile, alamat berbasis wilayah.id, dan fasilitas daur ulang.
-- Driver app: map rumah user berdasarkan district driver, profile driver, dan upload foto profile.
-- Admin app: dashboard, manajemen akun/user/driver, dan jadwal pengangkutan.
+- User app: dashboard, scan sampah, pet Leafy, jadwal global, profile, alamat berbasis wilayah.id, dan fasilitas daur ulang.
+- Driver app: map rumah user berdasarkan district driver, processing site, profile driver, dan upload foto profile.
+- Admin app: dashboard, manajemen semua akun role `USER`/`DRIVER`/`ADMIN`, EcoPoints user, dan jadwal pengangkutan global.
 - Backend API: auth role-aware, profile, dashboard, pet, activity, schedules, scans, regions, recycling facilities, driver, dan admin.
 - Database: PostgreSQL lewat Prisma. Supabase dapat dipakai untuk deployment.
-- Kategori scan dan jadwal disimpan sebagai teks biasa agar fleksibel untuk admin dan classifier final.
+- Scan gambar dikirim ke AI classifier eksternal melalui endpoint `/predict`; hasil dinormalisasi ke `Organik`, `Anorganik`, atau `B3`.
+- Kategori scan dan jadwal disimpan sebagai teks biasa agar fleksibel untuk admin dan hasil classifier.
 - PWA: frontend installable dengan app shell caching melalui `vite-plugin-pwa`.
 
 ## Menjalankan Project
@@ -52,7 +53,7 @@ Default URL lokal:
 
 ## Environment
 
-Backend membutuhkan `.env` dengan `DATABASE_URL` PostgreSQL. Frontend dapat memakai `VITE_API_BASE_URL` jika ingin override API base URL.
+Backend membutuhkan `.env` dengan `DATABASE_URL` PostgreSQL. Lihat juga `backend/.env.example` untuk contoh lengkap. Frontend dapat memakai `VITE_API_BASE_URL` jika ingin override API base URL.
 
 Contoh backend:
 
@@ -60,6 +61,10 @@ Contoh backend:
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
 PORT=5000
 CORS_ORIGIN="http://localhost:5173"
+JWT_SECRET="change_this_secret"
+JWT_EXPIRES_IN="7d"
+AI_CLASSIFIER_BASE_URL="https://nodewaste-ai-api-production.up.railway.app"
+AI_CLASSIFIER_TIMEOUT_MS=15000
 ```
 
 Contoh frontend:
@@ -73,17 +78,21 @@ VITE_API_BASE_URL="http://localhost:5000/api"
 Backend:
 
 - `npm run dev` menjalankan server dengan watch mode.
+- `npm start` menjalankan server tanpa watch mode.
 - `npm run check` mengecek syntax entrypoint.
 - `npm run smoke:test` mengetes flow utama auth/dashboard/pet/activity ke database.
 - `npm run seed:driver` membuat data demo driver, district, rumah user, jadwal, dan tempat pengolahan.
 - `npm run seed:admin` membuat akun admin demo.
+- `npm run prisma:generate` generate Prisma Client.
 - `npm run prisma:migrate` menjalankan migration development.
+- `npm run prisma:studio` membuka Prisma Studio.
 
 Frontend:
 
 - `npm run dev` menjalankan Vite dev server.
 - `npm run build` membuat production build.
 - `npm run lint` menjalankan ESLint.
+- `npm run preview` menjalankan preview build.
 
 ## Dokumentasi Detail
 

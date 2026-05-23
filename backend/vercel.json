@@ -3,7 +3,7 @@
   "buildCommand": "npm run prisma:generate",
   "functions": {
     "api/index.js": {
-      "maxDuration": 10
+      "maxDuration": 30
     }
   },
   "routes": [

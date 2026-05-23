@@ -32,6 +32,25 @@ export const swaggerDocument = {
     },
   },
   paths: {
+    // --- HEALTH ---
+    "/api/health": {
+      get: {
+        tags: ["Health"],
+        summary: "Health check service backend",
+        responses: { 200: { description: "Backend aktif" } },
+      },
+    },
+    "/api/health/db": {
+      get: {
+        tags: ["Health"],
+        summary: "Health check koneksi database",
+        responses: {
+          200: { description: "Database terhubung" },
+          500: { description: "Database tidak terhubung" },
+        },
+      },
+    },
+
     // --- AUTHENTICATION ---
     "/api/auth/register": {
       post: {
@@ -64,6 +83,41 @@ export const swaggerDocument = {
         },
       },
     },
+    "/api/auth/register/driver": {
+      post: {
+        tags: ["Authentication"],
+        summary: "Mendaftar akun driver beserta profil kendaraan dan wilayah",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name", "email", "password", "vehiclePlate", "districtName"],
+                properties: {
+                  name: { type: "string", example: "Driver Demo" },
+                  email: { type: "string", example: "driver@example.com" },
+                  password: { type: "string", example: "password123" },
+                  vehiclePlate: { type: "string", example: "AB1234CD" },
+                  vehicleType: { type: "string", example: "Pickup" },
+                  districtName: { type: "string", example: "Umbulharjo" },
+                  city: { type: "string", example: "Kota Yogyakarta" },
+                  province: { type: "string", example: "DI Yogyakarta" },
+                  provinceCode: { type: "string", example: "34" },
+                  cityCode: { type: "string", example: "34.71" },
+                  districtCode: { type: "string", example: "34.71.06" },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          201: { description: "Registrasi driver berhasil" },
+          400: { description: "Payload tidak valid" },
+          409: { description: "Email atau plat kendaraan sudah digunakan" },
+        },
+      },
+    },
     "/api/auth/login": {
       post: {
         tags: ["Authentication"],
@@ -85,6 +139,18 @@ export const swaggerDocument = {
         responses: {
           200: { description: "Login berhasil, mengembalikan Token JWT" },
           401: { description: "Email atau password salah" },
+        },
+      },
+    },
+    "/api/auth/me": {
+      get: {
+        tags: ["Authentication"],
+        summary: "Mengambil user aktif dari token JWT",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "User aktif berhasil diambil" },
+          401: { description: "Unauthorized" },
+          403: { description: "Akun dinonaktifkan" },
         },
       },
     },
@@ -117,7 +183,7 @@ export const swaggerDocument = {
       },
       put: {
         tags: ["Profile"],
-        summary: "Memperbarui nama dan email profil",
+        summary: "Memperbarui nama, email, dan alamat profil user",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -128,6 +194,20 @@ export const swaggerDocument = {
                 properties: {
                   name: { type: "string", example: "Muhammad Abbad" },
                   email: { type: "string", example: "abbad.baru@example.com" },
+                  address: {
+                    type: "object",
+                    properties: {
+                      address: { type: "string", example: "Jl. Kebun Hijau No. 10" },
+                      latitude: { type: "number", example: -7.7956 },
+                      longitude: { type: "number", example: 110.3695 },
+                      districtName: { type: "string", example: "Umbulharjo" },
+                      city: { type: "string", example: "Kota Yogyakarta" },
+                      province: { type: "string", example: "DI Yogyakarta" },
+                      provinceCode: { type: "string", example: "34" },
+                      cityCode: { type: "string", example: "34.71" },
+                      districtCode: { type: "string", example: "34.71.06" },
+                    },
+                  },
                 },
               },
             },
@@ -135,6 +215,29 @@ export const swaggerDocument = {
         },
         responses: {
           200: { description: "Profil berhasil diperbarui" },
+        },
+      },
+    },
+    "/api/profile/photo": {
+      put: {
+        tags: ["Profile"],
+        summary: "Memperbarui foto profile user",
+        description: "Menerima multipart/form-data field photo maksimal 2 MB.",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: { photo: { type: "string", format: "binary" } },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Foto profile berhasil diperbarui" },
+          400: { description: "Foto tidak valid" },
         },
       },
     },
@@ -381,6 +484,30 @@ export const swaggerDocument = {
         },
       },
     },
+    "/api/driver/profile/photo": {
+      put: {
+        tags: ["Driver"],
+        summary: "Memperbarui foto profile driver",
+        description: "Menerima multipart/form-data field photo maksimal 2 MB.",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: { photo: { type: "string", format: "binary" } },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "Foto profile driver berhasil diperbarui" },
+          400: { description: "Foto tidak valid" },
+          403: { description: "Hanya role DRIVER yang dapat mengakses endpoint ini" },
+        },
+      },
+    },
     "/api/driver/map": {
       get: {
         tags: ["Driver"],
@@ -412,6 +539,14 @@ export const swaggerDocument = {
         tags: ["Admin"],
         summary: "Daftar akun semua role",
         security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "role",
+            in: "query",
+            required: false,
+            schema: { type: "string", enum: ["USER", "DRIVER", "ADMIN"] },
+          },
+        ],
         responses: {
           200: { description: "Daftar akun berhasil diambil" },
           403: { description: "Hanya role ADMIN yang dapat mengakses endpoint ini" },
@@ -420,6 +555,7 @@ export const swaggerDocument = {
       post: {
         tags: ["Admin"],
         summary: "Membuat akun USER, DRIVER, atau ADMIN",
+        description: "Jika role DRIVER, payload juga membutuhkan data kendaraan dan wilayah kerja.",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -435,6 +571,12 @@ export const swaggerDocument = {
                   role: { type: "string", enum: ["USER", "DRIVER", "ADMIN"] },
                   vehiclePlate: { type: "string", example: "AB1234CD" },
                   vehicleType: { type: "string", example: "Motor bak" },
+                  districtName: { type: "string", example: "Umbulharjo" },
+                  city: { type: "string", example: "Kota Yogyakarta" },
+                  province: { type: "string", example: "DI Yogyakarta" },
+                  provinceCode: { type: "string", example: "34" },
+                  cityCode: { type: "string", example: "34.71" },
+                  districtCode: { type: "string", example: "34.71.06" },
                 },
               },
             },
@@ -450,7 +592,7 @@ export const swaggerDocument = {
       put: {
         tags: ["Admin"],
         summary: "Memperbarui akun atau status aktif akun",
-        description: "Admin dapat mengubah nama, email, dan isActive. Admin tidak dapat menonaktifkan akun sendiri.",
+        description: "Admin dapat mengubah nama, email, role, isActive, serta data driver bila role DRIVER. Admin tidak dapat menonaktifkan atau mengubah role akun sendiri.",
         security: [{ bearerAuth: [] }],
         parameters: [
           { name: "id", in: "path", required: true, schema: { type: "string" } },
@@ -464,7 +606,21 @@ export const swaggerDocument = {
                 properties: {
                   name: { type: "string", example: "Nama Baru" },
                   email: { type: "string", example: "akun.baru@example.com" },
+                  role: { type: "string", enum: ["USER", "DRIVER", "ADMIN"] },
                   isActive: { type: "boolean", example: true },
+                  vehiclePlate: { type: "string", example: "AB4321CD" },
+                  vehicleType: { type: "string", example: "Pickup" },
+                  district: {
+                    type: "object",
+                    properties: {
+                      districtName: { type: "string", example: "Umbulharjo" },
+                      city: { type: "string", example: "Kota Yogyakarta" },
+                      province: { type: "string", example: "DI Yogyakarta" },
+                      provinceCode: { type: "string", example: "34" },
+                      cityCode: { type: "string", example: "34.71" },
+                      districtCode: { type: "string", example: "34.71.06" },
+                    },
+                  },
                 },
               },
             },
@@ -474,6 +630,87 @@ export const swaggerDocument = {
           200: { description: "Akun berhasil diperbarui" },
           400: { description: "Payload tidak valid" },
           404: { description: "Akun tidak ditemukan" },
+        },
+      },
+      delete: {
+        tags: ["Admin"],
+        summary: "Menghapus akun permanen",
+        description: "Admin tidak dapat menghapus akun sendiri.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        responses: {
+          200: { description: "Akun berhasil dihapus permanen" },
+          400: { description: "Admin tidak bisa menghapus akun sendiri" },
+          404: { description: "Akun tidak ditemukan" },
+        },
+      },
+    },
+    "/api/admin/accounts/{id}/points/add": {
+      post: {
+        tags: ["Admin"],
+        summary: "Menambahkan EcoPoints user",
+        description: "Hanya berlaku untuk akun role USER.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["amount"],
+                properties: { amount: { type: "integer", example: 50 } },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "EcoPoints berhasil ditambahkan" },
+          400: { description: "Payload tidak valid atau akun bukan USER" },
+          404: { description: "Akun tidak ditemukan" },
+        },
+      },
+    },
+    "/api/admin/accounts/{id}/points/subtract": {
+      post: {
+        tags: ["Admin"],
+        summary: "Mengurangi EcoPoints user",
+        description: "Hanya berlaku untuk akun role USER dan tidak boleh membuat EcoPoints negatif.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "string" } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["amount"],
+                properties: { amount: { type: "integer", example: 25 } },
+              },
+            },
+          },
+        },
+        responses: {
+          200: { description: "EcoPoints berhasil dikurangi" },
+          400: { description: "Payload tidak valid, akun bukan USER, atau poin menjadi negatif" },
+          404: { description: "Akun tidak ditemukan" },
+        },
+      },
+    },
+    "/api/admin/users": {
+      get: {
+        tags: ["Admin"],
+        summary: "Daftar akun untuk kompatibilitas halaman admin lama",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          200: { description: "Daftar user berhasil diambil" },
+          403: { description: "Hanya role ADMIN yang dapat mengakses endpoint ini" },
         },
       },
     },
@@ -488,6 +725,30 @@ export const swaggerDocument = {
         tags: ["Admin"],
         summary: "Membuat akun driver beserta profil kendaraan dan wilayah kerja",
         security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["name", "email", "password", "vehiclePlate", "districtName"],
+                properties: {
+                  name: { type: "string", example: "Driver Baru" },
+                  email: { type: "string", example: "driver.baru@example.com" },
+                  password: { type: "string", example: "password123" },
+                  vehiclePlate: { type: "string", example: "AB1234CD" },
+                  vehicleType: { type: "string", example: "Pickup" },
+                  districtName: { type: "string", example: "Umbulharjo" },
+                  city: { type: "string", example: "Kota Yogyakarta" },
+                  province: { type: "string", example: "DI Yogyakarta" },
+                  provinceCode: { type: "string", example: "34" },
+                  cityCode: { type: "string", example: "34.71" },
+                  districtCode: { type: "string", example: "34.71.06" },
+                },
+              },
+            },
+          },
+        },
         responses: {
           201: { description: "Driver berhasil dibuat" },
           400: { description: "Payload tidak valid" },
@@ -502,6 +763,33 @@ export const swaggerDocument = {
         parameters: [
           { name: "id", in: "path", required: true, schema: { type: "string" } },
         ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: { type: "string", example: "Driver Update" },
+                  email: { type: "string", example: "driver.update@example.com" },
+                  vehiclePlate: { type: "string", example: "AB4321CD" },
+                  vehicleType: { type: "string", example: "Motor bak" },
+                  district: {
+                    type: "object",
+                    properties: {
+                      districtName: { type: "string", example: "Umbulharjo" },
+                      city: { type: "string", example: "Kota Yogyakarta" },
+                      province: { type: "string", example: "DI Yogyakarta" },
+                      provinceCode: { type: "string", example: "34" },
+                      cityCode: { type: "string", example: "34.71" },
+                      districtCode: { type: "string", example: "34.71.06" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         responses: {
           200: { description: "Driver berhasil diperbarui" },
           404: { description: "Driver tidak ditemukan" },

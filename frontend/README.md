@@ -1,6 +1,6 @@
 # NodeWaste Frontend
 
-Frontend NodeWaste berbasis React, Vite, Tailwind CSS, React Router, dan PWA melalui `vite-plugin-pwa`.
+Frontend NodeWaste berbasis React 19, Vite, Tailwind CSS, React Router 7, dan PWA melalui `vite-plugin-pwa`.
 
 ## Scripts
 
@@ -15,8 +15,9 @@ Saat ini aplikasi berisi:
 
 - Public routes: `/`, `/login`, dan `/register`.
 - User routes: `/dashboard`, `/scan`, `/pet`, `/schedule`, `/profile`, dan `/profile/edit`.
-- Driver routes: `/driver/map`, `/driver/profile`, dan `/driver/profile/edit`.
+- Driver routes: `/driver/map`, `/driver/profile`, dan `/driver/profile/edit`. Route `/driver/dashboard` saat ini redirect ke `/driver/map`.
 - Admin routes: `/admin/dashboard`, `/admin/users`, `/admin/users/new`, `/admin/users/:id/edit`, `/admin/points`, `/admin/schedules`, `/admin/schedules/new`, dan `/admin/schedules/:id/edit`.
+- Admin mengelola role `USER`, `DRIVER`, dan `ADMIN` dari route `/admin/users`; form driver muncul saat role dipilih `DRIVER`.
 - Role redirect setelah login: `USER` ke `/dashboard`, `DRIVER` ke `/driver/map`, dan `ADMIN` ke `/admin/dashboard`.
 - PWA installable dengan app shell caching dan auto update service worker.
 
@@ -26,12 +27,15 @@ Saat ini aplikasi berisi:
 - `src/main.jsx` entrypoint React.
 - `src/services/apiClient.js` API base URL, auth token, request helper, dan cache localStorage.
 - `src/services/authApi.js` API user app dan session helper.
+- `src/services/scanApi.js` API upload scan gambar.
 - `src/services/adminApi.js` API admin app.
 - `src/services/driverApi.js` API driver app.
 - `src/services/regionApi.js` API wilayah.id untuk alamat/district.
+- `src/hooks/useCachedResource.js` hook cache-first untuk data page.
 - `src/components/AppShell.jsx` shell area user.
 - `src/components/driver/DriverShell.jsx` shell area driver.
 - `src/components/admin/AdminShell.jsx` shell area admin.
+- `src/utils/sweetAlert.js` modal konfirmasi/loading/sukses custom tanpa library eksternal.
 
 ## API Base URL
 
@@ -51,8 +55,10 @@ VITE_API_BASE_URL="http://localhost:5000/api"
 
 - Auth token disimpan di `localStorage` sebagai `nodewaste_token`.
 - Data user tersimpan sebagai `nodewaste_user`.
-- Beberapa request memakai cache localStorage dengan prefix `nodewaste_api_cache:` dan dibersihkan setelah mutasi terkait.
-- Dashboard, pet, activities, schedules, profile, admin, dan driver mengambil data dari backend API.
+- Request cache-first memakai in-memory cache, localStorage prefix `nodewaste_api_cache:`, TTL default 24 jam, request dedupe, dan background revalidate.
+- Cache dibersihkan setelah mutasi terkait seperti update profile, pet action, scan, admin account, dan jadwal.
+- Setelah login/register, frontend melakukan prefetch data sesuai role.
+- Dashboard, pet, activities, schedules, profile, admin, driver, scan, regions, dan recycling facilities mengambil data dari backend API.
 - `src/services/dashboardData.js` masih tersedia sebagai data lokal/fallback visual, bukan sumber utama dashboard saat runtime.
 - Styling utama memakai Tailwind CSS dan komponen internal, tanpa UI library eksternal.
 
