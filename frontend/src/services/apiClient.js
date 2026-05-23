@@ -6,7 +6,7 @@ const pendingRequests = new Map()
 
 export function getApiBaseUrl() {
   if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL
-  if (window.location.hostname === 'nodewaste.vercel.app') return productionApiBaseUrl
+  if (!['localhost', '127.0.0.1'].includes(window.location.hostname)) return productionApiBaseUrl
 
   return 'http://localhost:5000/api'
 }
@@ -66,10 +66,11 @@ export function clearApiCache(pathPrefix = '') {
 
 export async function apiRequest(path, options = {}) {
   const token = getAuthToken()
+  const apiBaseUrl = getApiBaseUrl()
   let response
 
   try {
-    response = await fetch(`${getApiBaseUrl()}${path}`, {
+    response = await fetch(`${apiBaseUrl}${path}`, {
       headers: {
         ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -78,7 +79,7 @@ export async function apiRequest(path, options = {}) {
       ...options,
     })
   } catch {
-    throw new Error('Koneksi ke server terputus. Coba lagi sebentar.')
+    throw new Error(`Backend tidak bisa dihubungi (${apiBaseUrl}). Pastikan server API aktif atau VITE_API_BASE_URL sudah benar.`)
   }
 
   const payload = await response.json().catch(() => null)

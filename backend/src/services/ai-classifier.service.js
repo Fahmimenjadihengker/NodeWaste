@@ -62,14 +62,14 @@ function normalizeCategory(...values) {
   }
 
   if (normalized === 'anorganik' || includesAny(text, ['anorganik', 'plastic', 'plastik', 'bottle', 'botol', 'can', 'kaleng', 'glass', 'kaca', 'paper', 'kertas', 'cardboard', 'karton', 'metal', 'logam'])) {
-    return 'ANORGANIK'
+    return 'Anorganik'
   }
 
   if (normalized === 'organik' || includesAny(text, ['organik', 'organic', 'food', 'makanan', 'sisa makanan', 'leaf', 'daun', 'fruit', 'buah', 'vegetable', 'sayur', 'compost', 'kompos'])) {
-    return 'ORGANIK'
+    return 'Organik'
   }
 
-  return 'ANORGANIK'
+  return 'Anorganik'
 }
 
 function normalizeConfidence(value) {
@@ -86,21 +86,32 @@ function normalizeLabel(value, fallback) {
   const label = String(value || '').trim()
   if (label) return label
 
-  if (fallback === 'ORGANIK') return 'Sampah Organik'
+  if (fallback === 'Organik') return 'Sampah Organik'
   if (fallback === 'B3') return 'Sampah B3'
   return 'Sampah Anorganik'
+}
+
+function normalizeRecommendation(value) {
+  if (value && typeof value === 'object') {
+    return normalizeRecommendation(value.text || value.message || value.guide || value.panduan)
+  }
+
+  const text = String(value || '').trim()
+  return text || null
 }
 
 export function normalizeAiPrediction(payload) {
   const labelValue = findValueByKeys(payload, ['label', 'class', 'class_name', 'prediction', 'predicted_class', 'jenis', 'name'])
   const categoryValue = findValueByKeys(payload, ['category', 'kategori', 'waste_category', 'wasteCategory'])
   const confidenceValue = findValueByKeys(payload, ['confidence', 'score', 'probability', 'prob', 'akurasi'])
-  const category = normalizeCategory(categoryValue, labelValue)
+  const recommendationValue = findValueByKeys(payload, ['recommendation', 'rekomendasi', 'guide', 'panduan', 'text'])
+  const category = normalizeCategory(categoryValue, labelValue, recommendationValue)
 
   return {
     category,
     label: normalizeLabel(labelValue || categoryValue, category),
     confidence: normalizeConfidence(confidenceValue),
+    recommendation: normalizeRecommendation(recommendationValue),
   }
 }
 

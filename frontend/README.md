@@ -38,7 +38,7 @@ Saat ini aplikasi berisi:
 `src/services/apiClient.js` menentukan base URL dengan urutan berikut:
 
 1. `VITE_API_BASE_URL` jika tersedia.
-2. `https://nodewaste-backend.vercel.app/api` jika hostname frontend adalah `nodewaste.vercel.app`.
+2. `https://nodewaste-backend.vercel.app/api` jika hostname frontend bukan `localhost` atau `127.0.0.1`.
 3. `http://localhost:5000/api` untuk development lokal.
 
 Contoh `.env` frontend:

@@ -21,5 +21,5 @@ export async function processScan(user, file) {
     xpReward,
   );
 
-  return result;
+  return { ...result, recommendation: aiResult.recommendation };
 }

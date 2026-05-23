@@ -215,7 +215,7 @@ function ScanPage() {
           points: scan.ecoPoints,
           xp: scan.xpReward,
           isValid: scan.isValid,
-          guide: categoryGuide[scan.category] || 'Ikuti panduan pemilahan sampah sesuai kategori.',
+          guide: response.data.recommendation || categoryGuide[scan.category] || 'Ikuti panduan pemilahan sampah sesuai kategori.',
         })
       } catch (error) {
         setResult({ wasteName: 'Scan gagal', category: 'Unknown', confidence: 0, points: 0, xp: 0, isValid: false, guide: error.message })

@@ -33,10 +33,22 @@ const allowedOrigins = [
   .map((origin) => normalizeOrigin(origin.trim()))
   .filter(Boolean);
 
+function isAllowedOrigin(origin) {
+  const normalizedOrigin = normalizeOrigin(origin)
+  if (allowedOrigins.includes(normalizedOrigin)) return true
+
+  try {
+    const { hostname, protocol } = new URL(normalizedOrigin)
+    return protocol === "https:" && hostname.endsWith(".vercel.app")
+  } catch {
+    return false
+  }
+}
+
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(normalizeOrigin(origin))) {
+      if (!origin || isAllowedOrigin(origin)) {
         callback(null, true);
         return;
       }
