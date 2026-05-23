@@ -150,7 +150,7 @@ function PetPage() {
   const handleLeafyClick = () => {
     const now = Date.now()
     clickTimesRef.current = [...clickTimesRef.current.filter((time) => now - time < 2000), now]
-    const nextMood = clickTimesRef.current.length >= 5 ? 'angry' : 'happy'
+    const nextMood = clickTimesRef.current.length >= 10 ? 'angry' : 'happy'
 
     setAvatarMood(nextMood)
     setFeedback(nextMood === 'angry' ? 'Leafy kesal kalau diklik terlalu sering.' : 'Leafy suka diperhatikan, tapi jangan dispam ya.')

@@ -45,7 +45,6 @@ model District {
   drivers         DriverProfile[]
   processingSites ProcessingSite[]
   userAddresses   UserAddress[]
-  wasteSchedules  WasteSchedule[]
 
   @@unique([name, city])
   @@map("districts")
@@ -87,7 +86,6 @@ model UserAddress {
 
 model WasteSchedule {
   id            String   @id @default(uuid())
-  districtId    String?  @map("district_id")
   wasteCategory String   @map("waste_category")
   pickupDay     String   @map("pickup_day")
   pickupTime    String   @map("pickup_time")
@@ -95,9 +93,6 @@ model WasteSchedule {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  district District? @relation(fields: [districtId], references: [id], onDelete: SetNull)
-
-  @@index([districtId])
   @@map("waste_schedules")
 }
 

@@ -102,7 +102,7 @@ Data disimpan di PostgreSQL melalui Prisma. Pastikan `DATABASE_URL` di `.env` me
 
 Endpoint scan meneruskan upload gambar ke AI classifier eksternal melalui `POST /predict`. Default service AI adalah `https://nodewaste-ai-api-production.up.railway.app` dan dapat dioverride lewat `AI_CLASSIFIER_BASE_URL`. Timeout request AI default 15 detik dan dapat diatur lewat `AI_CLASSIFIER_TIMEOUT_MS`.
 
-Kategori jadwal (`waste_schedules.waste_category`) dan kategori scan (`scans.category`) disimpan sebagai teks biasa (`String`) agar label seperti `Organik`, `Anorganik`, `B3`, atau kategori lain dari classifier/admin tidak terkunci enum lama. Untuk database lama yang masih memakai enum Prisma `WasteCategory`, jalankan SQL manual `backend/prisma/category-to-text.sql` satu kali.
+Kategori jadwal (`waste_schedules.waste_category`) dan kategori scan (`scans.category`) disimpan sebagai teks biasa (`String`) agar label seperti `Organik`, `Anorganik`, `B3`, atau kategori lain dari classifier/admin tidak terkunci enum lama. Jadwal sekarang berdiri sendiri dan tidak berelasi ke `districts`. Untuk database lama yang masih punya enum/kolom district pada jadwal, jalankan SQL manual `backend/prisma/schedule-standalone.sql` satu kali. Jika hanya perlu konversi enum kategori lama, `backend/prisma/category-to-text.sql` masih tersedia.
 
 Untuk deploy Vercel dengan Supabase, gunakan Supabase pooler connection string di environment variable `DATABASE_URL`, bukan direct host `db.<project-ref>.supabase.co:5432`. Direct host Supabase dapat gagal dari Vercel karena koneksi IPv6/pooling serverless. Format umumnya:
 
@@ -116,7 +116,7 @@ Saat user register, backend membuat row `users` dengan 100 EcoPoints awal dan pe
 
 Status Leafy mengalami decay harian saat data pet dibuka: happiness berkurang 3 poin per hari dan hunger naik 5 poin per hari. Frontend menampilkan hunger sebagai indikator kenyang (`100 - hunger`).
 
-Jadwal user dan admin saat ini memakai jadwal global (`waste_schedules.district_id = null`). Jika belum ada data jadwal di database, endpoint user mengembalikan fallback dummy untuk kategori `Organik`, `Anorganik`, `B3`, dan `Daur Ulang/Residu`.
+Jadwal user dan admin memakai tabel `waste_schedules` standalone. Jika belum ada data jadwal di database, endpoint user mengembalikan fallback dummy untuk kategori `Organik`, `Anorganik`, `B3`, dan `Daur Ulang/Residu`.
 
 Seed driver/admin tidak berjalan otomatis. Jalankan `npm run seed:driver` atau `npm run seed:admin` hanya saat membutuhkan data demo. Akun demo driver adalah `driver.demo@nodewaste.test`; akun demo admin adalah `admin.demo@nodewaste.test`. Keduanya memakai password `password123`.
 

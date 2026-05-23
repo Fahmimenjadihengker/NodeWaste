@@ -13,9 +13,9 @@ NodeWaste/
 ## Scope Saat Ini
 
 - Public app: landing page, login, dan register.
-- User app: dashboard, scan sampah, pet Leafy, jadwal global, profile, alamat berbasis wilayah.id, dan fasilitas daur ulang.
+- User app: dashboard, scan sampah, pet Leafy, jadwal standalone, profile, alamat berbasis wilayah.id, dan fasilitas daur ulang.
 - Driver app: map rumah user berdasarkan district driver, processing site, profile driver, dan upload foto profile.
-- Admin app: dashboard, manajemen semua akun role `USER`/`DRIVER`/`ADMIN`, EcoPoints user, dan jadwal pengangkutan global.
+- Admin app: dashboard, manajemen semua akun role `USER`/`DRIVER`/`ADMIN`, EcoPoints user, dan jadwal pengangkutan standalone.
 - Backend API: auth role-aware, profile, dashboard, pet, activity, schedules, scans, regions, recycling facilities, driver, dan admin.
 - Database: PostgreSQL lewat Prisma. Supabase dapat dipakai untuk deployment.
 - Scan gambar dikirim ke AI classifier eksternal melalui endpoint `/predict`; hasil dinormalisasi ke `Organik`, `Anorganik`, atau `B3`.

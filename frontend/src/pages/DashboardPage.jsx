@@ -171,7 +171,7 @@ function DashboardPage() {
   const handleLeafyClick = () => {
     const now = Date.now()
     clickTimesRef.current = [...clickTimesRef.current.filter((time) => now - time < 2000), now]
-    const nextMood = clickTimesRef.current.length >= 5 ? 'angry' : 'happy'
+    const nextMood = clickTimesRef.current.length >= 10 ? 'angry' : 'happy'
 
     setLeafyMood(nextMood)
     window.clearTimeout(moodTimerRef.current)

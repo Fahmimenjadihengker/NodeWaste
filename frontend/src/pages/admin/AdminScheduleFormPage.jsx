@@ -5,7 +5,6 @@ import { sweetConfirm, sweetLoading, sweetSuccess } from '../../utils/sweetAlert
 
 const inputClass = 'rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-700 focus:ring-4 focus:ring-leaf-900/10'
 const emptyForm = { wasteCategory: 'Organik', pickupDay: '', pickupTime: '', instruction: '' }
-const categoryLabel = { ORGANIK: 'Organik', ANORGANIK: 'Anorganik', DAUR_ULANG_RESIDU: 'Daur Ulang/Residu' }
 
 function formFromSchedule(schedule) {
   if (!schedule) return emptyForm
@@ -59,7 +58,7 @@ function AdminScheduleFormPage() {
         <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{isEdit ? 'Perbarui jadwal.' : 'Jadwal baru.'}</h1>
         <div className="mt-8 rounded-[1.5rem] border border-leaf-900/10 bg-[#f5f1df] p-5">
           <div className="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1.4fr]">
-            <div className="rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 font-black text-moss">{categoryLabel[form.wasteCategory] || form.wasteCategory}</div>
+            <input className={inputClass} placeholder="Kategori, contoh Organik" value={form.wasteCategory} onChange={(event) => setForm((current) => ({ ...current, wasteCategory: event.target.value }))} />
             <input className={inputClass} placeholder="Hari pickup" value={form.pickupDay} onChange={(event) => setForm((current) => ({ ...current, pickupDay: event.target.value }))} />
             <input className={inputClass} placeholder="Jam pickup, contoh 08:00" value={form.pickupTime} onChange={(event) => setForm((current) => ({ ...current, pickupTime: event.target.value }))} />
             <input className={inputClass} placeholder="Instruksi" value={form.instruction} onChange={(event) => setForm((current) => ({ ...current, instruction: event.target.value }))} />

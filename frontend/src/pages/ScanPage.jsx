@@ -64,11 +64,28 @@ function CameraPanel({ videoRef, canvasRef, cameraState, errorMessage, onStart, 
 function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
   if (isLoading) {
     return (
-      <section className="rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
-        <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Menganalisis</p>
-        <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Memproses gambar...</h2>
-        <div className="mt-6 h-2 overflow-hidden rounded-full bg-moss/10">
-          <div className="h-full w-2/3 animate-pulse rounded-full bg-leaf-600" />
+      <section className="overflow-hidden rounded-[1.5rem] border border-leaf-600/15 bg-[#fff8e8] p-6 shadow-[0_24px_70px_rgba(32,58,37,0.12)] sm:p-8">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+          {previewUrl ? <img className="aspect-square w-full rounded-[1.25rem] object-cover shadow-[0_18px_42px_rgba(32,58,37,0.12)] sm:w-36" src={previewUrl} alt="Gambar sedang dianalisis" /> : null}
+          <div className="flex-1">
+            <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Menganalisis</p>
+            <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900 sm:text-4xl">Memproses gambar...</h2>
+            <p className="mt-3 text-sm font-semibold leading-6 text-moss/60">AI sedang membaca tekstur, bentuk, dan kategori sampah dari foto kamu.</p>
+          </div>
+          <div className="relative mx-auto grid h-28 w-28 place-items-center sm:mx-0">
+            <span className="absolute inset-0 rounded-full border-8 border-leaf-600/10" />
+            <span className="absolute inset-0 animate-spin rounded-full border-8 border-transparent border-t-leaf-600 border-r-honey" />
+            <span className="absolute h-16 w-16 animate-ping rounded-full bg-leaf-600/15" />
+            <span className="relative grid h-14 w-14 place-items-center rounded-full bg-leaf-600 text-lg font-black text-white shadow-glow">AI</span>
+          </div>
+        </div>
+        <div className="mt-7 overflow-hidden rounded-full bg-moss/10">
+          <div className="h-3 w-full origin-left animate-pulse rounded-full bg-gradient-to-r from-leaf-600 via-honey to-leaf-600" />
+        </div>
+        <div className="mt-5 grid gap-3 text-xs font-black uppercase tracking-[0.16em] text-moss/45 sm:grid-cols-3">
+          <span className="rounded-full bg-white/55 px-4 py-3">Membaca gambar</span>
+          <span className="rounded-full bg-white/55 px-4 py-3">Klasifikasi</span>
+          <span className="rounded-full bg-white/55 px-4 py-3">Menyiapkan reward</span>
         </div>
       </section>
     )

@@ -31,17 +31,6 @@ const defaultSchedules = [
   },
 ]
 
-function toDistrict(district) {
-  if (!district) return null
-
-  return {
-    id: district.id,
-    name: district.name,
-    city: district.city,
-    province: district.province,
-  }
-}
-
 function toScheduleItem(schedule) {
   return {
     id: schedule.id,
@@ -49,27 +38,19 @@ function toScheduleItem(schedule) {
     pickupDay: schedule.pickupDay,
     pickupTime: schedule.pickupTime,
     instruction: schedule.instruction,
-    district: toDistrict(schedule.district),
   }
 }
 
-export async function getUserSchedules(userId) {
-  const address = await prisma.userAddress.findUnique({
-    where: { userId },
-    include: { district: true },
-  })
-
+export async function getUserSchedules() {
   const schedules = await prisma.wasteSchedule.findMany({
-    where: { districtId: null },
-    include: { district: true },
     orderBy: [
-      { districtId: 'desc' },
       { wasteCategory: 'asc' },
+      { pickupDay: 'asc' },
     ],
   })
 
   return {
-    district: toDistrict(address?.district),
+    district: null,
     isDummy: schedules.length === 0,
     schedules: schedules.length ? schedules.map(toScheduleItem) : defaultSchedules,
   }

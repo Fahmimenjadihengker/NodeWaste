@@ -57,7 +57,6 @@ function toSchedule(schedule) {
     pickupDay: schedule.pickupDay,
     pickupTime: schedule.pickupTime,
     instruction: schedule.instruction,
-    district: toDistrict(schedule.district),
   }
 }
 
@@ -320,9 +319,7 @@ export async function updateAdminDriver(userId, payload) {
 
 export async function listAdminSchedules() {
   const schedules = await prisma.wasteSchedule.findMany({
-    where: { districtId: null },
-    include: { district: true },
-    orderBy: [{ districtId: 'asc' }, { wasteCategory: 'asc' }],
+    orderBy: [{ wasteCategory: 'asc' }, { pickupDay: 'asc' }],
     take: 200,
   })
 
@@ -332,13 +329,11 @@ export async function listAdminSchedules() {
 export async function createAdminSchedule(payload) {
   const schedule = await prisma.wasteSchedule.create({
       data: {
-        districtId: null,
         wasteCategory: payload.wasteCategory,
         pickupDay: payload.pickupDay,
         pickupTime: payload.pickupTime,
         instruction: payload.instruction,
       },
-      include: { district: true },
     })
 
   return { schedule: toSchedule(schedule) }
@@ -351,13 +346,11 @@ export async function updateAdminSchedule(id, payload) {
   const schedule = await prisma.wasteSchedule.update({
       where: { id },
       data: {
-        districtId: null,
         ...(payload.wasteCategory ? { wasteCategory: payload.wasteCategory } : {}),
         ...(payload.pickupDay ? { pickupDay: payload.pickupDay } : {}),
         ...(payload.pickupTime ? { pickupTime: payload.pickupTime } : {}),
         ...(Object.prototype.hasOwnProperty.call(payload, 'instruction') ? { instruction: payload.instruction } : {}),
       },
-      include: { district: true },
     })
 
   return { schedule: toSchedule(schedule) }
