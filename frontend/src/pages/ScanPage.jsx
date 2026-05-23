@@ -121,20 +121,6 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
   )
 }
 
-function ScanTips() {
-  return (
-    <section className="rounded-[1.25rem] border border-moss/10 bg-[#fff3cf] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
-      <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Tips scan</p>
-      <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Biar hasil lebih jelas</h2>
-      <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
-        <p>Pastikan objek berada di tengah frame kamera.</p>
-        <p>Gunakan cahaya cukup dan hindari gambar terlalu buram.</p>
-        <p>Scan satu jenis sampah dalam satu pengambilan gambar.</p>
-      </div>
-    </section>
-  )
-}
-
 function ScanPage() {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
@@ -144,6 +130,7 @@ function ScanPage() {
   const [previewUrl, setPreviewUrl] = useState('')
   const [result, setResult] = useState(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const hasCapturedImage = Boolean(previewUrl || result || isAnalyzing)
 
   const stopCamera = () => {
     streamRef.current?.getTracks().forEach((track) => track.stop())
@@ -233,14 +220,12 @@ function ScanPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
-      <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+    <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+      {hasCapturedImage ? (
+        <ScanResult result={result} previewUrl={previewUrl} isLoading={isAnalyzing} onScanAgain={resetScan} />
+      ) : (
         <CameraPanel videoRef={videoRef} canvasRef={canvasRef} cameraState={cameraState} errorMessage={errorMessage} onStart={startCamera} onCapture={captureImage} />
-        <div className="space-y-6">
-          <ScanResult result={result} previewUrl={previewUrl} isLoading={isAnalyzing} onScanAgain={resetScan} />
-          <ScanTips />
-        </div>
-      </div>
+      )}
     </div>
   )
 }
