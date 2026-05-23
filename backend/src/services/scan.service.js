@@ -1,8 +1,10 @@
 import { saveScanResult } from "../stores/scan.store.js";
+import { classifyWasteImage } from "./ai-classifier.service.js";
 
-export async function processScan(user, file, mockResult) {
+export async function processScan(user, file) {
   const ecoPoints = 50;
   const xpReward = 30;
+  const aiResult = await classifyWasteImage(file);
 
   // Gambar belum disimpan permanen sampai storage/Path AI final tersedia.
   const imageUrl = null;
@@ -10,9 +12,9 @@ export async function processScan(user, file, mockResult) {
   const result = await saveScanResult(
     user.id,
     {
-      category: mockResult.category,
-      label: mockResult.label,
-      confidence: mockResult.confidence,
+      category: aiResult.category,
+      label: aiResult.label,
+      confidence: aiResult.confidence,
       imageUrl: imageUrl,
     },
     ecoPoints,

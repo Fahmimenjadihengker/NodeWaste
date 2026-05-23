@@ -170,7 +170,7 @@ export const swaggerDocument = {
         tags: ["Scan & Gamification"],
         summary: "Klasifikasi gambar sampah",
         description:
-          "Mengirimkan foto sampah untuk dianalisis dan mendapatkan imbalan EcoPoints.",
+          "Mengirimkan foto sampah ke AI classifier untuk dianalisis dan mendapatkan imbalan EcoPoints.",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,

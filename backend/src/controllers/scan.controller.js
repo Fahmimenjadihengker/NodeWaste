@@ -7,25 +7,7 @@ export async function createScan(request, response, next) {
       throw new HttpError(400, "Gambar sampah wajib diunggah");
     }
 
-    // Mock AI Classifier Logic (Sesuai diskusi sebelumnya)
-    const filename = request.file.originalname.toLowerCase();
-    let mockResult = {
-      category: "Anorganik",
-      label: "Botol Plastik",
-      confidence: 95,
-    };
-
-    if (filename.includes("food")) {
-      mockResult = {
-        category: "Organik",
-        label: "Sisa Makanan",
-        confidence: 88,
-      };
-    } else if (filename.includes("battery")) {
-      mockResult = { category: "B3", label: "Baterai Bekas", confidence: 92 };
-    }
-
-    const data = await processScan(request.user, request.file, mockResult);
+    const data = await processScan(request.user, request.file);
 
     response.status(201).json({
       success: true,
