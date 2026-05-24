@@ -62,7 +62,34 @@ function CameraPanel({ videoRef, canvasRef, cameraState, errorMessage, onStart, 
 }
 
 function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    if (!isLoading) {
+      setProgress(0)
+      return
+    }
+
+    const interval = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 90) {
+          clearInterval(interval)
+          return 90
+        }
+        return p + 5
+      })
+    }, 200)
+
+    return () => clearInterval(interval)
+  }, [isLoading])
+
   if (isLoading) {
+    const getStageStyle = (threshold) => {
+      return progress >= threshold
+        ? 'rounded-full bg-leaf-600 px-4 py-3 text-white transition-colors duration-500 shadow-glow'
+        : 'rounded-full bg-white/55 px-4 py-3 text-moss/45 transition-colors duration-500'
+    }
+
     return (
       <section className="overflow-hidden rounded-[1.5rem] border border-leaf-600/15 bg-[#fff8e8] p-6 shadow-[0_24px_70px_rgba(32,58,37,0.12)] sm:p-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
@@ -72,20 +99,15 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
             <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900 sm:text-4xl">Memproses gambar...</h2>
             <p className="mt-3 text-sm font-semibold leading-6 text-moss/60">AI sedang membaca tekstur, bentuk, dan kategori sampah dari foto kamu.</p>
           </div>
-          <div className="relative mx-auto grid h-28 w-28 place-items-center sm:mx-0">
-            <span className="absolute inset-0 rounded-full border-8 border-leaf-600/10" />
-            <span className="absolute inset-0 animate-spin rounded-full border-8 border-transparent border-t-leaf-600 border-r-honey" />
-            <span className="absolute h-16 w-16 animate-ping rounded-full bg-leaf-600/15" />
-            <span className="relative grid h-14 w-14 place-items-center rounded-full bg-leaf-600 text-lg font-black text-white shadow-glow">AI</span>
-          </div>
+
         </div>
         <div className="mt-7 overflow-hidden rounded-full bg-moss/10">
-          <div className="h-3 w-full origin-left animate-pulse rounded-full bg-gradient-to-r from-leaf-600 via-honey to-leaf-600" />
+          <div className="h-3 rounded-full bg-leaf-600 transition-all duration-300 ease-out" style={{ width: `${progress}%` }} />
         </div>
-        <div className="mt-5 grid gap-3 text-xs font-black uppercase tracking-[0.16em] text-moss/45 sm:grid-cols-3">
-          <span className="rounded-full bg-white/55 px-4 py-3">Membaca gambar</span>
-          <span className="rounded-full bg-white/55 px-4 py-3">Klasifikasi</span>
-          <span className="rounded-full bg-white/55 px-4 py-3">Menyiapkan reward</span>
+        <div className="mt-5 grid gap-3 text-xs font-black uppercase tracking-[0.16em] sm:grid-cols-3">
+          <span className={getStageStyle(0)}>Membaca gambar</span>
+          <span className={getStageStyle(33)}>Klasifikasi</span>
+          <span className={getStageStyle(66)}>Menyiapkan reward</span>
         </div>
       </section>
     )
@@ -102,7 +124,7 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
   }
 
   return (
-    <section className={`rounded-[1.25rem] border p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)] ${result.isValid ? 'border-leaf-600/20 bg-[#edf4e6]' : 'border-honey/30 bg-[#fff3cf]'}`}>
+    <section className={`rounded-[1.25rem] border p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)] ${result.isValid ? 'border-leaf-600/20 bg-[#dce8cf]' : 'border-honey/30 bg-[#fff3cf]'}`}>
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
         {previewUrl ? <img className="aspect-square w-full rounded-[1rem] object-cover sm:w-40" src={previewUrl} alt="Preview hasil scan" /> : null}
         <div className="flex-1">
@@ -111,7 +133,7 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">{result.category}</span>
             {result.bagType ? (
-              <span className="rounded-full bg-[#e8f0e0] px-4 py-2 text-sm font-black text-leaf-800">{result.bagType}</span>
+              <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">{result.bagType}</span>
             ) : null}
             <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">Akurasi {getConfidenceLabel(result.confidence)}</span>
           </div>

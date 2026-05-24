@@ -43,7 +43,7 @@ const facilityIcon = new L.DivIcon({
 });
 
 const driverIcon = new L.DivIcon({
-  html: `<div class="grid h-10 w-10 place-items-center rounded-full border-[3px] border-white text-white shadow-[0_0_15px_rgba(59,130,246,0.6)] bg-blue-500 animate-pulse">${renderToString(<Navigation size={20} strokeWidth={2.5} fill="currentColor" />)}</div>`,
+  html: `<div class="grid h-10 w-10 place-items-center rounded-full border-[3px] border-white text-white shadow-[0_0_15px_rgba(59,130,246,0.6)] bg-blue-500">${renderToString(<Navigation size={20} strokeWidth={2.5} fill="currentColor" />)}</div>`,
   className: '',
   iconSize: [40, 40],
   iconAnchor: [20, 20],
@@ -100,7 +100,7 @@ function MapBottomControls({ driverPos, distanceInfo, setTargetPos, setDistanceI
       {/* Dynamic Island Content */}
       <div className="w-full pointer-events-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 rounded-[1.25rem] sm:rounded-3xl bg-white/90 backdrop-blur-md shadow-2xl p-3 sm:p-4 sm:px-6 border border-white/60">
         <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1.5 sm:gap-3 text-[10px] sm:text-sm font-bold text-moss/70">
-          <span className="inline-flex items-center gap-1 sm:gap-1.5"><span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.6)]" /> Anda</span>
+          <span className="inline-flex items-center gap-1 sm:gap-1.5"><span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]" /> Anda</span>
           <span className="inline-flex items-center gap-1 sm:gap-1.5"><span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-leaf-600" /> User</span>
           <span className="inline-flex items-center gap-1 sm:gap-1.5"><span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-honey" /> TPS</span>
           <span className="inline-flex items-center gap-1 sm:gap-1.5"><span className="h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-blue-600" /> Daur Ulang</span>
@@ -179,7 +179,7 @@ function RoutingMachine({ driverPos, targetPos, setDistanceInfo }) {
       addWaypoints: false,
       show: false, // Hide turn-by-turn panel
       lineOptions: {
-        styles: [{ color: '#3b82f6', weight: 6, opacity: 0.8, className: 'animate-pulse' }]
+        styles: [{ color: '#3b82f6', weight: 6, opacity: 0.8 }]
       },
       createMarker: () => null, // We already use our custom markers
     }).addTo(map);
