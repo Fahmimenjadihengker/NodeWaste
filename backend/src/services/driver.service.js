@@ -77,14 +77,7 @@ export async function getDriverDashboard(userId) {
   const districtId = context.driverProfile?.districtId
   const [houseCount, processingSiteCount] = await Promise.all([
     districtId ? prisma.userAddress.count({ where: { districtId } }) : 0,
-    prisma.processingSite.count({
-      where: districtId ? {
-        OR: [
-          { districtId },
-          { districtId: null },
-        ],
-      } : { districtId: null },
-    }),
+    prisma.processingSite.count(),
   ])
 
   return {
@@ -121,15 +114,9 @@ export async function getDriverMap(userId) {
       take: 150,
     }) : [],
     prisma.processingSite.findMany({
-      where: districtId ? {
-        OR: [
-          { districtId },
-          { districtId: null },
-        ],
-      } : { districtId: null },
       include: { district: true },
       orderBy: { name: 'asc' },
-      take: 100,
+      take: 300,
     }),
     prisma.recyclingFacility.findMany(),
   ])

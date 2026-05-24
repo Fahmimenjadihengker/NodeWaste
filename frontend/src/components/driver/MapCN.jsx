@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import { renderToString } from 'react-dom/server';
-import { Home, Trash2, Package, Navigation, Route, Crosshair, X } from 'lucide-react';
+import { Home, Trash2, Package, Navigation, Route, Crosshair, X, Maximize2 } from 'lucide-react';
 
 // Helper: Haversine distance calculation
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
@@ -65,11 +65,23 @@ function DynamicMapZoomer({ driverPos, targetPos }) {
   return null;
 }
 
-function MapBottomControls({ driverPos, distanceInfo, setTargetPos, setDistanceInfo }) {
+function MapInvalidator({ isModalOpen }) {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [isModalOpen, map]);
+  return null;
+}
+
+function MapBottomControls({ driverPos, distanceInfo, setTargetPos, setDistanceInfo, isFullscreen }) {
   const map = useMap();
 
   return (
-    <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-3xl z-[1000] flex flex-col items-end gap-3 sm:gap-4 pointer-events-none">
+    <div className={`absolute ${isFullscreen ? 'bottom-8 pb-[env(safe-area-inset-bottom)]' : 'bottom-4'} sm:bottom-6 left-1/2 -translate-x-1/2 w-[92%] sm:w-[85%] max-w-3xl z-[1000] flex flex-col items-end gap-3 sm:gap-4 pointer-events-none transition-all duration-300`}>
       
       {/* Recenter Button */}
       {driverPos && (
@@ -195,6 +207,7 @@ function MapCN({ houses = [], processingSites = [], recyclingFacilities = [] }) 
   const [driverPos, setDriverPos] = useState(null);
   const [targetPos, setTargetPos] = useState(null);
   const [distanceInfo, setDistanceInfo] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const points = [
     ...houses.map((house) => ({
@@ -205,6 +218,16 @@ function MapCN({ houses = [], processingSites = [], recyclingFacilities = [] }) 
       latitude: house.latitude,
       longitude: house.longitude,
     })),
+    ...recyclingFacilities
+      .filter((facility) => !processingSites.some((site) => site.latitude === facility.latitude && site.longitude === facility.longitude))
+      .map((facility) => ({
+        id: `facility-${facility.id}`,
+        type: 'facility',
+        title: facility.name,
+        description: facility.address,
+        latitude: facility.latitude,
+        longitude: facility.longitude,
+      })),
     ...processingSites.map((site) => ({
       id: `site-${site.id}`,
       type: 'site',
@@ -212,14 +235,6 @@ function MapCN({ houses = [], processingSites = [], recyclingFacilities = [] }) 
       description: site.address,
       latitude: site.latitude,
       longitude: site.longitude,
-    })),
-    ...recyclingFacilities.map((facility) => ({
-      id: `facility-${facility.id}`,
-      type: 'facility',
-      title: facility.name,
-      description: facility.address,
-      latitude: facility.latitude,
-      longitude: facility.longitude,
     })),
   ].filter((point) => Number.isFinite(point.latitude) && Number.isFinite(point.longitude));
 
@@ -256,24 +271,49 @@ function MapCN({ houses = [], processingSites = [], recyclingFacilities = [] }) 
   };
 
   return (
-    <div className="overflow-hidden rounded-[1.75rem] border border-moss/10 shadow-[0_22px_70px_rgba(32,58,37,0.10)] relative z-0 flex flex-col">
-      <div className="relative h-[34rem] w-full bg-moss/5">
+    <div className={isModalOpen ? "fixed inset-0 z-[99999] bg-[#f5f1df] flex flex-col" : "overflow-hidden bg-white rounded-[1.75rem] border border-moss/10 shadow-[0_22px_70px_rgba(32,58,37,0.10)] relative z-0 flex flex-col"}>
+      {isModalOpen && (
+        <div className="flex items-center justify-between bg-white px-5 py-4 border-b border-moss/10 shadow-sm pt-[max(1rem,env(safe-area-inset-top))]">
+          <div>
+            <h2 className="text-lg font-black text-leaf-950">Navigasi Rute</h2>
+            <p className="text-xs font-semibold text-moss/60">Mode layar penuh</p>
+          </div>
+          <button onClick={() => setIsModalOpen(false)} className="rounded-full bg-red-50 p-2 text-red-600 hover:bg-red-100 transition-colors">
+            <X size={20} strokeWidth={2.5} />
+          </button>
+        </div>
+      )}
+      <div className={`relative w-full bg-moss/5 ${isModalOpen ? 'flex-1 h-full' : 'h-[34rem]'}`}>
         <MapContainer
           center={DEFAULT_CENTER}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '100%', width: '100%', zIndex: 0 }}
         >
+          <MapInvalidator isModalOpen={isModalOpen} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
+          {!isModalOpen && (
+            <div className="absolute top-4 left-4 z-[1000] pointer-events-none">
+              <button 
+                onClick={(e) => { e.stopPropagation(); setIsModalOpen(true); }}
+                className="pointer-events-auto flex items-center gap-2 rounded-full bg-white px-4 py-2 sm:px-5 sm:py-3 shadow-[0_8px_20px_rgba(32,58,37,0.15)] hover:bg-gray-50 text-leaf-800 transition-transform hover:scale-105 active:scale-95 border-2 border-moss/10"
+              >
+                <Maximize2 size={18} strokeWidth={2.5} />
+                <span className="text-xs sm:text-sm font-black">Buka Penuh</span>
+              </button>
+            </div>
+          )}
+          
           <MapBottomControls 
             driverPos={driverPos} 
             distanceInfo={distanceInfo} 
             setTargetPos={setTargetPos} 
-            setDistanceInfo={setDistanceInfo} 
+            setDistanceInfo={setDistanceInfo}
+            isFullscreen={isModalOpen}
           />
           <DriverTracker setDriverPos={setDriverPos} />
           <RoutingMachine driverPos={driverPos} targetPos={targetPos} setDistanceInfo={setDistanceInfo} />

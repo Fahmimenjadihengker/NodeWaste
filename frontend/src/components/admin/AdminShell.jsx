@@ -1,7 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { clearAuthSession, getStoredUser } from '../../services/authApi.js'
 import AppNavIcon from '../AppNavIcon.jsx'
-import Footer from '../Footer.jsx'
 import MobileBottomNavbar from '../MobileBottomNavbar.jsx'
 import { adminNavItems, mobileAdminNavItems } from './adminNavItems.js'
 import { sweetConfirm } from '../../utils/sweetAlert.js'
@@ -19,7 +18,12 @@ function AdminShell() {
 
   return (
     <main className="min-h-screen bg-[#f5f1df] pb-28 text-moss md:pb-0">
-      <aside className="fixed bottom-0 left-0 top-20 z-40 hidden w-72 border-r border-leaf-900/10 bg-[#edf5e4] px-5 py-6 shadow-[18px_0_50px_rgba(32,58,37,0.10)] md:flex md:flex-col">
+      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-72 border-r border-leaf-900/10 bg-[#edf5e4] px-5 py-8 shadow-[18px_0_50px_rgba(32,58,37,0.10)] md:flex md:flex-col overflow-y-auto">
+        <div className="mb-10 px-2">
+          <p className="text-2xl font-black tracking-[-0.04em] text-leaf-950">NodeWaste</p>
+          <p className="text-sm font-bold text-moss/55">Admin Dashboard</p>
+        </div>
+
         <nav className="grid gap-2" aria-label="Navigasi admin">
           {adminNavItems.map((item) => (
             <NavLink
@@ -41,22 +45,17 @@ function AdminShell() {
         </div>
       </aside>
 
-       <header className="sticky top-0 z-50 border-b border-leaf-900/10 bg-[#fbf7e8]/90 px-5 py-4 shadow-sm backdrop-blur-xl md:px-8">
+       <header className="sticky top-0 z-50 border-b border-leaf-900/10 bg-[#fbf7e8]/90 px-5 py-4 shadow-sm backdrop-blur-xl md:hidden">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xl font-black tracking-[-0.04em] text-leaf-950">NodeWaste</p>
             <p className="text-sm font-bold text-moss/55">Admin Dashboard</p>
-          </div>
-          <div className="hidden items-center gap-3 rounded-full px-3 py-2 transition hover:bg-leaf-100 md:flex">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-leaf-600 text-xs font-black text-white shadow-[0_8px_18px_rgba(52,122,55,0.24)]">{(user?.name || 'A').slice(0, 1).toUpperCase()}</span>
-            <span className="max-w-48 truncate text-sm font-black text-leaf-900">{user?.name || 'Admin'}</span>
           </div>
         </div>
       </header>
 
       <section className="md:ml-72">
         <Outlet context={{ user, onLogout: handleLogout }} />
-        <Footer className="pb-32 md:pb-10" />
       </section>
       <MobileBottomNavbar navItems={mobileAdminNavItems} />
     </main>

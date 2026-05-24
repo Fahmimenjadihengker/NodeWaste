@@ -1,3 +1,5 @@
+import { useOutletContext } from 'react-router-dom'
+import { MapPin, Trash2, Package, Truck } from 'lucide-react'
 import AppCard from '../../components/AppCard.jsx'
 import MapCN from '../../components/driver/MapCN.jsx'
 import { SkeletonCard, SkeletonText } from '../../components/Skeleton.jsx'
@@ -12,73 +14,95 @@ const fallbackData = {
 }
 
 function DriverMapPage() {
+  const { user } = useOutletContext()
   const { data, error, isLoading } = useCachedResource({ getCached: getCachedDriverMap, load: getDriverMap, fallback: fallbackData })
   const district = data.driverProfile?.district
-  const districtLabel = [district?.name, district?.city].filter(Boolean).join(', ') || 'wilayah driver'
+  const profile = data.driverProfile
+  const districtLabel = [district?.name, district?.city].filter(Boolean).join(', ') || 'Wilayah belum diatur'
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
-      <section className="grid gap-6 lg:grid-cols-[0.78fr_0.22fr]">
-        {/* <div>
-          <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Map driver</p>
-          <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] text-leaf-900 sm:text-5xl lg:text-6xl">
-            Titik rumah dan TPS.
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-moss/70 sm:text-lg">
-            Satu map operasional untuk melihat rumah user biasa yang sudah mengisi alamat dan tempat TPS/pengolahan di {districtLabel}.
-          </p>
-          {isLoading ? <div className="mt-5 max-w-xl space-y-3"><SkeletonText className="w-3/4" /><SkeletonText className="w-1/2" /></div> : null}
-          {error ? <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800">Map belum bisa dimuat. Coba ulang setelah backend aktif.</p> : null}
-        </div> */}
+      
+      {/* HEADER SECTION */}
+      <section className="grid gap-6 lg:grid-cols-[1fr_0.42fr]">
+        <AppCard className="relative overflow-hidden p-8 sm:p-10">
+          <div className="relative z-10">
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-moss/50">
+              Peta Operasional
+            </p>
+            
+            <h1 className="mt-6 text-4xl font-black leading-tight tracking-[-0.04em] text-leaf-950 sm:text-5xl">
+              Halo, <span className="text-leaf-700">{user?.name || 'Driver'}!</span>
+            </h1>
+            <p className="mt-4 max-w-2xl text-base font-semibold leading-relaxed text-moss/75">
+              Anda ditugaskan di <strong className="text-leaf-900">{districtLabel}</strong>. Berikut adalah peta navigasi rute operasional Anda hari ini.
+            </p>
 
-        <AppCard tone="softCream" className="grid content-center p-5">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Ringkasan titik</p>
-          <div className="mt-4 grid grid-cols-3 gap-4 lg:grid-cols-1">
-            <div>
-              <p className="text-4xl font-black text-leaf-900">{data.houses?.length || 0}</p>
-              <p className="text-sm font-bold text-moss/60">Rumah</p>
+            {error ? (
+              <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 shadow-sm">
+                <p className="text-sm font-bold text-red-800">Map belum bisa dimuat. Coba ulang setelah backend aktif.</p>
+              </div>
+            ) : null}
+            
+            {isLoading ? (
+              <div className="mt-6 max-w-xl space-y-3">
+                <SkeletonText className="w-3/4 h-4" />
+                <SkeletonText className="w-1/2 h-4" />
+              </div>
+            ) : null}
+          </div>
+        </AppCard>
+
+        <AppCard className="group relative overflow-hidden p-7 sm:p-8 flex flex-col justify-between">
+          <div className="relative z-10 flex items-center justify-between">
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-800">Kendaraan</p>
+            <div className="rounded-full bg-leaf-800/10 p-2 text-leaf-900 transition-transform group-hover:rotate-12">
+              <Truck className="h-5 w-5" />
             </div>
-            <div>
-              <p className="text-4xl font-black text-leaf-900">{data.processingSites?.length || 0}</p>
-              <p className="text-sm font-bold text-moss/60">TPS</p>
-            </div>
-            <div>
-              <p className="text-4xl font-black text-leaf-900">{data.recyclingFacilities?.length || 0}</p>
-              <p className="text-sm font-bold text-moss/60">Fasilitas</p>
-            </div>
+          </div>
+          <div className="relative z-10 mt-auto pt-6">
+            <h2 className="text-4xl font-black tracking-[-0.04em] text-leaf-950">{profile?.vehiclePlate || '-'}</h2>
+            <p className="mt-2 text-sm font-black uppercase tracking-[0.15em] text-moss/60">{profile?.vehicleType || 'Tipe Belum Diatur'}</p>
           </div>
         </AppCard>
       </section>
 
+      {/* STATISTIC SECTION */}
+      <section className="mt-6 grid grid-cols-3 gap-4 sm:gap-6">
+        <AppCard tone="softCream" className="p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="rounded-full bg-emerald-100 p-2.5 sm:p-3 text-emerald-600 mb-2 sm:mb-3 shadow-sm">
+            <MapPin className="h-5 w-5 sm:h-6 sm:w-6" />
+          </div>
+          <p className="text-2xl sm:text-4xl font-black text-leaf-950">{data.houses?.length || 0}</p>
+          <p className="mt-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] text-moss/60">Rumah</p>
+        </AppCard>
+        
+        <AppCard tone="softCream" className="p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="rounded-full bg-amber-100 p-2.5 sm:p-3 text-amber-600 mb-2 sm:mb-3 shadow-sm">
+            <Trash2 className="h-5 w-5 sm:h-6 sm:w-6" />
+          </div>
+          <p className="text-2xl sm:text-4xl font-black text-leaf-950">{data.processingSites?.length || 0}</p>
+          <p className="mt-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] text-moss/60">TPS</p>
+        </AppCard>
+
+        <AppCard tone="softCream" className="p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="rounded-full bg-blue-100 p-2.5 sm:p-3 text-blue-600 mb-2 sm:mb-3 shadow-sm">
+            <Package className="h-5 w-5 sm:h-6 sm:w-6" />
+          </div>
+          <p className="text-2xl sm:text-4xl font-black text-leaf-950">{data.recyclingFacilities?.length || 0}</p>
+          <p className="mt-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] text-moss/60">Daur Ulang</p>
+        </AppCard>
+      </section>
+
+      {/* MAP SECTION */}
       <section className="mt-8">
-        {isLoading ? <SkeletonCard className="min-h-[26rem]" /> : <MapCN houses={data.houses} processingSites={data.processingSites} recyclingFacilities={data.recyclingFacilities} />}
+        {isLoading ? (
+          <SkeletonCard className="min-h-[32rem] rounded-[2rem]" />
+        ) : (
+          <MapCN houses={data.houses} processingSites={data.processingSites} recyclingFacilities={data.recyclingFacilities} />
+        )}
       </section>
 
-      {/* <section className="mt-6 grid gap-4 lg:grid-cols-2">
-        <AppCard tone="green" className="p-5">
-          <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Rumah user</h2>
-          <div className="mt-4 divide-y divide-moss/10">
-            {data.houses?.length ? data.houses.slice(0, 6).map((house) => (
-              <article key={house.id} className="py-4 first:pt-0 last:pb-0">
-                <p className="font-black text-moss">{house.user?.name || 'User'}</p>
-                <p className="mt-1 text-sm font-semibold leading-6 text-moss/60">{house.address}</p>
-              </article>
-            )) : <p className="text-sm font-semibold text-moss/60">Belum ada user yang mengisi alamat di wilayah ini.</p>}
-          </div>
-        </AppCard>
-
-        <AppCard tone="yellow" className="p-5">
-          <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">TPS/tempat pengolahan</h2>
-          <div className="mt-4 divide-y divide-moss/10">
-            {data.processingSites?.length ? data.processingSites.slice(0, 6).map((site) => (
-              <article key={site.id} className="py-4 first:pt-0 last:pb-0">
-                <p className="font-black text-moss">{site.name}</p>
-                <p className="mt-1 text-sm font-semibold leading-6 text-moss/60">{site.address}</p>
-              </article>
-            )) : <p className="text-sm font-semibold text-moss/60">Belum ada TPS untuk wilayah ini.</p>}
-          </div>
-        </AppCard>
-      </section> */}
     </div>
   )
 }
