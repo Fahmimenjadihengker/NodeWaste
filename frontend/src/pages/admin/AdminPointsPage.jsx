@@ -57,7 +57,7 @@ function AdminPointsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
-      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
+      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#dce8cf] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Manajemen poin</p>
@@ -78,7 +78,7 @@ function AdminPointsPage() {
               { key: 'name', label: 'User', render: (row) => <div><p className="font-black text-leaf-950">{row.name}</p><p className="text-xs text-moss/50">{row.email}</p></div> },
               { key: 'points', label: 'EcoPoints', render: (row) => row.ecoPoints },
               { key: 'amount', label: 'Jumlah', render: (row) => <input className="w-28 rounded-full border border-leaf-900/10 bg-[#fffdf4] px-4 py-2 text-sm font-black text-moss outline-none focus:border-leaf-700" min="1" placeholder="0" type="number" value={amounts[row.id] || ''} onChange={(event) => setAmounts((current) => ({ ...current, [row.id]: event.target.value }))} /> },
-              { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><button className="rounded-full bg-[#edf5e4] px-3 py-2 text-xs font-black text-leaf-900" type="button" onClick={() => adjustPoints(row, 'add')}>Tambah</button><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => adjustPoints(row, 'subtract')}>Kurangi</button></div> },
+              { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><button className="rounded-full bg-[#dce8cf] px-3 py-2 text-xs font-black text-leaf-900" type="button" onClick={() => adjustPoints(row, 'add')}>Tambah</button><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => adjustPoints(row, 'subtract')}>Kurangi</button></div> },
             ]}
             rows={filteredAccounts}
             emptyText="Belum ada user."

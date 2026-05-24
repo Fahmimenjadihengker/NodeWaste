@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getDistricts, getProvinces, getRegencies } from '../services/regionApi.js'
 import { SkeletonText } from './Skeleton.jsx'
 import MapPicker from './MapPicker.jsx'
-const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
+const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#dce8cf] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
 
 function RegionSelect({ label, value, fallbackName = '', options, disabled, isLoading, placeholder, onChange }) {
   const selected = findByCode(options, value)
@@ -198,7 +198,7 @@ function AddressForm({ value, onChange, title = 'Alamat rumah', heading = 'Titik
       </div>
 
       <div className="mt-6 grid gap-4">
-        {loading.provinces ? <div className="rounded-2xl border border-moss/10 bg-[#f8f4e6] p-4"><SkeletonText className="w-32" /><SkeletonText className="mt-3 h-10 w-full" /></div> : null}
+        {loading.provinces ? <div className="rounded-2xl border border-moss/10 bg-[#dce8cf] p-4"><SkeletonText className="w-32" /><SkeletonText className="mt-3 h-10 w-full" /></div> : null}
         <label className="block">
           <span className="text-sm font-black text-moss/70">Alamat lengkap</span>
           <input className={inputClass} value={value.address} onChange={(event) => updateValue({ address: event.target.value })} />

@@ -21,7 +21,7 @@ function WorkflowScrollSection({ steps }) {
   const { activeIndex, setItemRef } = useActiveSectionIndex(steps.length)
 
   return (
-    <section id="cara-kerja" className="relative z-10 border-y border-moss/10 bg-[#e7edda] px-5 py-16 sm:px-8 lg:px-10 lg:py-16">
+    <section id="cara-kerja" className="relative z-10 border-y border-moss/10 bg-[#dce8cf] px-5 py-16 sm:px-8 lg:px-10 lg:py-16">
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
         <div className="lg:sticky lg:top-32">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Cara kerja</p>

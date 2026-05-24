@@ -92,7 +92,24 @@ function normalizeLabel(value, fallback) {
 }
 
 function normalizeRecommendation(value) {
-  if (value && typeof value === 'object') {
+  if (!value) return null
+
+  if (typeof value === 'object') {
+    const keys = Object.keys(value).map(k => k.toLowerCase());
+    const hasStructuredKeys = keys.some(k => k.includes('panduan') || k.includes('kantong') || k.includes('klasifikasi'));
+    
+    if (hasStructuredKeys) {
+      // Create a normalized object with predictable keys
+      const normalizedObj = {};
+      for (const [k, v] of Object.entries(value)) {
+        const lowerKey = k.toLowerCase();
+        if (lowerKey.includes('panduan')) normalizedObj['panduan penanganan sampah'] = v;
+        else if (lowerKey.includes('kantong')) normalizedObj['Letakkan di kantong'] = v;
+        else if (lowerKey.includes('klasifikasi')) normalizedObj['Klasifikasi jenis sampah'] = v;
+        else normalizedObj[k] = v;
+      }
+      return normalizedObj;
+    }
     return normalizeRecommendation(value.text || value.message || value.guide || value.panduan)
   }
 

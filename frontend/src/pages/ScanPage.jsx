@@ -110,6 +110,9 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
           <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">{result.wasteName}</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">{result.category}</span>
+            {result.bagType ? (
+              <span className="rounded-full bg-[#e8f0e0] px-4 py-2 text-sm font-black text-leaf-800">{result.bagType}</span>
+            ) : null}
             <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">Akurasi {getConfidenceLabel(result.confidence)}</span>
           </div>
         </div>
@@ -117,7 +120,22 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
 
       <div className="mt-6">
         <h3 className="font-black text-leaf-900">Panduan pengelolaan</h3>
-        <p className="mt-2 text-sm leading-6 text-moss/65">{result.guide}</p>
+        {typeof result.guide === 'object' && result.guide ? (
+          <div className="mt-3">
+            <ul className="list-inside list-disc space-y-2 text-sm leading-6 text-moss/70">
+              {(Array.isArray(result.guide['panduan penanganan sampah']) ? result.guide['panduan penanganan sampah'] : [result.guide['panduan penanganan sampah']]).map((item, index) => (
+                item ? <li key={index}>{item}</li> : null
+              ))}
+            </ul>
+            {result.guide['Letakkan di kantong'] && (
+              <p className="mt-4 text-sm font-bold text-moss">
+                Letakkan di kantong: <span className="text-leaf-700">{result.guide['Letakkan di kantong']}</span>
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className="mt-2 text-sm leading-6 text-moss/65">{result.guide}</p>
+        )}
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -211,7 +229,9 @@ function ScanPage() {
 
       try {
         const response = await createScan(blob)
-        const scan = response.data.scan
+        const scan = response.data?.scan || response.data
+        const recommendationData = response.data?.recommendation || scan.recommendation
+        
         setResult({
           wasteName: scan.label,
           category: scan.category,
@@ -219,7 +239,8 @@ function ScanPage() {
           points: scan.ecoPoints,
           xp: scan.xpReward,
           isValid: scan.isValid,
-          guide: response.data.recommendation || categoryGuide[scan.category] || 'Ikuti panduan pemilahan sampah sesuai kategori.',
+          guide: recommendationData || categoryGuide[scan.category] || 'Ikuti panduan pemilahan sampah sesuai kategori.',
+          bagType: typeof recommendationData === 'object' && recommendationData ? recommendationData['Klasifikasi jenis sampah'] : null,
         })
       } catch (error) {
         setResult({ wasteName: 'Scan gagal', category: 'Unknown', confidence: 0, points: 0, xp: 0, isValid: false, guide: error.message })

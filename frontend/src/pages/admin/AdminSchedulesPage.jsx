@@ -40,7 +40,7 @@ function AdminSchedulesPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
-      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
+      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#dce8cf] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Manajemen jadwal</p>
@@ -55,7 +55,7 @@ function AdminSchedulesPage() {
             <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">{schedules.length} jadwal</h2>
           </div>
           {feedback ? <p className="mb-4 rounded-2xl bg-[#f5f1df] px-4 py-3 text-sm font-bold text-moss/75">{feedback}</p> : null}
-          <AdminTable isLoading={isLoading} columns={[{ key: 'category', label: 'Kategori', render: (row) => row.wasteCategory.replaceAll('_', ' ') }, { key: 'day', label: 'Hari', render: (row) => row.pickupDay }, { key: 'time', label: 'Jam', render: (row) => row.pickupTime }, { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><Link className="rounded-full bg-[#edf5e4] px-3 py-2 text-xs font-black text-leaf-900" to={`/admin/schedules/${row.id}/edit`}>Edit</Link><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => removeSchedule(row)}>Hapus</button></div> }]} rows={schedules} emptyText="Belum ada jadwal." />
+          <AdminTable isLoading={isLoading} columns={[{ key: 'category', label: 'Kategori', render: (row) => row.wasteCategory.replaceAll('_', ' ') }, { key: 'day', label: 'Hari', render: (row) => row.pickupDay }, { key: 'time', label: 'Jam', render: (row) => row.pickupTime }, { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><Link className="rounded-full bg-[#dce8cf] px-3 py-2 text-xs font-black text-leaf-900" to={`/admin/schedules/${row.id}/edit`}>Edit</Link><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => removeSchedule(row)}>Hapus</button></div> }]} rows={schedules} emptyText="Belum ada jadwal." />
         </div>
       </section>
     </div>

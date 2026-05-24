@@ -72,7 +72,7 @@ function AdminUsersPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
-      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
+      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#dce8cf] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Manajemen pengguna</p>
@@ -95,7 +95,7 @@ function AdminUsersPage() {
             </div>
           </div>
           {feedback ? <p className="mb-4 rounded-2xl bg-[#f5f1df] px-4 py-3 text-sm font-bold text-moss/75">{feedback}</p> : null}
-          <AdminTable isLoading={isLoading} columns={[{ key: 'name', label: 'Nama', render: (row) => <div><p className="font-black text-leaf-950">{row.name}</p><p className="text-xs text-moss/50">{row.email}</p></div> }, { key: 'role', label: 'Role', render: (row) => row.role }, { key: 'status', label: 'Status', render: (row) => row.isActive ? 'Aktif' : 'Nonaktif' }, { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><Link className="rounded-full bg-[#edf5e4] px-3 py-2 text-xs font-black text-leaf-900" to={`/admin/users/${row.id}/edit`}>Edit</Link><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => toggleActive(row)}>{row.isActive ? 'Disable' : 'Enable'}</button><button className="rounded-full bg-red-50 px-3 py-2 text-xs font-black text-red-700" type="button" onClick={() => removeAccount(row)}>Delete</button></div> }]} rows={filteredAccounts} emptyText="Belum ada akun." />
+          <AdminTable isLoading={isLoading} columns={[{ key: 'name', label: 'Nama', render: (row) => <div><p className="font-black text-leaf-950">{row.name}</p><p className="text-xs text-moss/50">{row.email}</p></div> }, { key: 'role', label: 'Role', render: (row) => row.role }, { key: 'status', label: 'Status', render: (row) => row.isActive ? 'Aktif' : 'Nonaktif' }, { key: 'actions', label: 'Aksi', render: (row) => <div className="flex flex-wrap gap-2"><Link className="rounded-full bg-[#dce8cf] px-3 py-2 text-xs font-black text-leaf-900" to={`/admin/users/${row.id}/edit`}>Edit</Link><button className="rounded-full bg-[#f5f1df] px-3 py-2 text-xs font-black text-moss" type="button" onClick={() => toggleActive(row)}>{row.isActive ? 'Disable' : 'Enable'}</button><button className="rounded-full bg-red-50 px-3 py-2 text-xs font-black text-red-700" type="button" onClick={() => removeAccount(row)}>Delete</button></div> }]} rows={filteredAccounts} emptyText="Belum ada akun." />
         </div>
       </section>
     </div>

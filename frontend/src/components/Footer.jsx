@@ -38,7 +38,7 @@ function Footer({ variant = 'app', className = '', customLinks = null }) {
   const navLinks = customLinks !== null ? customLinks : (isPublic ? publicLinks : appLinks)
 
   return (
-    <footer className={`mt-auto w-full bg-[#edf4e6] text-moss pt-12 pb-8 border-t border-leaf-900/10 ${className}`}>
+    <footer className={`mt-auto w-full bg-[#dce8cf] text-moss pt-12 pb-8 border-t border-leaf-900/10 ${className}`}>
       <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 flex flex-col gap-10">
          
          {/* Top section: Brand and Links */}

@@ -53,7 +53,7 @@ function AdminScheduleFormPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
-      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
+      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#dce8cf] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">{isEdit ? 'Edit jadwal' : 'Tambah jadwal'}</p>
         <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{isEdit ? 'Perbarui jadwal.' : 'Jadwal baru.'}</h1>
         <div className="mt-8 max-w-2xl rounded-[1.5rem] border border-leaf-900/10 bg-[#f5f1df] p-5 sm:p-6">
@@ -64,10 +64,10 @@ function AdminScheduleFormPage() {
             <input className={inputClass} placeholder="Instruksi" value={form.instruction} onChange={(event) => setForm((current) => ({ ...current, instruction: event.target.value }))} />
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <button className="rounded-full bg-[#edf5e4] px-6 py-3 text-sm font-black text-leaf-900 shadow-lg shadow-leaf-950/10 transition hover:bg-[#e2edd8]" type="button" onClick={submit}>{isEdit ? 'Simpan perubahan' : 'Buat jadwal'}</button>
+            <button className="rounded-full bg-[#dce8cf] px-6 py-3 text-sm font-black text-leaf-900 shadow-lg shadow-leaf-950/10 transition hover:bg-[#e2edd8]" type="button" onClick={submit}>{isEdit ? 'Simpan perubahan' : 'Buat jadwal'}</button>
             <Link className="rounded-full border border-leaf-900/10 bg-[#fffdf4] px-6 py-3 text-sm font-black text-moss" to="/admin/schedules">Batal</Link>
           </div>
-          {feedback ? <p className="mt-4 rounded-2xl bg-[#edf5e4] px-4 py-3 text-sm font-bold text-moss/75">{feedback}</p> : null}
+          {feedback ? <p className="mt-4 rounded-2xl bg-[#dce8cf] px-4 py-3 text-sm font-bold text-moss/75">{feedback}</p> : null}
         </div>
       </section>
     </div>

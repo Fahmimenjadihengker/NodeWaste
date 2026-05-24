@@ -18,7 +18,7 @@ function AdminShell() {
 
   return (
     <main className="min-h-screen bg-[#f5f1df] pb-28 text-moss md:pb-0">
-      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-72 border-r border-leaf-900/10 bg-[#edf5e4] px-5 py-8 shadow-[18px_0_50px_rgba(32,58,37,0.10)] md:flex md:flex-col overflow-y-auto">
+      <aside className="fixed bottom-0 left-0 top-0 z-40 hidden w-72 border-r border-leaf-900/10 bg-[#dce8cf] px-5 py-8 shadow-[18px_0_50px_rgba(32,58,37,0.10)] md:flex md:flex-col overflow-y-auto">
         <div className="mb-10 px-2">
           <p className="text-2xl font-black tracking-[-0.04em] text-leaf-950">NodeWaste</p>
           <p className="text-sm font-bold text-moss/55">Admin Dashboard</p>

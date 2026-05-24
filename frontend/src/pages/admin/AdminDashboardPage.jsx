@@ -24,7 +24,7 @@ function AdminDashboardPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
-      <section className="overflow-hidden rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_24px_70px_rgba(32,58,37,0.10)] sm:p-8">
+      <section className="overflow-hidden rounded-[2rem] border border-leaf-900/10 bg-[#dce8cf] p-6 shadow-[0_24px_70px_rgba(32,58,37,0.10)] sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-800/60">Dashboard admin</p>

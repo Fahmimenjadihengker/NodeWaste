@@ -62,5 +62,8 @@ export async function saveScanResult(userId, scanData, points, xp) {
     });
 
     return { scan, user: updatedUser };
+  }, {
+    maxWait: 5000, // 5 seconds max wait to connect to prisma
+    timeout: 15000 // 15 seconds transaction timeout
   });
 }

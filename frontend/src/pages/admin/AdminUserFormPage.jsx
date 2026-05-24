@@ -75,7 +75,7 @@ function AdminUserFormPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
-      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#edf5e4] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
+      <section className="rounded-[2rem] border border-leaf-900/10 bg-[#dce8cf] p-6 shadow-[0_18px_55px_rgba(32,58,37,0.08)] sm:p-8">
         <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">{isEdit ? 'Edit pengguna' : 'Tambah pengguna'}</p>
         <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">{isEdit ? 'Edit akun.' : 'Akun baru.'}</h1>
         <div className="mt-8 rounded-[1.5rem] border border-leaf-900/10 bg-[#f5f1df] p-5">
@@ -86,12 +86,12 @@ function AdminUserFormPage() {
             <select className={inputClass} value={form.role} onChange={(event) => setForm((current) => ({ ...current, role: event.target.value }))}>{['USER', 'DRIVER', 'ADMIN'].map((role) => <option key={role} value={role}>{role}</option>)}</select>
             {isEdit ? <label className="flex items-center gap-3 rounded-2xl border border-leaf-900/10 bg-[#fffdf4] px-4 py-3 text-sm font-black text-moss"><input type="checkbox" checked={form.isActive} onChange={(event) => setForm((current) => ({ ...current, isActive: event.target.checked }))} /> Akun aktif</label> : null}
           </div>
-          {form.role === 'DRIVER' ? <div className="mt-4 rounded-[1.4rem] border border-leaf-900/10 bg-[#edf5e4] p-4"><div className="grid gap-4 lg:grid-cols-2"><input className={inputClass} placeholder="Plat kendaraan" value={form.vehiclePlate} onChange={(event) => setForm((current) => ({ ...current, vehiclePlate: event.target.value }))} /><input className={inputClass} placeholder="Tipe kendaraan" value={form.vehicleType} onChange={(event) => setForm((current) => ({ ...current, vehicleType: event.target.value }))} /></div><div className="mt-4 rounded-[1.2rem] bg-[#fffdf4] p-4"><AddressForm value={district} onChange={setDistrict} title="Wilayah kerja" heading="Wilayah driver" description="Pilih wilayah kerja driver." /></div></div> : null}
+          {form.role === 'DRIVER' ? <div className="mt-4 rounded-[1.4rem] border border-leaf-900/10 bg-[#dce8cf] p-4"><div className="grid gap-4 lg:grid-cols-2"><input className={inputClass} placeholder="Plat kendaraan" value={form.vehiclePlate} onChange={(event) => setForm((current) => ({ ...current, vehiclePlate: event.target.value }))} /><input className={inputClass} placeholder="Tipe kendaraan" value={form.vehicleType} onChange={(event) => setForm((current) => ({ ...current, vehicleType: event.target.value }))} /></div><div className="mt-4 rounded-[1.2rem] bg-[#fffdf4] p-4"><AddressForm value={district} onChange={setDistrict} title="Wilayah kerja" heading="Wilayah driver" description="Pilih wilayah kerja driver." /></div></div> : null}
           <div className="mt-6 flex flex-wrap gap-3">
-            <button className="rounded-full bg-[#edf5e4] px-6 py-3 text-sm font-black text-leaf-900 shadow-lg shadow-leaf-950/10 transition hover:bg-[#e2edd8]" type="button" onClick={submit}>{isEdit ? 'Simpan perubahan' : 'Buat akun'}</button>
+            <button className="rounded-full bg-[#dce8cf] px-6 py-3 text-sm font-black text-leaf-900 shadow-lg shadow-leaf-950/10 transition hover:bg-[#e2edd8]" type="button" onClick={submit}>{isEdit ? 'Simpan perubahan' : 'Buat akun'}</button>
             <Link className="rounded-full border border-leaf-900/10 bg-[#fffdf4] px-6 py-3 text-sm font-black text-moss" to="/admin/users">Batal</Link>
           </div>
-          {feedback ? <p className="mt-4 rounded-2xl bg-[#edf5e4] px-4 py-3 text-sm font-bold text-moss/75">{feedback}</p> : null}
+          {feedback ? <p className="mt-4 rounded-2xl bg-[#dce8cf] px-4 py-3 text-sm font-bold text-moss/75">{feedback}</p> : null}
         </div>
       </section>
     </div>
