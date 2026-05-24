@@ -3,6 +3,7 @@ import AppCard from '../../components/AppCard.jsx'
 import { SkeletonText } from '../../components/Skeleton.jsx'
 import { useCachedResource } from '../../hooks/useCachedResource.js'
 import { getCachedDriverProfile, getDriverProfile } from '../../services/driverApi.js'
+import { sweetConfirm } from '../../utils/sweetAlert.js'
 
 const fallbackProfile = {
   user: null,
@@ -18,10 +19,15 @@ function getInitial(name) {
 }
 
 function DriverProfilePage() {
-  const { user: storedUser } = useOutletContext()
+  const { user: storedUser, onLogout } = useOutletContext()
   const { data, error, isLoading } = useCachedResource({ getCached: getCachedDriverProfile, load: getDriverProfile, fallback: fallbackProfile })
   const user = data.user || storedUser
   const driverProfile = data.driverProfile || fallbackProfile.driverProfile
+
+  const confirmLogout = async () => {
+    const confirmed = await sweetConfirm({ title: 'Keluar akun?', text: 'Sesi driver akan diakhiri dari perangkat ini.', confirmText: 'Logout', danger: true })
+    if (confirmed) onLogout()
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
@@ -42,7 +48,10 @@ function DriverProfilePage() {
           {!isLoading ? <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {[['Plat kendaraan', driverProfile.vehiclePlate || '-'], ['Tipe kendaraan', driverProfile.vehicleType || '-'], ['Wilayah kerja', driverProfile.district ? `${driverProfile.district.name}, ${driverProfile.district.city}` : '-']].map(([label, value]) => <div key={label} className="rounded-[1.2rem] bg-[#f5f1df] p-4"><p className="text-xs font-black uppercase tracking-[0.16em] text-moss/45">{label}</p><p className="mt-2 text-lg font-black text-leaf-900">{value}</p></div>)}
           </div> : null}
-          <Link className="mt-8 inline-flex rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900" to="/driver/profile/edit">Edit profile</Link>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Link className="inline-flex justify-center rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900" to="/driver/profile/edit">Edit profile</Link>
+            <button className="inline-flex justify-center rounded-full border border-red-200 px-6 py-3 text-sm font-black text-red-700 transition hover:bg-red-700 hover:text-white" type="button" onClick={confirmLogout}>Logout</button>
+          </div>
         </AppCard>
       </section>
     </div>

@@ -1,5 +1,4 @@
 import { useOutletContext } from 'react-router-dom'
-import { MapPin, Trash2, Package, Truck } from 'lucide-react'
 import AppCard from '../../components/AppCard.jsx'
 import MapCN from '../../components/driver/MapCN.jsx'
 import { SkeletonCard, SkeletonText } from '../../components/Skeleton.jsx'
@@ -56,9 +55,6 @@ function DriverMapPage() {
         <AppCard className="group relative overflow-hidden p-7 sm:p-8 flex flex-col justify-between">
           <div className="relative z-10 flex items-center justify-between">
             <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-800">Kendaraan</p>
-            <div className="rounded-full bg-leaf-800/10 p-2 text-leaf-900 transition-transform group-hover:rotate-12">
-              <Truck className="h-5 w-5" />
-            </div>
           </div>
           <div className="relative z-10 mt-auto pt-6">
             <h2 className="text-4xl font-black tracking-[-0.04em] text-leaf-950">{profile?.vehiclePlate || '-'}</h2>
@@ -70,25 +66,16 @@ function DriverMapPage() {
       {/* STATISTIC SECTION */}
       <section className="mt-6 grid grid-cols-3 gap-4 sm:gap-6">
         <AppCard tone="softCream" className="p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
-          <div className="rounded-full bg-emerald-100 p-2.5 sm:p-3 text-emerald-600 mb-2 sm:mb-3 shadow-sm">
-            <MapPin className="h-5 w-5 sm:h-6 sm:w-6" />
-          </div>
           <p className="text-2xl sm:text-4xl font-black text-leaf-950">{data.houses?.length || 0}</p>
           <p className="mt-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] text-moss/60">Rumah</p>
         </AppCard>
         
         <AppCard tone="softCream" className="p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
-          <div className="rounded-full bg-amber-100 p-2.5 sm:p-3 text-amber-600 mb-2 sm:mb-3 shadow-sm">
-            <Trash2 className="h-5 w-5 sm:h-6 sm:w-6" />
-          </div>
           <p className="text-2xl sm:text-4xl font-black text-leaf-950">{data.processingSites?.length || 0}</p>
           <p className="mt-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] text-moss/60">TPS</p>
         </AppCard>
 
         <AppCard tone="softCream" className="p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-transform duration-300 hover:-translate-y-1 hover:shadow-md">
-          <div className="rounded-full bg-blue-100 p-2.5 sm:p-3 text-blue-600 mb-2 sm:mb-3 shadow-sm">
-            <Package className="h-5 w-5 sm:h-6 sm:w-6" />
-          </div>
           <p className="text-2xl sm:text-4xl font-black text-leaf-950">{data.recyclingFacilities?.length || 0}</p>
           <p className="mt-1 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] text-moss/60">Daur Ulang</p>
         </AppCard>

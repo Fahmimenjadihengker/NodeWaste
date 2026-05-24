@@ -3,4 +3,7 @@ export const driverNavItems = [
   { label: 'Profile', to: '/driver/profile', icon: 'profile' },
 ]
 
-export const mobileDriverNavItems = driverNavItems
+export const mobileDriverNavItems = [
+  { label: 'Map', to: '/driver/map', icon: 'map' },
+  { label: 'Profile', to: '/driver/profile', icon: 'profile' },
+]
