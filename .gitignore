@@ -71,3 +71,5 @@ Icon
 # 7. AI & Agents
 # =========================
 .agents/
+.gemini/
+.skills-lock.json

@@ -104,7 +104,7 @@ export async function getDriverDashboard(userId) {
 export async function getDriverMap(userId) {
   const context = await getDriverContext(userId)
   const districtId = context.driverProfile?.districtId
-  const [houses, processingSites] = await Promise.all([
+  const [houses, processingSites, recyclingFacilities] = await Promise.all([
     districtId ? prisma.userAddress.findMany({
       where: { districtId },
       include: {
@@ -131,12 +131,22 @@ export async function getDriverMap(userId) {
       orderBy: { name: 'asc' },
       take: 100,
     }),
+    prisma.recyclingFacility.findMany(),
   ])
 
   return {
     driverProfile: toDriverProfile(context.driverProfile),
     houses: houses.map(toHouse),
     processingSites: processingSites.map(toProcessingSite),
+    recyclingFacilities: recyclingFacilities.map(f => ({
+      id: f.id,
+      name: f.name,
+      type: f.type,
+      address: f.address,
+      latitude: f.latitude,
+      longitude: f.longitude,
+      description: f.description
+    })),
   }
 }
 

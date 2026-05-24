@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getDistricts, getProvinces, getRegencies } from '../services/regionApi.js'
 import { SkeletonText } from './Skeleton.jsx'
-
+import MapPicker from './MapPicker.jsx'
 const inputClass = 'mt-2 w-full rounded-2xl border border-moss/10 bg-[#f8f4e6] px-4 py-3 font-semibold text-moss outline-none transition focus:border-leaf-600'
 
 function RegionSelect({ label, value, fallbackName = '', options, disabled, isLoading, placeholder, onChange }) {
@@ -209,12 +209,20 @@ function AddressForm({ value, onChange, title = 'Alamat rumah', heading = 'Titik
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className="text-sm font-black text-moss/70">Latitude</span>
-            <input className={inputClass} inputMode="decimal" value={value.latitude} onChange={(event) => updateValue({ latitude: event.target.value })} />
+            <input className={`${inputClass} bg-moss/5 text-moss/60`} inputMode="decimal" value={value.latitude || ''} readOnly placeholder="Pilih dari map" />
           </label>
           <label className="block">
             <span className="text-sm font-black text-moss/70">Longitude</span>
-            <input className={inputClass} inputMode="decimal" value={value.longitude} onChange={(event) => updateValue({ longitude: event.target.value })} />
+            <input className={`${inputClass} bg-moss/5 text-moss/60`} inputMode="decimal" value={value.longitude || ''} readOnly placeholder="Pilih dari map" />
           </label>
+        </div>
+
+        <div className="mt-4">
+          <MapPicker 
+            latitude={value.latitude} 
+            longitude={value.longitude} 
+            onChange={(lat, lng) => updateValue({ latitude: lat, longitude: lng })} 
+          />
         </div>
       </div>
     </div>
