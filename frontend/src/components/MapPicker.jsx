@@ -65,14 +65,14 @@ export default function MapPicker({ latitude, longitude, onChange }) {
     if (position) {
       onChange(position.lat, position.lng);
     }
-  }, [position]);
+  }, [onChange, position]);
 
   // Update internal state if props change externally
   useEffect(() => {
     if (latitude && longitude && (!position || position.lat !== Number(latitude) || position.lng !== Number(longitude))) {
-      setPosition({ lat: Number(latitude), lng: Number(longitude) });
+      queueMicrotask(() => setPosition({ lat: Number(latitude), lng: Number(longitude) }));
     }
-  }, [latitude, longitude]);
+  }, [latitude, longitude, position]);
 
   const handleGetCurrentLocation = () => {
     if (navigator.geolocation) {

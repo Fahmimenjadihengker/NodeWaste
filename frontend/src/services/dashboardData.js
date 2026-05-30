@@ -15,10 +15,11 @@ export const dashboardData = {
     happiness: 78,
     hunger: 34,
   },
-  categories: [
-    { label: 'Organik', value: 4, color: 'bg-leaf-600' },
-    { label: 'Anorganik', value: 5, color: 'bg-[#7fa765]' },
-    { label: 'B3', value: 1, color: 'bg-honey' },
+  classifications: [
+    { key: 'berbahaya', label: 'Berbahaya', value: 1, color: 'bg-red-700' },
+    { key: 'daurUlang', label: 'Daur Ulang', value: 4, color: 'bg-leaf-600' },
+    { key: 'dibakar', label: 'Dibakar', value: 3, color: 'bg-honey' },
+    { key: 'tidakDibakar', label: 'Tidak dibakar', value: 2, color: 'bg-[#7fa765]' },
   ],
   activities: [
     { title: 'Scan Botol Plastik', meta: '+15 EcoPoints, +10 XP', time: 'Hari ini' },
@@ -27,19 +28,19 @@ export const dashboardData = {
   ],
   scanActivity: {
     weekly: [
-      { label: 'Sen', valid: 2, categories: { organik: 1, anorganik: 1, b3: 0 } },
-      { label: 'Sel', valid: 1, categories: { organik: 0, anorganik: 1, b3: 0 } },
-      { label: 'Rab', valid: 3, categories: { organik: 1, anorganik: 2, b3: 0 } },
-      { label: 'Kam', valid: 1, categories: { organik: 1, anorganik: 0, b3: 0 } },
-      { label: 'Jum', valid: 2, categories: { organik: 0, anorganik: 1, b3: 1 } },
-      { label: 'Sab', valid: 1, categories: { organik: 0, anorganik: 1, b3: 0 } },
-      { label: 'Min', valid: 2, categories: { organik: 1, anorganik: 1, b3: 0 } },
+      { label: 'Sen', valid: 2, classifications: { berbahaya: 0, daurUlang: 1, dibakar: 1, tidakDibakar: 0 } },
+      { label: 'Sel', valid: 1, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 1 } },
+      { label: 'Rab', valid: 3, classifications: { berbahaya: 1, daurUlang: 1, dibakar: 1, tidakDibakar: 0 } },
+      { label: 'Kam', valid: 1, classifications: { berbahaya: 0, daurUlang: 1, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Jum', valid: 2, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 1, tidakDibakar: 1 } },
+      { label: 'Sab', valid: 1, classifications: { berbahaya: 0, daurUlang: 1, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Min', valid: 2, classifications: { berbahaya: 0, daurUlang: 1, dibakar: 1, tidakDibakar: 0 } },
     ],
     monthly: [
-      { label: 'M1', valid: 8, categories: { organik: 3, anorganik: 4, b3: 1 } },
-      { label: 'M2', valid: 6, categories: { organik: 2, anorganik: 4, b3: 0 } },
-      { label: 'M3', valid: 10, categories: { organik: 4, anorganik: 5, b3: 1 } },
-      { label: 'M4', valid: 7, categories: { organik: 3, anorganik: 3, b3: 1 } },
+      { label: 'M1', valid: 8, classifications: { berbahaya: 1, daurUlang: 3, dibakar: 2, tidakDibakar: 2 } },
+      { label: 'M2', valid: 6, classifications: { berbahaya: 0, daurUlang: 2, dibakar: 2, tidakDibakar: 2 } },
+      { label: 'M3', valid: 10, classifications: { berbahaya: 1, daurUlang: 4, dibakar: 3, tidakDibakar: 2 } },
+      { label: 'M4', valid: 7, classifications: { berbahaya: 1, daurUlang: 3, dibakar: 2, tidakDibakar: 1 } },
     ],
   },
 }

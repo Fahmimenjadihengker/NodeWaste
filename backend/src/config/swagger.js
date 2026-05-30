@@ -308,7 +308,7 @@ export const swaggerDocument = {
             required: false,
             schema: {
               type: "string",
-              enum: ["all", "scan", "pet", "organik", "anorganik", "b3"],
+              enum: ["all", "scan", "pet", "berbahaya", "daur-ulang", "dibakar", "tidak-dibakar"],
               default: "all",
             },
           },

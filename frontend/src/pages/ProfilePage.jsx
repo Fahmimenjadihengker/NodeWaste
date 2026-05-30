@@ -4,15 +4,14 @@ import AppCard from '../components/AppCard.jsx'
 import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard } from '../components/Skeleton.jsx'
 import { getActivities, getCachedActivities, getCachedProfile, getProfile, saveStoredUser } from '../services/authApi.js'
+import { scanClassificationFilters } from '../utils/scanClassification.js'
 import { sweetConfirm } from '../utils/sweetAlert.js'
 
 const historyFilters = [
   { label: 'Semua', value: 'all' },
   { label: 'Scan', value: 'scan' },
   { label: 'Pet', value: 'pet' },
-  { label: 'Organik', value: 'organik' },
-  { label: 'Anorganik', value: 'anorganik' },
-  { label: 'B3', value: 'b3' },
+  ...scanClassificationFilters,
 ]
 
 const emptyStats = { ecoPoints: 0, xp: 0, level: 1, streak: 0, totalScans: 0, validScans: 0, nextLevelXp: 100 }
@@ -80,7 +79,7 @@ function ProfilePage() {
   const filteredHistory = useMemo(() => {
     if (activeFilter === 'all') return history
     if (activeFilter === 'scan' || activeFilter === 'pet') return history.filter((item) => item.type === activeFilter)
-    return history.filter((item) => item.category === activeFilter)
+    return history.filter((item) => (item.classification || item.category) === activeFilter)
   }, [activeFilter, history])
 
   useEffect(() => {

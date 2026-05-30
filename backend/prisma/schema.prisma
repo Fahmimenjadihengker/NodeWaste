@@ -136,7 +136,7 @@ model Pet {
 model Scan {
   id         String        @id @default(uuid())
   userId     String        @map("user_id")
-  category   String
+  classification String
   label      String
   confidence Int
   isValid    Boolean       @default(false) @map("is_valid")

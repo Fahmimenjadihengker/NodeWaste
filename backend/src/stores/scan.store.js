@@ -17,7 +17,7 @@ export async function saveScanResult(userId, scanData, points, xp) {
     const scan = await tx.scan.create({
       data: {
         userId,
-        category: scanData.category,
+        classification: scanData.classification,
         label: scanData.label,
         confidence: scanData.confidence,
         imageUrl: scanData.imageUrl,
@@ -57,7 +57,7 @@ export async function saveScanResult(userId, scanData, points, xp) {
         type: "SCAN", // Pastikan enum atau tipe di DB sesuai
         title: `Scan ${scan.label}`,
         meta: `+${points} EcoPoints, +${xp} XP`,
-        detail: `Kategori: ${scan.category}, confidence ${scan.confidence}%`,
+        detail: `Klasifikasi: ${scan.classification}, confidence ${scan.confidence}%`,
       },
     });
 

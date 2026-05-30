@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -51,16 +51,16 @@ const driverIcon = new L.DivIcon({
 
 function DynamicMapZoomer({ driverPos, targetPos }) {
   const map = useMap();
-  const [hasInitialZoomed, setHasInitialZoomed] = useState(false);
+  const hasInitialZoomedRef = useRef(false);
 
   useEffect(() => {
     if (targetPos) return; // Biarkan RoutingMachine yang mengontrol zoom saat ada rute
 
-    if (driverPos && !hasInitialZoomed) {
+    if (driverPos && !hasInitialZoomedRef.current) {
       map.setView([driverPos.lat, driverPos.lng], 15, { animate: true });
-      setHasInitialZoomed(true);
+      hasInitialZoomedRef.current = true;
     }
-  }, [driverPos, targetPos, map, hasInitialZoomed]);
+  }, [driverPos, targetPos, map]);
 
   return null;
 }

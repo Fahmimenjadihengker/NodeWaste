@@ -6,13 +6,13 @@ export async function processScan(user, file) {
   const xpReward = 30;
   const aiResult = await classifyWasteImage(file);
 
-  // Gambar belum disimpan permanen sampai storage/Path AI final tersedia.
+  // Gambar belum disimpan permanen sampai storage final tersedia.
   const imageUrl = null;
 
   const result = await saveScanResult(
     user.id,
     {
-      category: aiResult.category,
+      classification: aiResult.classification,
       label: aiResult.label,
       confidence: aiResult.confidence,
       imageUrl: imageUrl,

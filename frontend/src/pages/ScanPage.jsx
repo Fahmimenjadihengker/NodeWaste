@@ -1,16 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
+import ScanClassificationPill from '../components/ScanClassificationPill.jsx'
 import { createScan } from '../services/scanApi.js'
 
-const categoryGuide = {
-  Organik: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
-  Anorganik: 'Kosongkan isi, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
-  B3: 'Jangan campur dengan sampah rumah tangga. Simpan kering, lalu bawa ke titik pengumpulan B3 atau e-waste.',
-  ORGANIK: 'Pisahkan dari plastik atau kemasan lain, lalu olah menjadi kompos atau buang ke tempat sampah organik.',
-  ANORGANIK: 'Kosongkan isi, bilas singkat jika kotor, lalu masukkan ke tempat sampah anorganik atau drop-off daur ulang.',
-}
-
 function getConfidenceLabel(confidence) {
-  return `${Math.round(confidence * 100)}%`
+  const value = Number(confidence || 0)
+  return `${Math.round(value > 0 && value <= 1 ? value * 100 : value)}%`
 }
 
 function CameraPanel({ videoRef, canvasRef, cameraState, errorMessage, onStart, onCapture }) {
@@ -65,10 +59,9 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    if (!isLoading) {
-      setProgress(0)
-      return
-    }
+    if (!isLoading) return undefined
+
+    queueMicrotask(() => setProgress(0))
 
     const interval = setInterval(() => {
       setProgress((p) => {
@@ -118,7 +111,7 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
       <section className="rounded-[1.25rem] border border-moss/10 bg-[#fff8e8] p-6 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
         <p className="text-sm font-black uppercase tracking-[0.22em] text-moss/45">Hasil scan</p>
         <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">Belum ada hasil.</h2>
-        <p className="mt-3 text-sm leading-6 text-moss/65">Buka kamera lalu ambil gambar. Hasil dummy akan muncul otomatis setelah gambar diproses.</p>
+        <p className="mt-3 text-sm leading-6 text-moss/65">Buka kamera lalu ambil gambar. Hasil klasifikasi akan muncul setelah gambar diproses.</p>
       </section>
     )
   }
@@ -131,10 +124,7 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
           <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">{result.isValid ? 'Scan valid' : 'Perlu scan ulang'}</p>
           <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">{result.wasteName}</h2>
           <div className="mt-4 flex flex-wrap gap-2">
-            <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">{result.category}</span>
-            {result.bagType ? (
-              <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">{result.bagType}</span>
-            ) : null}
+            <ScanClassificationPill classification={result.classification} />
             <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">Akurasi {getConfidenceLabel(result.confidence)}</span>
           </div>
         </div>
@@ -245,7 +235,7 @@ function ScanPage() {
     canvas.toBlob(async (blob) => {
       if (!blob) {
         setIsAnalyzing(false)
-        setResult({ wasteName: 'Gambar gagal diproses', category: 'Unknown', confidence: 0, points: 0, xp: 0, isValid: false, guide: 'Coba ambil gambar ulang.' })
+        setResult({ wasteName: 'Gambar gagal diproses', classification: 'Belum diklasifikasi', confidence: 0, points: 0, xp: 0, isValid: false, guide: 'Coba ambil gambar ulang.' })
         return
       }
 
@@ -256,16 +246,15 @@ function ScanPage() {
         
         setResult({
           wasteName: scan.label,
-          category: scan.category,
-          confidence: scan.confidence / 100,
+          classification: scan.classification,
+          confidence: scan.confidence,
           points: scan.ecoPoints,
           xp: scan.xpReward,
           isValid: scan.isValid,
-          guide: recommendationData || categoryGuide[scan.category] || 'Ikuti panduan pemilahan sampah sesuai kategori.',
-          bagType: typeof recommendationData === 'object' && recommendationData ? recommendationData['Klasifikasi jenis sampah'] : null,
+          guide: recommendationData || 'Ikuti panduan penanganan sampah sesuai hasil klasifikasi.',
         })
       } catch (error) {
-        setResult({ wasteName: 'Scan gagal', category: 'Unknown', confidence: 0, points: 0, xp: 0, isValid: false, guide: error.message })
+        setResult({ wasteName: 'Scan gagal', classification: 'Belum diklasifikasi', confidence: 0, points: 0, xp: 0, isValid: false, guide: error.message })
       } finally {
         setIsAnalyzing(false)
       }

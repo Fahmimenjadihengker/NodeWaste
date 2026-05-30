@@ -6,8 +6,17 @@ import { HttpError } from '../utils/http-error.js'
 
 const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS || 10)
 
-function emptyCategoryCounts() {
-  return { organik: 0, anorganik: 0, b3: 0 }
+function emptyClassificationCounts() {
+  return { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 }
+}
+
+function normalizeClassificationKey(classification) {
+  const key = String(classification || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
+  if (key.includes('berbahaya') || key === 'b3') return 'berbahaya'
+  if (key.includes('daurulang') || key.includes('recycle')) return 'daurUlang'
+  if (key.includes('tidakdibakar') || key.includes('janganbakar')) return 'tidakDibakar'
+  if (key.includes('dibakar') || key.includes('bakar')) return 'dibakar'
+  return null
 }
 
 function toDistrict(district) {
@@ -62,20 +71,20 @@ async function resolveDistrict(tx, payload) {
 }
 
 export async function getProfile(user) {
-  const [totalScans, validScans, categoryGroups, address] = await Promise.all([
+  const [totalScans, validScans, classificationGroups, address] = await Promise.all([
     prisma.scan.count({ where: { userId: user.id } }),
     prisma.scan.count({ where: { userId: user.id, isValid: true } }),
-    prisma.scan.groupBy({ by: ['category'], where: { userId: user.id }, _count: { _all: true } }),
+    prisma.scan.groupBy({ by: ['classification'], where: { userId: user.id }, _count: { _all: true } }),
     prisma.userAddress.findUnique({
       where: { userId: user.id },
       include: { district: true },
     }),
   ])
-  const categoryCounts = emptyCategoryCounts()
+  const classificationCounts = emptyClassificationCounts()
 
-  for (const group of categoryGroups) {
-    const key = group.category.toLowerCase()
-    categoryCounts[key] = group._count._all
+  for (const group of classificationGroups) {
+    const key = normalizeClassificationKey(group.classification)
+    if (key) classificationCounts[key] = group._count._all
   }
 
   return {
@@ -89,7 +98,7 @@ export async function getProfile(user) {
       streak: user.streak,
       totalScans,
       validScans,
-      categories: categoryCounts,
+      classifications: classificationCounts,
     },
   }
 }

@@ -2,24 +2,34 @@ import prisma from '../config/prisma.js'
 import { toRelativeTime } from '../utils/date-label.js'
 
 function normalizeFilter(filter) {
-  return ['scan', 'pet', 'organik', 'anorganik', 'b3'].includes(filter) ? filter : 'all'
+  return ['scan', 'pet', 'berbahaya', 'daur-ulang', 'dibakar', 'tidak-dibakar'].includes(filter) ? filter : 'all'
 }
 
-function normalizeCategoryKey(category) {
-  const key = String(category || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
-  if (key === 'organik') return 'organik'
-  if (key === 'anorganik') return 'anorganik'
-  if (key === 'b3') return 'b3'
-  return key
+function normalizeClassificationKey(classification) {
+  const key = String(classification || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
+  if (key.includes('berbahaya') || key === 'b3') return 'berbahaya'
+  if (key.includes('daurulang') || key.includes('recycle')) return 'daur-ulang'
+  if (key.includes('tidakdibakar') || key.includes('janganbakar')) return 'tidak-dibakar'
+  if (key.includes('dibakar') || key.includes('bakar')) return 'dibakar'
+  return key || null
+}
+
+function filterToClassification(filter) {
+  return {
+    berbahaya: 'Berbahaya',
+    'daur-ulang': 'Daur Ulang',
+    dibakar: 'Dibakar',
+    'tidak-dibakar': 'Tidak dibakar',
+  }[filter]
 }
 
 function toActivityItem(activity) {
-  const category = normalizeCategoryKey(activity.scan?.category) || (activity.type === 'PET' ? 'pet' : activity.type.toLowerCase())
+  const classification = normalizeClassificationKey(activity.scan?.classification) || (activity.type === 'PET' ? 'pet' : activity.type.toLowerCase())
 
   return {
     id: activity.id,
     type: activity.type.toLowerCase(),
-    category,
+    classification,
     title: activity.title,
     meta: activity.meta,
     detail: activity.detail || '',
@@ -34,9 +44,10 @@ export async function getUserActivities(userId, options = {}) {
 
   if (filter === 'scan') where.type = 'SCAN'
   if (filter === 'pet') where.type = 'PET'
-  if (['organik', 'anorganik', 'b3'].includes(filter)) {
+  const classificationFilter = filterToClassification(filter)
+  if (classificationFilter) {
     where.type = 'SCAN'
-    where.scan = { is: { category: { equals: filter === 'b3' ? 'B3' : filter, mode: 'insensitive' } } }
+    where.scan = { is: { classification: { equals: classificationFilter, mode: 'insensitive' } } }
   }
 
   const activities = await prisma.activity.findMany({
@@ -48,7 +59,7 @@ export async function getUserActivities(userId, options = {}) {
       meta: true,
       detail: true,
       createdAt: true,
-      scan: { select: { category: true } },
+      scan: { select: { classification: true } },
     },
     orderBy: { createdAt: 'desc' },
     take: limit,

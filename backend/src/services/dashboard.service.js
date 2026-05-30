@@ -5,23 +5,25 @@ import { getCurrentPet } from './pet.service.js'
 const nextLevelXp = 100
 const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
-function emptyCategoryCounts() {
-  return { organik: 0, anorganik: 0, b3: 0 }
+function emptyClassificationCounts() {
+  return { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 }
 }
 
-function buildCategories(categoryCounts) {
+function buildClassifications(classificationCounts) {
   return [
-    { label: 'Organik', value: categoryCounts.organik, color: 'bg-leaf-600' },
-    { label: 'Anorganik', value: categoryCounts.anorganik, color: 'bg-[#7fa765]' },
-    { label: 'B3', value: categoryCounts.b3, color: 'bg-honey' },
+    { key: 'berbahaya', label: 'Berbahaya', value: classificationCounts.berbahaya, color: 'bg-red-700' },
+    { key: 'daurUlang', label: 'Daur Ulang', value: classificationCounts.daurUlang, color: 'bg-leaf-600' },
+    { key: 'dibakar', label: 'Dibakar', value: classificationCounts.dibakar, color: 'bg-honey' },
+    { key: 'tidakDibakar', label: 'Tidak dibakar', value: classificationCounts.tidakDibakar, color: 'bg-[#7fa765]' },
   ]
 }
 
-function normalizeCategoryKey(category) {
-  const key = String(category || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
-  if (key === 'organik') return 'organik'
-  if (key === 'anorganik') return 'anorganik'
-  if (key === 'b3') return 'b3'
+function normalizeClassificationKey(classification) {
+  const key = String(classification || '').toLowerCase().replace(/[^a-z0-9]+/g, '')
+  if (key.includes('berbahaya') || key === 'b3') return 'berbahaya'
+  if (key.includes('daurulang') || key.includes('recycle')) return 'daurUlang'
+  if (key.includes('tidakdibakar') || key.includes('janganbakar')) return 'tidakDibakar'
+  if (key.includes('dibakar') || key.includes('bakar')) return 'dibakar'
   return null
 }
 
@@ -34,33 +36,33 @@ function buildScanActivity(scans) {
       dateKey: date.toISOString().slice(0, 10),
       label: days[date.getDay()],
       valid: 0,
-      categories: emptyCategoryCounts(),
+      classifications: emptyClassificationCounts(),
     }
   })
 
   const monthly = Array.from({ length: 4 }, (_, index) => ({
     label: `M${index + 1}`,
     valid: 0,
-    categories: emptyCategoryCounts(),
+    classifications: emptyClassificationCounts(),
   }))
 
   for (const scan of scans) {
     if (!scan.isValid) continue
 
-    const category = normalizeCategoryKey(scan.category)
-    if (!category) continue
+    const classification = normalizeClassificationKey(scan.classification)
+    if (!classification) continue
     const dateKey = scan.createdAt.toISOString().slice(0, 10)
     const weeklyItem = weekly.find((item) => item.dateKey === dateKey)
 
     if (weeklyItem) {
       weeklyItem.valid += 1
-      weeklyItem.categories[category] += 1
+      weeklyItem.classifications[classification] += 1
     }
 
     const day = scan.createdAt.getDate()
     const monthIndex = Math.min(Math.floor((day - 1) / 7), 3)
     monthly[monthIndex].valid += 1
-    monthly[monthIndex].categories[category] += 1
+    monthly[monthIndex].classifications[classification] += 1
   }
 
   return {
@@ -78,20 +80,20 @@ export async function getDashboard(userId) {
   weekStart.setDate(weekStart.getDate() - 6)
   weekStart.setHours(0, 0, 0, 0)
 
-  const [user, pet, totalScans, validScans, categoryGroups, chartScans, recentActivities] = await Promise.all([
+  const [user, pet, totalScans, validScans, classificationGroups, chartScans, recentActivities] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     getCurrentPet(prisma, userId),
     prisma.scan.count({ where: { userId } }),
     prisma.scan.count({ where: { userId, isValid: true } }),
-    prisma.scan.groupBy({ by: ['category'], where: { userId }, _count: { _all: true } }),
-    prisma.scan.findMany({ where: { userId, isValid: true, createdAt: { gte: monthStart } }, select: { category: true, isValid: true, createdAt: true }, orderBy: { createdAt: 'desc' } }),
+    prisma.scan.groupBy({ by: ['classification'], where: { userId }, _count: { _all: true } }),
+    prisma.scan.findMany({ where: { userId, isValid: true, createdAt: { gte: monthStart } }, select: { classification: true, isValid: true, createdAt: true }, orderBy: { createdAt: 'desc' } }),
     getUserActivities(userId, { limit: 5 }),
   ])
 
-  const categoryCounts = emptyCategoryCounts()
-  for (const group of categoryGroups) {
-    const category = normalizeCategoryKey(group.category)
-    if (category) categoryCounts[category] = group._count._all
+  const classificationCounts = emptyClassificationCounts()
+  for (const group of classificationGroups) {
+    const classification = normalizeClassificationKey(group.classification)
+    if (classification) classificationCounts[classification] = group._count._all
   }
 
   return {
@@ -105,7 +107,7 @@ export async function getDashboard(userId) {
       validScans,
     },
     pet,
-    categories: buildCategories(categoryCounts),
+    classifications: buildClassifications(classificationCounts),
     activities: recentActivities,
     scanActivity: buildScanActivity(chartScans.filter((scan) => scan.createdAt >= weekStart || scan.createdAt >= monthStart)),
   }

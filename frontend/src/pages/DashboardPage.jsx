@@ -6,24 +6,21 @@ import ProgressBar from '../components/ProgressBar.jsx'
 import { SkeletonCard, SkeletonText } from '../components/Skeleton.jsx'
 import { useCachedResource } from '../hooks/useCachedResource.js'
 import { getCachedDashboard, getDashboard } from '../services/authApi.js'
+import { scanClassifications } from '../utils/scanClassification.js'
 const emptyDashboardData = {
   stats: { ecoPoints: 0, xp: 0, nextLevelXp: 100, level: 1, streak: 0, totalScans: 0, validScans: 0 },
   pet: { name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0 },
-  categories: [
-    { label: 'Organik', value: 0, color: 'bg-leaf-600' },
-    { label: 'Anorganik', value: 0, color: 'bg-[#7fa765]' },
-    { label: 'B3', value: 0, color: 'bg-honey' },
-  ],
+  classifications: scanClassifications.map((item) => ({ ...item, value: 0, color: item.colorClass })),
   activities: [],
   scanActivity: { weekly: [], monthly: [] },
 }
 
-const scanCategorySegments = [
-  { key: 'organik', label: 'Organik', colorClass: 'bg-leaf-600' },
-  { key: 'anorganik', label: 'Anorganik', colorClass: 'bg-[#7fa765]' },
-  { key: 'b3', label: 'B3', colorClass: 'bg-honey' },
+const scanClassificationSegments = [
+  ...scanClassifications,
   { key: 'total', label: 'Total scan', colorClass: 'bg-moss' },
 ]
+
+const emptyScanClassificationCounts = { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 }
 
 function StatBlock({ label, value, helper }) {
   return (
@@ -47,14 +44,14 @@ function ProgressLine({ label, value }) {
   )
 }
 
-function ScanActivityChart({ data, categories }) {
+function ScanActivityChart({ data, classifications }) {
   const [range, setRange] = useState('weekly')
-  const chartData = data[range]
-  const maxScan = Math.max(...chartData.map((item) => Object.values(item.categories).reduce((sum, value) => sum + value, 0)), 1)
+  const chartData = (data[range] || []).map((item) => ({ ...item, classifications: { ...emptyScanClassificationCounts, ...item.classifications } }))
+  const maxScan = Math.max(...chartData.map((item) => Object.values(item.classifications).reduce((sum, value) => sum + value, 0)), 1)
   const totalValid = chartData.reduce((sum, item) => sum + item.valid, 0)
-  const categorySummary = categories.map((category) => ({
-    label: category.label,
-    value: category.value,
+  const classificationSummary = classifications.map((classification) => ({
+    label: classification.label,
+    value: classification.value,
   }))
 
   return (
@@ -87,10 +84,10 @@ function ScanActivityChart({ data, categories }) {
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Scan valid</p>
           <p className="mt-2 text-3xl font-black text-leaf-900">{totalValid}</p>
         </div>
-        {categorySummary.map((category) => (
-          <div key={category.label} className="rounded-[1.25rem] bg-[#f8f4e6]/60 p-5">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">{category.label}</p>
-            <p className="mt-2 text-3xl font-black text-leaf-900">{category.value}</p>
+        {classificationSummary.map((classification) => (
+          <div key={classification.label} className="rounded-[1.25rem] bg-[#f8f4e6]/60 p-5">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">{classification.label}</p>
+            <p className="mt-2 text-3xl font-black text-leaf-900">{classification.value}</p>
           </div>
         ))}
       </div>
@@ -111,13 +108,13 @@ function ScanActivityChart({ data, categories }) {
 
           <div className="relative grid h-44 items-end gap-5" style={{ gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))` }}>
             {chartData.map((item) => {
-              const categoryTotal = Object.values(item.categories).reduce((sum, value) => sum + value, 0)
+              const classificationTotal = Object.values(item.classifications).reduce((sum, value) => sum + value, 0)
 
               return (
                 <div key={item.label} className="flex h-full items-end justify-center">
                   <div className="flex h-full w-full max-w-24 items-end justify-center gap-1.5">
-                    {scanCategorySegments.map((segment) => {
-                      const value = segment.key === 'total' ? categoryTotal : item.categories[segment.key]
+                    {scanClassificationSegments.map((segment) => {
+                      const value = segment.key === 'total' ? classificationTotal : item.classifications[segment.key]
                       const height = value ? Math.max((value / maxScan) * 11, 1) : 0
 
                       return (
@@ -137,12 +134,12 @@ function ScanActivityChart({ data, categories }) {
 
           <div className="mt-4 grid gap-5" style={{ gridTemplateColumns: `repeat(${chartData.length}, minmax(0, 1fr))` }}>
             {chartData.map((item) => {
-              const categoryTotal = Object.values(item.categories).reduce((sum, value) => sum + value, 0)
+              const classificationTotal = Object.values(item.classifications).reduce((sum, value) => sum + value, 0)
 
               return (
                 <div key={item.label} className="text-center">
                   <p className="text-sm font-black text-leaf-900">{item.label}</p>
-                  <p className="mt-1 text-xs font-bold text-moss/50">{categoryTotal} scan</p>
+                  <p className="mt-1 text-xs font-bold text-moss/50">{classificationTotal} scan</p>
                 </div>
               )
             })}
@@ -151,7 +148,7 @@ function ScanActivityChart({ data, categories }) {
       </div>
 
       <div className="mt-5 flex flex-wrap gap-4 text-sm font-bold text-moss/65">
-        {scanCategorySegments.map((segment) => (
+        {scanClassificationSegments.map((segment) => (
           <span key={segment.key} className="inline-flex items-center gap-2"><span className={`h-3 w-3 rounded-full ${segment.colorClass}`} />{segment.label}</span>
         ))}
       </div>
@@ -162,7 +159,7 @@ function ScanActivityChart({ data, categories }) {
 function DashboardPage() {
   const { user } = useOutletContext()
   const { data, error: feedback, isLoading } = useCachedResource({ getCached: getCachedDashboard, load: getDashboard, fallback: emptyDashboardData })
-  const { stats, pet, categories, activities, scanActivity } = data
+  const { stats, pet, classifications = emptyDashboardData.classifications, activities, scanActivity } = data
   const [leafyMood, setLeafyMood] = useState('idle')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
@@ -225,16 +222,16 @@ function DashboardPage() {
           </AppCard>
 
           <AppCard>
-            <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Kategori sampah</h2>
-            <p className="mt-2 text-sm leading-6 text-moss/65">Ringkasan sampah yang sudah kamu scan atau olah.</p>
+            <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Klasifikasi jenis sampah</h2>
+            <p className="mt-2 text-sm leading-6 text-moss/65">Ringkasan klasifikasi dari hasil scan AI.</p>
             <div className="mt-5 space-y-4">
-              {categories.map((category) => (
-                <div key={category.label} className="grid grid-cols-[1fr_auto] items-center gap-4">
+              {classifications.map((classification) => (
+                <div key={classification.label} className="grid grid-cols-[1fr_auto] items-center gap-4">
                   <div>
-                    <p className="font-black text-moss">{category.label}</p>
-                    <ProgressBar value={category.value * 12} className="mt-2 h-2" barClassName={category.color} />
+                    <p className="font-black text-moss">{classification.label}</p>
+                    <ProgressBar value={stats.validScans ? (classification.value / stats.validScans) * 100 : 0} className="mt-2 h-2" barClassName={classification.color} />
                   </div>
-                  <span className="font-black text-leaf-900">{category.value}</span>
+                  <span className="font-black text-leaf-900">{classification.value}</span>
                 </div>
               ))}
             </div>
@@ -261,7 +258,7 @@ function DashboardPage() {
         </section>
 
         <div id="grafik-scan" className="mt-8 scroll-mt-28">
-          <ScanActivityChart data={scanActivity} categories={categories} />
+          <ScanActivityChart data={scanActivity} classifications={classifications} />
         </div>
       </div>
   )
