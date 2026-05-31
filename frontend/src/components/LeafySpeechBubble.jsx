@@ -13,8 +13,8 @@ const leafyMessages = [
   'Terima kasih sudah merawat bumi bareng aku.',
 ]
 
-function LeafySpeechBubble({ className = '' }) {
-  const { message, isVisible } = useRotatingMessages(leafyMessages, 5000, 20000)
+function LeafySpeechBubble({ className = '', visibleMs = 3000, pauseMs = 7000 }) {
+  const { message, isVisible } = useRotatingMessages(leafyMessages, visibleMs, pauseMs)
 
   if (!isVisible) return null
 

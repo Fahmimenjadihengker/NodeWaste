@@ -71,8 +71,8 @@ function ProfileEditPage() {
 
       saveStoredUser(userResponse)
       closeLoading?.()
+      navigate('/profile', { replace: true })
       await sweetSuccess({ text: 'Profile berhasil diupdate.' })
-      navigate('/profile')
     } catch (error) {
       closeLoading?.()
       setFeedback(error.message)
