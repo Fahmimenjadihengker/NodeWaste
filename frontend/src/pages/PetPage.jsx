@@ -112,6 +112,7 @@ function PetPage() {
   const [pet, setPet] = useState({ name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0, xp: 0, nextLevelXp: 100 })
   const [lastMood, setLastMood] = useState('happy')
   const [avatarMood, setAvatarMood] = useState('idle')
+  const [avatarAnimationKey, setAvatarAnimationKey] = useState(0)
   const [feedback, setFeedback] = useState('Memuat data Leafy...')
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
@@ -153,6 +154,7 @@ function PetPage() {
     const nextMood = clickTimesRef.current.length >= 10 ? 'angry' : 'happy'
 
     setAvatarMood(nextMood)
+    setAvatarAnimationKey((current) => current + 1)
     setFeedback(nextMood === 'angry' ? 'Leafy kesal kalau diklik terlalu sering.' : 'Leafy suka diperhatikan, tapi jangan dispam ya.')
     window.clearTimeout(moodTimerRef.current)
     moodTimerRef.current = window.setTimeout(() => {
@@ -179,6 +181,7 @@ function PetPage() {
       setPet(response.data.pet)
       setLastMood(action.mood)
       setAvatarMood('happy')
+      setAvatarAnimationKey((current) => current + 1)
       setFeedback(`${action.label} berhasil. Leafy ${moodCopy[action.mood].label.toLowerCase()}!`)
       setLogs((current) => [
         { title: `Leafy ${action.label.toLowerCase()}`, meta: `-${action.cost} EcoPoints`, time: 'Baru saja' },
@@ -205,13 +208,11 @@ function PetPage() {
           </div>
 
           <div className="mt-8 rounded-[1.25rem] bg-[#f5f1df]/50 p-5 text-center">
-            <LeafyAvatar mood={avatarMood} onClick={handleLeafyClick} />
+            <LeafyAvatar mood={avatarMood} animationKey={avatarAnimationKey} onClick={handleLeafyClick} />
             <div className="mx-auto mt-2 max-w-sm rounded-[1.25rem] bg-[#fff8e8]/80 p-4">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Mood</p>
               <h2 className="mt-1 text-2xl font-black text-leaf-900">{moodInfo.label}</h2>
-              <div className="mt-3 rounded-[1.25rem] border border-moss/10 bg-[#fff8e8]/85 px-5 py-4 shadow-inner shadow-white/40">
-                <p className="text-sm font-black text-leaf-900">{feedback}</p>
-              </div>
+              <p className="mt-3 text-sm font-black leading-6 text-leaf-900">{feedback}</p>
             </div>
           </div>
         </div>

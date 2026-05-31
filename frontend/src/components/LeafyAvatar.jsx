@@ -1,4 +1,4 @@
-function LeafyAvatar({ compact = false, mood = 'idle', onClick }) {
+function LeafyAvatar({ compact = false, mood = 'idle', animationKey = 0, onClick }) {
   const isHappy = mood === 'happy'
   const isAngry = mood === 'angry'
   const animationClass = isAngry ? 'animate-leafy-shake' : isHappy ? 'animate-leafy-bounce' : 'animate-leafy-idle'
@@ -15,11 +15,11 @@ function LeafyAvatar({ compact = false, mood = 'idle', onClick }) {
       disabled={!onClick}
     >
       {(isHappy || isAngry) ? (
-        <span className={`absolute right-0 top-1 z-10 rounded-full border border-moss/10 px-3 py-1.5 text-xs font-black shadow-[0_10px_24px_rgba(32,58,37,0.14)] animate-leafy-pop ${isAngry ? 'bg-honey text-moss' : 'bg-[#fff8e8] text-leaf-900'}`}>
+        <span key={`bubble-${mood}-${animationKey}`} className={`absolute right-0 top-1 z-10 rounded-full border border-moss/10 px-3 py-1.5 text-xs font-black shadow-[0_10px_24px_rgba(32,58,37,0.14)] animate-leafy-pop ${isAngry ? 'bg-honey text-moss' : 'bg-[#fff8e8] text-leaf-900'}`}>
           {isAngry ? 'Jangan spam aku!' : 'Yey!'}
         </span>
       ) : null}
-      <div className={`absolute inset-0 ${animationClass}`}>
+      <div key={`avatar-${mood}-${animationKey}`} className={`absolute inset-0 ${animationClass}`}>
         <div className="absolute bottom-1 left-1/2 h-7 w-36 -translate-x-1/2 rounded-full bg-moss/10" />
         <div className={`absolute left-1/2 h-[7.3rem] w-36 -translate-x-1/2 rounded-[48%_48%_36%_36%] bg-leaf-600 ${compact ? 'bottom-0' : 'bottom-5'}`} />
         <div className="absolute bottom-[5.15rem] left-[1.95rem] h-14 w-8 -rotate-[18deg] rounded-full bg-leaf-700" />
