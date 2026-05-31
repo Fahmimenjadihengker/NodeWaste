@@ -19,10 +19,25 @@ L.Marker.prototype.options.icon = DefaultIcon;
 // Default to Jakarta
 const DEFAULT_CENTER = [-6.200000, 106.816666];
 
-function LocationMarker({ position, setPosition }) {
+function toPosition(latitude, longitude) {
+  const lat = Number(latitude);
+  const lng = Number(longitude);
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+  return { lat, lng };
+}
+
+function isSamePosition(a, b) {
+  if (!a || !b) return a === b;
+
+  return Math.abs(a.lat - b.lat) < 0.0000001 && Math.abs(a.lng - b.lng) < 0.0000001;
+}
+
+function LocationMarker({ position, onPositionChange }) {
   useMapEvents({
     click(e) {
-      setPosition(e.latlng);
+      onPositionChange(e.latlng);
     },
   });
 
@@ -31,7 +46,7 @@ function LocationMarker({ position, setPosition }) {
     dragend() {
       const marker = markerRef.current;
       if (marker != null) {
-        setPosition(marker.getLatLng());
+        onPositionChange(marker.getLatLng());
       }
     },
   };
@@ -57,32 +72,31 @@ function MapUpdater({ center }) {
 }
 
 export default function MapPicker({ latitude, longitude, onChange }) {
-  const [position, setPosition] = useState(
-    latitude && longitude ? { lat: Number(latitude), lng: Number(longitude) } : null
-  );
+  const [position, setPosition] = useState(() => toPosition(latitude, longitude));
 
-  useEffect(() => {
-    if (!position) return;
+  const updatePosition = (nextPosition) => {
+    const normalizedPosition = toPosition(nextPosition.lat, nextPosition.lng);
+    if (!normalizedPosition) return;
 
-    const currentLat = Number(latitude);
-    const currentLng = Number(longitude);
-    if (currentLat === position.lat && currentLng === position.lng) return;
-
-    onChange(position.lat, position.lng);
-  }, [latitude, longitude, onChange, position]);
+    setPosition((current) => isSamePosition(current, normalizedPosition) ? current : normalizedPosition);
+    onChange(normalizedPosition.lat, normalizedPosition.lng);
+  };
 
   // Update internal state if props change externally
   useEffect(() => {
-    if (latitude && longitude && (!position || position.lat !== Number(latitude) || position.lng !== Number(longitude))) {
-      queueMicrotask(() => setPosition({ lat: Number(latitude), lng: Number(longitude) }));
-    }
-  }, [latitude, longitude, position]);
+    const propPosition = toPosition(latitude, longitude);
+    if (!propPosition) return;
+
+    queueMicrotask(() => {
+      setPosition((current) => isSamePosition(current, propPosition) ? current : propPosition);
+    });
+  }, [latitude, longitude]);
 
   const handleGetCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setPosition({
+          updatePosition({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude
           });
@@ -120,7 +134,7 @@ export default function MapPicker({ latitude, longitude, onChange }) {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <LocationMarker position={position} setPosition={setPosition} />
+          <LocationMarker position={position} onPositionChange={updatePosition} />
           {position && <MapUpdater center={position} />}
         </MapContainer>
       </div>
