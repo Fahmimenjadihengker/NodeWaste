@@ -3,7 +3,7 @@ import { getUserActivities } from './activity.service.js'
 import { getCurrentPet } from './pet.service.js'
 
 const nextLevelXp = 100
-const days = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min']
+const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
 
 function emptyClassificationCounts() {
@@ -35,24 +35,15 @@ function getDateKey(date) {
   return `${year}-${month}-${day}`
 }
 
-function getWeekStart(date) {
-  const start = new Date(date)
-  const day = start.getDay() || 7
-  start.setDate(start.getDate() - day + 1)
-  start.setHours(0, 0, 0, 0)
-  return start
-}
-
 function buildScanActivity(scans) {
   const now = new Date()
-  const currentWeekStart = getWeekStart(now)
   const daily = Array.from({ length: 7 }, (_, index) => {
-    const date = new Date(currentWeekStart)
-    date.setDate(currentWeekStart.getDate() + index)
+    const date = new Date(now)
+    date.setDate(now.getDate() - (6 - index))
 
     return {
       dateKey: getDateKey(date),
-      label: days[index],
+      label: days[date.getDay()],
       valid: 0,
       classifications: emptyClassificationCounts(),
     }

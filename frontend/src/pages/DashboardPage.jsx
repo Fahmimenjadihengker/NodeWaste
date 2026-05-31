@@ -21,6 +21,22 @@ const scanClassificationSegments = [
 ]
 
 const emptyScanClassificationCounts = { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 }
+const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+
+function emptyChartItems(labels) {
+  return labels.map((label) => ({ label, valid: 0, classifications: emptyScanClassificationCounts }))
+}
+
+function normalizeScanActivity(data) {
+  const legacyDaily = Array.isArray(data?.weekly) && data.weekly.length === 7 ? data.weekly : []
+  const legacyWeekly = Array.isArray(data?.monthly) && data.monthly.length === 4 ? data.monthly : []
+
+  return {
+    daily: Array.isArray(data?.daily) && data.daily.length ? data.daily : legacyDaily,
+    weekly: Array.isArray(data?.weekly) && data.weekly.length === 4 ? data.weekly : legacyWeekly,
+    monthly: Array.isArray(data?.monthly) && data.monthly.length === 12 ? data.monthly : emptyChartItems(monthLabels),
+  }
+}
 
 function StatBlock({ label, value, helper }) {
   return (
@@ -44,20 +60,21 @@ function ProgressLine({ label, value }) {
   )
 }
 
-function ScanActivityChart({ data, classifications }) {
+function ScanActivityChart({ data, classifications, validScans }) {
   const [range, setRange] = useState('daily')
-  const chartData = (data[range] || []).map((item) => ({ ...item, classifications: { ...emptyScanClassificationCounts, ...item.classifications } }))
+  const normalizedData = normalizeScanActivity(data)
+  const chartData = (normalizedData[range] || []).map((item) => ({ ...item, classifications: { ...emptyScanClassificationCounts, ...item.classifications } }))
   const rangeOptions = [
     { key: 'daily', label: 'Daily' },
     { key: 'weekly', label: 'Weekly' },
     { key: 'monthly', label: 'Monthly' },
   ]
   const maxScan = Math.max(...chartData.map((item) => Object.values(item.classifications).reduce((sum, value) => sum + value, 0)), 1)
-  const totalValid = chartData.reduce((sum, item) => sum + item.valid, 0)
   const classificationSummary = classifications.map((classification) => ({
     label: classification.label,
     value: classification.value,
   }))
+  const summaryTotal = validScans ?? classificationSummary.reduce((sum, classification) => sum + classification.value, 0)
 
   return (
     <AppCard className="animate-fade-up shadow-[0_18px_56px_rgba(32,58,37,0.08)] [animation-delay:180ms] [animation-fill-mode:both] sm:p-7 lg:p-8">
@@ -84,10 +101,10 @@ function ScanActivityChart({ data, classifications }) {
         </div>
       </div>
 
-      <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="rounded-[1.25rem] bg-[#f8f4e6]/75 p-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Scan valid</p>
-          <p className="mt-2 text-3xl font-black text-leaf-900">{totalValid}</p>
+          <p className="mt-2 text-3xl font-black text-leaf-900">{summaryTotal}</p>
         </div>
         {classificationSummary.map((classification) => (
           <div key={classification.label} className="rounded-[1.25rem] bg-[#f8f4e6]/60 p-5">
@@ -299,7 +316,7 @@ function DashboardPage() {
         </section>
 
         <div id="grafik-scan" className="mt-8 scroll-mt-28">
-          {isLoading ? <SkeletonCard className="min-h-[30rem]" /> : <ScanActivityChart data={scanActivity} classifications={classifications} />}
+          {isLoading ? <SkeletonCard className="min-h-[30rem]" /> : <ScanActivityChart data={scanActivity} classifications={classifications} validScans={stats.validScans} />}
         </div>
       </div>
   )
