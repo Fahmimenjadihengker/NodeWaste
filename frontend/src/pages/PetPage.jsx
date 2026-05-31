@@ -199,8 +199,10 @@ function PetPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Virtual pet</p>
-              <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Rawat {pet.name}.</h1>
-              <p className="mt-4 max-w-xl text-base leading-8 text-moss/70">Gunakan EcoPoints untuk menjaga Leafy tetap kenyang dan bahagia.</p>
+              <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Leafy the Waste Cat.</h1>
+              <div className="mt-5 rounded-[1.25rem] border border-moss/10 bg-[#fff8e8]/85 px-5 py-4 shadow-inner shadow-white/40">
+                <p className="text-sm font-black text-leaf-900">{feedback}</p>
+              </div>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
           </div>
@@ -226,9 +228,6 @@ function PetPage() {
             <p className="mt-2 text-4xl font-black text-leaf-900">{pet.xp}/{pet.nextLevelXp}</p>
             <ProgressBar value={petXpProgress} className="mt-4 h-2" />
           </AppCard>
-          <div className="sm:col-span-2 rounded-[1.25rem] border border-moss/10 bg-[#f8f4e6] p-4 shadow-[0_18px_50px_rgba(32,58,37,0.08)]">
-            <p className="text-sm font-black text-leaf-900">{feedback}</p>
-          </div>
           {isLoading ? <><SkeletonCard className="min-h-48" /><SkeletonCard className="min-h-48" /></> : statusItems.map((status) => (
             <StatusMeter key={status.label} {...status} />
           ))}
@@ -237,18 +236,18 @@ function PetPage() {
               <ActionCard key={action.id} action={action} disabled={ecoPoints < action.cost} onAction={handleAction} />
             ))}
           </div>
+          <AppCard as="div" tone="softCream" className="sm:col-span-2 self-start">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
+            <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Cara merawat</h2>
+            <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
+              <p>Jika lapar, beri makan.</p>
+              <p>Jika tidak bahagia, ajak main.</p>
+            </div>
+          </AppCard>
         </div>
       </section>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <AppCard as="div" tone="softCream" className="self-start">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
-          <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Cara merawat</h2>
-          <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
-            <p>Jika lapar, beri makan.</p>
-            <p>Jika tidak bahagia, ajak main.</p>
-          </div>
-        </AppCard>
+      <section className="mt-8">
         <ActivityLog items={logs} />
       </section>
     </div>
