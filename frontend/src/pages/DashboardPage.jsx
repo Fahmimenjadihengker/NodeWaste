@@ -8,7 +8,7 @@ import { useCachedResource } from '../hooks/useCachedResource.js'
 import { getCachedDashboard, getDashboard } from '../services/authApi.js'
 import { scanClassifications } from '../utils/scanClassification.js'
 const emptyDashboardData = {
-  stats: { ecoPoints: 0, xp: 0, nextLevelXp: 100, level: 1, streak: 0, totalScans: 0, validScans: 0 },
+  stats: { ecoPoints: 0, xp: 0, nextLevelXp: 100, level: 1, totalScans: 0, validScans: 0 },
   pet: { name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0 },
   classifications: scanClassifications.map((item) => ({ ...item, value: 0, color: item.colorClass })),
   activities: [],
@@ -82,9 +82,6 @@ function ScanActivityChart({ data, classifications, validScans }) {
         <div>
           <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Aktivitas scan</p>
           <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-leaf-900">Riwayat scan sampah</h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-moss/65">
-            Pantau scan valid yang berhasil diproses untuk melihat ritme kebiasaan memilahmu.
-          </p>
         </div>
 
         <div className="grid grid-cols-3 rounded-full bg-[#f5f1df] p-1 text-sm font-black text-moss shadow-inner shadow-moss/5">
@@ -101,7 +98,7 @@ function ScanActivityChart({ data, classifications, validScans }) {
         </div>
       </div>
 
-      <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-7 grid grid-cols-5 gap-4 overflow-x-auto pb-2">
         <div className="rounded-[1.25rem] bg-[#f8f4e6]/75 p-5">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Scan valid</p>
           <p className="mt-2 text-3xl font-black text-leaf-900">{summaryTotal}</p>
@@ -252,7 +249,7 @@ function DashboardPage() {
           </Link>
 
           <div className="mt-10 grid gap-5 border-y border-moss/15 py-7 sm:grid-cols-3">
-            {isLoading ? <><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /></> : <><StatBlock label="EcoPoints" value={stats.ecoPoints} helper="Siap dipakai merawat Leafy" /><StatBlock label="Streak" value={`${stats.streak} hari`} helper="Pertahankan hari ini" /><StatBlock label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} /></>}
+            {isLoading ? <><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /><SkeletonCard className="min-h-28" /></> : <><StatBlock label="EcoPoints" value={stats.ecoPoints} helper="Siap dipakai merawat Leafy" /><StatBlock label="Level" value={stats.level} helper={`${stats.xp}/${stats.nextLevelXp} XP`} /><StatBlock label="Total scan" value={stats.totalScans} helper={`${stats.validScans} scan valid`} /></>}
           </div>
 
         </section>
@@ -272,9 +269,9 @@ function DashboardPage() {
         </div>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-3">
-          <AppCard>
+          <AppCard className="min-h-[22rem]">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Progress level</h2>
-            {isLoading ? <div className="mt-4 space-y-4"><SkeletonText className="w-2/3" /><SkeletonText className="h-8 w-full" /></div> : <><p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p><div className="mt-8"><ProgressLine label="XP menuju level berikutnya" value={xpProgress} /></div></>}
+            {isLoading ? <div className="mt-4 space-y-4"><SkeletonText className="w-2/3" /><SkeletonText className="h-8 w-full" /></div> : <><p className="mt-2 text-sm leading-6 text-moss/65">Level {stats.level}, {stats.xp} XP dari {stats.nextLevelXp} XP.</p><div className="mt-6 grid gap-3 sm:grid-cols-2"><div className="rounded-[1.25rem] bg-[#f8f4e6] p-4"><p className="text-xs font-black uppercase tracking-[0.16em] text-moss/45">Level saat ini</p><p className="mt-2 text-3xl font-black text-leaf-900">{stats.level}</p></div><div className="rounded-[1.25rem] bg-[#f8f4e6] p-4"><p className="text-xs font-black uppercase tracking-[0.16em] text-moss/45">XP terkumpul</p><p className="mt-2 text-3xl font-black text-leaf-900">{stats.xp}</p></div></div><div className="mt-7"><ProgressLine label="XP menuju level berikutnya" value={xpProgress} /></div></>}
           </AppCard>
 
           <AppCard>

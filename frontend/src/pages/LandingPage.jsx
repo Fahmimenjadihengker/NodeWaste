@@ -13,7 +13,7 @@ const features = [
   },
   {
     title: 'Bangun kebiasaan memilah',
-    description: 'EcoPoints, XP, dan streak dipakai sebagai pengingat ringan agar kebiasaan kecil terasa konsisten.',
+    description: 'EcoPoints dan XP dipakai sebagai pengingat ringan agar kebiasaan kecil terasa konsisten.',
     detail: 'Reward dibuat sebagai dorongan, bukan tekanan. Progress membantu user melihat kebiasaan hariannya bertambah dari aksi kecil yang berulang.',
   },
   {
@@ -39,7 +39,7 @@ const workflowSteps = [
   },
   {
     title: 'Kumpulkan EcoPoints dan rawat Leafy.',
-    detail: 'Scan valid memberi progress. EcoPoints bisa dipakai untuk merawat Leafy, sementara XP dan streak menjaga motivasi tetap terlihat dari waktu ke waktu.',
+    detail: 'Scan valid memberi progress. EcoPoints bisa dipakai untuk merawat Leafy, sementara XP dan level menjaga motivasi tetap terlihat dari waktu ke waktu.',
   },
 ]
 

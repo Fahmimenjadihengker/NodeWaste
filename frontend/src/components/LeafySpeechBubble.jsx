@@ -9,7 +9,7 @@ const leafyMessages = [
   'Kebiasaan hijau dimulai dari satu langkah kecil.',
   'Kalau ragu, scan dulu biar lebih yakin.',
   'B3 jangan dicampur dengan sampah biasa ya.',
-  'Streak harianmu bikin aku makin semangat.',
+  'Progress levelmu bikin aku makin semangat.',
   'Terima kasih sudah merawat bumi bareng aku.',
 ]
 

@@ -95,7 +95,6 @@ export async function getProfile(user) {
       xp: user.xp,
       nextLevelXp: 100,
       level: user.level,
-      streak: user.streak,
       totalScans,
       validScans,
       classifications: classificationCounts,

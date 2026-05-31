@@ -4,7 +4,6 @@ export const dashboardData = {
     xp: 130,
     nextLevelXp: 100,
     level: 2,
-    streak: 3,
     totalScans: 12,
     validScans: 10,
   },

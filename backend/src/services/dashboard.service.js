@@ -118,7 +118,6 @@ export async function getDashboard(userId) {
       xp: user.xp,
       nextLevelXp,
       level: user.level,
-      streak: user.streak,
       totalScans,
       validScans,
     },

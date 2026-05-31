@@ -14,7 +14,7 @@ const historyFilters = [
   ...scanClassificationFilters,
 ]
 
-const emptyStats = { ecoPoints: 0, xp: 0, level: 1, streak: 0, totalScans: 0, validScans: 0, nextLevelXp: 100 }
+const emptyStats = { ecoPoints: 0, xp: 0, level: 1, totalScans: 0, validScans: 0, nextLevelXp: 100 }
 
 function getInitial(name) {
   return (name?.trim()?.charAt(0) || 'E').toUpperCase()
@@ -143,11 +143,10 @@ function ProfilePage() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
           <InfoItem label="EcoPoints" value={stats.ecoPoints} />
           <InfoItem label="Level" value={`${stats.level} (${stats.xp}/${stats.nextLevelXp} XP)`} />
           <InfoItem label="Total scan" value={`${stats.totalScans} scan, ${stats.validScans} valid`} />
-          <InfoItem label="Streak" value={`${stats.streak} hari`} />
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
