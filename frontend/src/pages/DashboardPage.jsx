@@ -267,7 +267,7 @@ function DashboardPage() {
               <span className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
             </div>
             <div className="relative mt-4">
-              <LeafySpeechBubble className="absolute -top-2 left-[68%] z-20 w-64 sm:left-[72%] lg:left-[76%]" />
+              <LeafySpeechBubble className="absolute right-0 top-1 z-20 w-60 translate-x-6" />
               <LeafyAvatar mood={leafyMood} animationKey={leafyAnimationKey} onClick={handleLeafyClick} />
             </div>
             {isLoading ? <div className="mt-5 space-y-4"><SkeletonText className="h-8 w-full" /><SkeletonText className="h-8 w-full" /></div> : <div className="mt-5 space-y-4"><ProgressLine label="Happiness" value={pet.happiness} /><ProgressLine label="Kenyang" value={100 - pet.hunger} /></div>}
