@@ -215,6 +215,7 @@ function DashboardPage() {
   const { data, error: feedback, isLoading } = useCachedResource({ getCached: getCachedDashboard, load: getDashboard, fallback: emptyDashboardData })
   const { stats, pet, classifications = emptyDashboardData.classifications, activities, scanActivity } = data
   const [leafyMood, setLeafyMood] = useState('idle')
+  const [leafyAnimationKey, setLeafyAnimationKey] = useState(0)
   const clickTimesRef = useRef([])
   const moodTimerRef = useRef(null)
   const xpProgress = Math.min(Math.round((stats.xp / stats.nextLevelXp) * 100), 100)
@@ -225,6 +226,7 @@ function DashboardPage() {
     const nextMood = clickTimesRef.current.length >= 10 ? 'angry' : 'happy'
 
     setLeafyMood(nextMood)
+    setLeafyAnimationKey((current) => current + 1)
     window.clearTimeout(moodTimerRef.current)
     moodTimerRef.current = window.setTimeout(() => {
       clickTimesRef.current = []
@@ -265,8 +267,8 @@ function DashboardPage() {
               <span className="rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
             </div>
             <div className="relative mt-4">
-              <LeafySpeechBubble className="absolute left-1/2 top-0 z-20 w-64 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-4" />
-              <LeafyAvatar mood={leafyMood} onClick={handleLeafyClick} />
+              <LeafySpeechBubble className="absolute -top-2 left-[68%] z-20 w-64 sm:left-[72%] lg:left-[76%]" />
+              <LeafyAvatar mood={leafyMood} animationKey={leafyAnimationKey} onClick={handleLeafyClick} />
             </div>
             {isLoading ? <div className="mt-5 space-y-4"><SkeletonText className="h-8 w-full" /><SkeletonText className="h-8 w-full" /></div> : <div className="mt-5 space-y-4"><ProgressLine label="Happiness" value={pet.happiness} /><ProgressLine label="Kenyang" value={100 - pet.hunger} /></div>}
           </section>
