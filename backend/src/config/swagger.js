@@ -289,7 +289,36 @@ export const swaggerDocument = {
           },
         },
         responses: {
-          201: { description: "Gambar berhasil diproses" },
+          201: {
+            description: "Gambar berhasil diproses",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    success: { type: "boolean", example: true },
+                    message: { type: "string", example: "Scan berhasil diproses" },
+                    data: {
+                      type: "object",
+                      properties: {
+                        scan: {
+                          type: "object",
+                          properties: {
+                            category: { type: "string", example: "Anorganik" },
+                            classification: { type: "string", example: "Daur Ulang" },
+                            label: { type: "string", example: "botol plastik" },
+                            confidence: { type: "integer", example: 91 },
+                            ecoPoints: { type: "integer", example: 50 },
+                            xpReward: { type: "integer", example: 30 },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },

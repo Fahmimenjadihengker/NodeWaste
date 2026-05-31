@@ -95,7 +95,7 @@ function SchedulePage() {
     <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <section>
         <div>
-          <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Jadwal sampah</p>
+          <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Jadwal pengambilan sampah</p>
           <h1 className="mt-3 text-4xl font-black leading-tight tracking-[-0.05em] text-leaf-900 sm:text-5xl lg:text-6xl">
             Keluarkan sampah di waktu yang tepat.
           </h1>

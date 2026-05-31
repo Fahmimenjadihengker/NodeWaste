@@ -134,20 +134,21 @@ model Pet {
 }
 
 model Scan {
-  id         String        @id @default(uuid())
-  userId     String        @map("user_id")
+  id             String     @id @default(uuid())
+  userId         String     @map("user_id")
+  category       String
   classification String
-  label      String
-  confidence Int
-  isValid    Boolean       @default(false) @map("is_valid")
-  ecoPoints  Int           @default(0) @map("eco_points")
-  xpReward   Int           @default(0) @map("xp_reward")
-  imageUrl   String?       @map("image_url")
-  latitude   Float?
-  longitude  Float?
-  createdAt  DateTime      @default(now()) @map("created_at")
-  activities Activity[]
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label          String
+  confidence     Int
+  isValid        Boolean    @default(false) @map("is_valid")
+  ecoPoints      Int        @default(0) @map("eco_points")
+  xpReward       Int        @default(0) @map("xp_reward")
+  imageUrl       String?    @map("image_url")
+  latitude       Float?
+  longitude      Float?
+  createdAt      DateTime   @default(now()) @map("created_at")
+  activities     Activity[]
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@map("scans")

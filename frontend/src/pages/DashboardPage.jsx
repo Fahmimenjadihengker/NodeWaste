@@ -59,7 +59,7 @@ function ScanActivityChart({ data, classifications }) {
       <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.22em] text-leaf-700">Aktivitas scan</p>
-          <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-leaf-900">Pola scan sampah</h2>
+          <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-leaf-900">Riwayat scan sampah</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-moss/65">
             Pantau scan valid yang berhasil diproses untuk melihat ritme kebiasaan memilahmu.
           </p>
@@ -156,6 +156,40 @@ function ScanActivityChart({ data, classifications }) {
   )
 }
 
+function ClassificationSummarySkeleton() {
+  return (
+    <div className="mt-5 space-y-4">
+      {scanClassifications.map((classification) => (
+        <div key={classification.key} className="grid grid-cols-[1fr_auto] items-center gap-4">
+          <div>
+            <SkeletonText className="w-32" />
+            <SkeletonText className="mt-2 h-2 w-full" />
+          </div>
+          <SkeletonText className="h-5 w-5" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function RecentActivitiesSkeleton() {
+  return (
+    <div className="mt-5 divide-y divide-moss/10">
+      {[0, 1, 2].map((item) => (
+        <div key={item} className="py-4 first:pt-0 last:pb-0">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <SkeletonText className="h-5 w-44" />
+              <SkeletonText className="mt-2 w-32" />
+            </div>
+            <SkeletonText className="h-4 w-16" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function DashboardPage() {
   const { user } = useOutletContext()
   const { data, error: feedback, isLoading } = useCachedResource({ getCached: getCachedDashboard, load: getDashboard, fallback: emptyDashboardData })
@@ -224,7 +258,7 @@ function DashboardPage() {
           <AppCard>
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Klasifikasi jenis sampah</h2>
             <p className="mt-2 text-sm leading-6 text-moss/65">Ringkasan klasifikasi dari hasil scan AI.</p>
-            <div className="mt-5 space-y-4">
+            {isLoading ? <ClassificationSummarySkeleton /> : <div className="mt-5 space-y-4">
               {classifications.map((classification) => (
                 <div key={classification.label} className="grid grid-cols-[1fr_auto] items-center gap-4">
                   <div>
@@ -234,11 +268,12 @@ function DashboardPage() {
                   <span className="font-black text-leaf-900">{classification.value}</span>
                 </div>
               ))}
-            </div>
+            </div>}
           </AppCard>
 
           <AppCard id="aktivitas" className="scroll-mt-28">
             <h2 className="text-2xl font-black tracking-[-0.03em] text-leaf-900">Aktivitas terbaru</h2>
+            {isLoading ? <RecentActivitiesSkeleton /> : (
             <div className="mt-5 divide-y divide-moss/10">
               {activities.length ? activities.map((activity) => (
                 <article key={`${activity.title}-${activity.time}`} className="py-4 first:pt-0 last:pb-0">
@@ -254,11 +289,12 @@ function DashboardPage() {
                 <p className="rounded-2xl bg-[#f5f1df] p-4 text-sm font-semibold text-moss/65">Belum ada aktivitas. Yuk mulai scan sampah pertamamu.</p>
               )}
             </div>
+            )}
           </AppCard>
         </section>
 
         <div id="grafik-scan" className="mt-8 scroll-mt-28">
-          <ScanActivityChart data={scanActivity} classifications={classifications} />
+          {isLoading ? <SkeletonCard className="min-h-[30rem]" /> : <ScanActivityChart data={scanActivity} classifications={classifications} />}
         </div>
       </div>
   )

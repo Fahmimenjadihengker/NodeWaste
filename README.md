@@ -18,7 +18,7 @@ NodeWaste/
 - Admin app: dashboard, manajemen semua akun role `USER`/`DRIVER`/`ADMIN`, EcoPoints user, dan jadwal pengangkutan standalone.
 - Backend API: auth role-aware, profile, dashboard, pet, activity, schedules, scans, regions, recycling facilities, driver, dan admin.
 - Database: PostgreSQL lewat Prisma. Supabase dapat dipakai untuk deployment.
-- Scan gambar dikirim ke AI classifier eksternal melalui endpoint `/predict`; field `recommendation["Klasifikasi jenis sampah"]` disimpan sebagai klasifikasi scan (`Berbahaya`, `Daur Ulang`, `Dibakar`, atau `Tidak dibakar`).
+- Scan gambar dikirim ke AI classifier eksternal melalui endpoint `/predict`; field `recommendation["Kategori sampah"]` disimpan sebagai kategori scan dan `recommendation["Klasifikasi jenis sampah"]` disimpan sebagai klasifikasi scan (`Berbahaya`, `Daur Ulang`, `Dibakar`, atau `Tidak dibakar`).
 - Klasifikasi scan dan kategori jadwal disimpan sebagai teks biasa agar fleksibel untuk admin dan hasil classifier.
 - PWA: frontend installable dengan app shell caching melalui `vite-plugin-pwa`.
 

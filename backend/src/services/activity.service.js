@@ -29,6 +29,7 @@ function toActivityItem(activity) {
   return {
     id: activity.id,
     type: activity.type.toLowerCase(),
+    category: activity.scan?.category || null,
     classification,
     title: activity.title,
     meta: activity.meta,
@@ -59,7 +60,7 @@ export async function getUserActivities(userId, options = {}) {
       meta: true,
       detail: true,
       createdAt: true,
-      scan: { select: { classification: true } },
+      scan: { select: { category: true, classification: true } },
     },
     orderBy: { createdAt: 'desc' },
     take: limit,

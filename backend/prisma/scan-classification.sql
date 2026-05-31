@@ -1,5 +1,6 @@
 -- Destructive migration for the new AI contract.
 -- Old scans used category labels (Organik/Anorganik/B3). The app now stores
+-- recommendation."Kategori sampah" as scans.category and
 -- recommendation."Klasifikasi jenis sampah" as scans.classification.
 
 DELETE FROM activities
@@ -9,6 +10,9 @@ DELETE FROM scans;
 
 ALTER TABLE scans
   DROP COLUMN IF EXISTS category;
+
+ALTER TABLE scans
+  ADD COLUMN IF NOT EXISTS category TEXT NOT NULL;
 
 ALTER TABLE scans
   ADD COLUMN IF NOT EXISTS classification TEXT NOT NULL;

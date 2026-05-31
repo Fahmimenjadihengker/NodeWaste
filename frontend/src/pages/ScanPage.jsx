@@ -100,7 +100,7 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
         <div className="mt-5 grid gap-3 text-xs font-black uppercase tracking-[0.16em] sm:grid-cols-3">
           <span className={getStageStyle(0)}>Membaca gambar</span>
           <span className={getStageStyle(33)}>Klasifikasi</span>
-          <span className={getStageStyle(66)}>Menyiapkan reward</span>
+          <span className={getStageStyle(66)}>Menyiapkan rekomendasi</span>
         </div>
       </section>
     )
@@ -125,6 +125,7 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
           <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-leaf-900">{result.wasteName}</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             <ScanClassificationPill classification={result.classification} />
+            <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">Kategori {result.category}</span>
             <span className="rounded-full bg-[#f5f1df] px-4 py-2 text-sm font-black text-moss">Akurasi {getConfidenceLabel(result.confidence)}</span>
           </div>
         </div>
@@ -139,11 +140,6 @@ function ScanResult({ result, previewUrl, isLoading, onScanAgain }) {
                 item ? <li key={index}>{item}</li> : null
               ))}
             </ul>
-            {result.guide['Letakkan di kantong'] && (
-              <p className="mt-4 text-sm font-bold text-moss">
-                Letakkan di kantong: <span className="text-leaf-700">{result.guide['Letakkan di kantong']}</span>
-              </p>
-            )}
           </div>
         ) : (
           <p className="mt-2 text-sm leading-6 text-moss/65">{result.guide}</p>
@@ -235,7 +231,7 @@ function ScanPage() {
     canvas.toBlob(async (blob) => {
       if (!blob) {
         setIsAnalyzing(false)
-        setResult({ wasteName: 'Gambar gagal diproses', classification: 'Belum diklasifikasi', confidence: 0, points: 0, xp: 0, isValid: false, guide: 'Coba ambil gambar ulang.' })
+        setResult({ wasteName: 'Gambar gagal diproses', category: 'Tidak diketahui', classification: 'Belum diklasifikasi', confidence: 0, points: 0, xp: 0, isValid: false, guide: 'Coba ambil gambar ulang.' })
         return
       }
 
@@ -246,6 +242,7 @@ function ScanPage() {
         
         setResult({
           wasteName: scan.label,
+          category: scan.category,
           classification: scan.classification,
           confidence: scan.confidence,
           points: scan.ecoPoints,
@@ -254,7 +251,7 @@ function ScanPage() {
           guide: recommendationData || 'Ikuti panduan penanganan sampah sesuai hasil klasifikasi.',
         })
       } catch (error) {
-        setResult({ wasteName: 'Scan gagal', classification: 'Belum diklasifikasi', confidence: 0, points: 0, xp: 0, isValid: false, guide: error.message })
+        setResult({ wasteName: 'Scan gagal', category: 'Tidak diketahui', classification: 'Belum diklasifikasi', confidence: 0, points: 0, xp: 0, isValid: false, guide: error.message })
       } finally {
         setIsAnalyzing(false)
       }

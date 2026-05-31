@@ -102,7 +102,7 @@ Data disimpan di PostgreSQL melalui Prisma. Pastikan `DATABASE_URL` di `.env` me
 
 Endpoint scan meneruskan upload gambar ke AI classifier eksternal melalui `POST /predict`. Default service AI adalah `https://nodewaste-ai-api-production.up.railway.app` dan dapat dioverride lewat `AI_CLASSIFIER_BASE_URL`. Timeout request AI default 15 detik dan dapat diatur lewat `AI_CLASSIFIER_TIMEOUT_MS`.
 
-Kategori jadwal (`waste_schedules.waste_category`) dan klasifikasi scan (`scans.classification`) disimpan sebagai teks biasa (`String`). Scan tidak lagi memakai `scans.category`; hasil yang disimpan berasal dari `recommendation["Klasifikasi jenis sampah"]` milik AI (`Berbahaya`, `Daur Ulang`, `Dibakar`, atau `Tidak dibakar`). Jadwal sekarang berdiri sendiri dan tidak berelasi ke `districts`. Untuk database lama yang masih punya enum/kolom district pada jadwal, jalankan SQL manual `backend/prisma/schedule-standalone.sql` satu kali. Untuk migrasi scan baru yang menghapus data scan lama dan mengganti kolom `category` ke `classification`, jalankan `backend/prisma/scan-classification.sql` satu kali.
+Kategori jadwal (`waste_schedules.waste_category`), kategori scan (`scans.category`), dan klasifikasi scan (`scans.classification`) disimpan sebagai teks biasa (`String`). Kategori scan berasal dari `recommendation["Kategori sampah"]`, sedangkan klasifikasi scan berasal dari `recommendation["Klasifikasi jenis sampah"]` milik AI (`Berbahaya`, `Daur Ulang`, `Dibakar`, atau `Tidak dibakar`). Jadwal sekarang berdiri sendiri dan tidak berelasi ke `districts`. Untuk database lama yang masih punya enum/kolom district pada jadwal, jalankan SQL manual `backend/prisma/schedule-standalone.sql` satu kali. Untuk migrasi scan baru yang menghapus data scan lama dan memastikan kolom `category`/`classification` sesuai kontrak baru, jalankan `backend/prisma/scan-classification.sql` satu kali. Jika database sudah telanjur menjalankan versi awal migrasi scan yang belum mengembalikan `category`, jalankan patch non-destruktif `backend/prisma/scan-category.sql`.
 
 Untuk deploy Vercel dengan Supabase, gunakan Supabase pooler connection string di environment variable `DATABASE_URL`, bukan direct host `db.<project-ref>.supabase.co:5432`. Direct host Supabase dapat gagal dari Vercel karena koneksi IPv6/pooling serverless. Format umumnya:
 
@@ -120,7 +120,7 @@ Jadwal user dan admin memakai tabel `waste_schedules` standalone. Jika belum ada
 
 Seed driver/admin tidak berjalan otomatis. Jalankan `npm run seed:driver` atau `npm run seed:admin` hanya saat membutuhkan data demo. Akun demo driver adalah `driver.demo@nodewaste.test`; akun demo admin adalah `admin.demo@nodewaste.test`. Keduanya memakai password `password123`.
 
-Endpoint scan menerima upload gambar JPEG/PNG maksimal 5 MB. Backend mengirim file tersebut ke AI classifier sebagai `multipart/form-data` field `file`, lalu menyimpan `classification.predicted_class`, confidence, dan `recommendation["Klasifikasi jenis sampah"]` sebelum menyimpan reward EcoPoints/XP.
+Endpoint scan menerima upload gambar JPEG/PNG maksimal 5 MB. Backend mengirim file tersebut ke AI classifier sebagai `multipart/form-data` field `file`, lalu menyimpan `classification.predicted_class`, confidence, `recommendation["Kategori sampah"]`, dan `recommendation["Klasifikasi jenis sampah"]` sebelum menyimpan reward EcoPoints/XP.
 
 Upload foto profile user dan driver menerima field `photo` maksimal 2 MB dan saat ini disimpan sebagai data URL base64 di kolom `users.profile_photo_url`.
 

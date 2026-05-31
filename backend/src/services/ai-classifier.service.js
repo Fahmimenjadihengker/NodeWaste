@@ -61,6 +61,17 @@ function normalizeClassification(value) {
   return text.replace(/\s+/g, ' ').replace(/^./, (char) => char.toUpperCase())
 }
 
+function normalizeCategory(value) {
+  const text = String(value || '').trim()
+  if (!text) return 'Tidak diketahui'
+
+  return text
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, (char) => char.toUpperCase())
+}
+
 function normalizeConfidence(value) {
   if (value === null || value === undefined || value === '') return 0
 
@@ -82,20 +93,22 @@ function normalizeRecommendation(value) {
   if (!value) return null
 
   if (typeof value === 'object') {
-    const keys = Object.keys(value).map(k => k.toLowerCase());
-    const hasStructuredKeys = keys.some(k => k.includes('panduan') || k.includes('kantong') || k.includes('klasifikasi'));
-    
+    const keys = Object.keys(value).map(k => k.toLowerCase())
+    const hasStructuredKeys = keys.some(k => (
+      k.includes('panduan') || k.includes('kantong') || k.includes('klasifikasi') || k.includes('kategori')
+    ))
+
     if (hasStructuredKeys) {
-      // Create a normalized object with predictable keys
-      const normalizedObj = {};
+      const normalizedObj = {}
       for (const [k, v] of Object.entries(value)) {
-        const lowerKey = k.toLowerCase();
-        if (lowerKey.includes('panduan')) normalizedObj['panduan penanganan sampah'] = v;
-        else if (lowerKey.includes('kantong')) normalizedObj['Letakkan di kantong'] = v;
-        else if (lowerKey.includes('klasifikasi')) normalizedObj['Klasifikasi jenis sampah'] = v;
-        else normalizedObj[k] = v;
+        const lowerKey = k.toLowerCase()
+        if (lowerKey.includes('panduan')) normalizedObj['panduan penanganan sampah'] = v
+        else if (lowerKey.includes('kantong')) normalizedObj['Letakkan di kantong'] = v
+        else if (lowerKey.includes('klasifikasi')) normalizedObj['Klasifikasi jenis sampah'] = v
+        else if (lowerKey.includes('kategori')) normalizedObj['Kategori sampah'] = v
+        else normalizedObj[k] = v
       }
-      return normalizedObj;
+      return normalizedObj
     }
     return normalizeRecommendation(value.text || value.message || value.guide || value.panduan)
   }
@@ -112,6 +125,9 @@ export function normalizeAiPrediction(payload) {
   const recommendationClassification = recommendation && typeof recommendation === 'object'
     ? recommendation['Klasifikasi jenis sampah']
     : null
+  const recommendationCategory = recommendation && typeof recommendation === 'object'
+    ? recommendation['Kategori sampah']
+    : null
   const classificationValue = recommendationClassification || findValueByKeys(payload, [
     'Klasifikasi jenis sampah',
     'klasifikasi_jenis_sampah',
@@ -120,8 +136,16 @@ export function normalizeAiPrediction(payload) {
     'disposal_classification',
   ])
   const classification = normalizeClassification(classificationValue)
+  const categoryValue = recommendationCategory || findValueByKeys(payload, [
+    'Kategori sampah',
+    'category',
+    'kategori',
+    'waste_category',
+    'wasteCategory',
+  ])
 
   return {
+    category: normalizeCategory(categoryValue),
     classification,
     label: normalizeLabel(labelValue, classification),
     confidence: normalizeConfidence(confidenceValue),

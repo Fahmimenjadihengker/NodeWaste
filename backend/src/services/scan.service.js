@@ -12,6 +12,7 @@ export async function processScan(user, file) {
   const result = await saveScanResult(
     user.id,
     {
+      category: aiResult.category,
       classification: aiResult.classification,
       label: aiResult.label,
       confidence: aiResult.confidence,
