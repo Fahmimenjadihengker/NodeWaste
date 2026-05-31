@@ -12,7 +12,7 @@ const emptyDashboardData = {
   pet: { name: 'Leafy', level: 1, mood: 'happy', happiness: 100, hunger: 0 },
   classifications: scanClassifications.map((item) => ({ ...item, value: 0, color: item.colorClass })),
   activities: [],
-  scanActivity: { weekly: [], monthly: [] },
+  scanActivity: { daily: [], weekly: [], monthly: [] },
 }
 
 const scanClassificationSegments = [
@@ -45,8 +45,13 @@ function ProgressLine({ label, value }) {
 }
 
 function ScanActivityChart({ data, classifications }) {
-  const [range, setRange] = useState('weekly')
+  const [range, setRange] = useState('daily')
   const chartData = (data[range] || []).map((item) => ({ ...item, classifications: { ...emptyScanClassificationCounts, ...item.classifications } }))
+  const rangeOptions = [
+    { key: 'daily', label: 'Daily' },
+    { key: 'weekly', label: 'Weekly' },
+    { key: 'monthly', label: 'Monthly' },
+  ]
   const maxScan = Math.max(...chartData.map((item) => Object.values(item.classifications).reduce((sum, value) => sum + value, 0)), 1)
   const totalValid = chartData.reduce((sum, item) => sum + item.valid, 0)
   const classificationSummary = classifications.map((classification) => ({
@@ -65,15 +70,15 @@ function ScanActivityChart({ data, classifications }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 rounded-full bg-[#f5f1df] p-1 text-sm font-black text-moss shadow-inner shadow-moss/5">
-          {['weekly', 'monthly'].map((option) => (
+        <div className="grid grid-cols-3 rounded-full bg-[#f5f1df] p-1 text-sm font-black text-moss shadow-inner shadow-moss/5">
+          {rangeOptions.map((option) => (
             <button
-              key={option}
-              className={`rounded-full px-4 py-2 transition ${range === option ? 'bg-leaf-600 text-white shadow-[0_8px_18px_rgba(52,122,55,0.24)]' : 'text-moss/60 hover:text-leaf-900'}`}
+              key={option.key}
+              className={`rounded-full px-4 py-2 transition ${range === option.key ? 'bg-leaf-600 text-white shadow-[0_8px_18px_rgba(52,122,55,0.24)]' : 'text-moss/60 hover:text-leaf-900'}`}
               type="button"
-              onClick={() => setRange(option)}
+              onClick={() => setRange(option.key)}
             >
-              {option === 'weekly' ? 'Weekly' : 'Monthly'}
+              {option.label}
             </button>
           ))}
         </div>
@@ -93,7 +98,7 @@ function ScanActivityChart({ data, classifications }) {
       </div>
 
       <div className="mt-8 overflow-x-auto pb-2">
-        <div className="relative min-w-[34rem] pb-5 pl-10 pr-2 pt-8 sm:min-w-0">
+        <div className={`relative pb-5 pl-10 pr-2 pt-8 ${range === 'monthly' ? 'min-w-[44rem]' : 'min-w-[34rem]'} sm:min-w-0`}>
           <div className="absolute left-0 top-8 flex h-44 w-8 flex-col justify-between text-right text-xs font-bold text-moss/45">
             {[maxScan, Math.round(maxScan * 0.67), Math.round(maxScan * 0.33), 0].map((value, index) => (
               <span key={`${value}-${index}`}>{value}</span>

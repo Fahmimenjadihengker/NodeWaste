@@ -27,7 +27,7 @@ export const dashboardData = {
     { title: 'Scan Sisa Makanan', meta: '+10 EcoPoints, +10 XP', time: '2 hari lalu' },
   ],
   scanActivity: {
-    weekly: [
+    daily: [
       { label: 'Sen', valid: 2, classifications: { berbahaya: 0, daurUlang: 1, dibakar: 1, tidakDibakar: 0 } },
       { label: 'Sel', valid: 1, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 1 } },
       { label: 'Rab', valid: 3, classifications: { berbahaya: 1, daurUlang: 1, dibakar: 1, tidakDibakar: 0 } },
@@ -36,11 +36,25 @@ export const dashboardData = {
       { label: 'Sab', valid: 1, classifications: { berbahaya: 0, daurUlang: 1, dibakar: 0, tidakDibakar: 0 } },
       { label: 'Min', valid: 2, classifications: { berbahaya: 0, daurUlang: 1, dibakar: 1, tidakDibakar: 0 } },
     ],
-    monthly: [
+    weekly: [
       { label: 'M1', valid: 8, classifications: { berbahaya: 1, daurUlang: 3, dibakar: 2, tidakDibakar: 2 } },
       { label: 'M2', valid: 6, classifications: { berbahaya: 0, daurUlang: 2, dibakar: 2, tidakDibakar: 2 } },
       { label: 'M3', valid: 10, classifications: { berbahaya: 1, daurUlang: 4, dibakar: 3, tidakDibakar: 2 } },
       { label: 'M4', valid: 7, classifications: { berbahaya: 1, daurUlang: 3, dibakar: 2, tidakDibakar: 1 } },
+    ],
+    monthly: [
+      { label: 'Jan', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Feb', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Mar', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Apr', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Mei', valid: 4, classifications: { berbahaya: 1, daurUlang: 2, dibakar: 1, tidakDibakar: 0 } },
+      { label: 'Jun', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Jul', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Agu', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Sep', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Okt', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Nov', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
+      { label: 'Des', valid: 0, classifications: { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 } },
     ],
   },
 }
