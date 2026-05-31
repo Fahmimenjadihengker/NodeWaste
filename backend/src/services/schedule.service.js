@@ -1,5 +1,7 @@
 import prisma from '../config/prisma.js'
 
+const dayOrder = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu']
+
 const defaultSchedules = [
   {
     id: 'dummy-organik',
@@ -41,18 +43,34 @@ function toScheduleItem(schedule) {
   }
 }
 
+function getScheduleDayIndex(schedule) {
+  const pickupDay = String(schedule.pickupDay || '').toLowerCase()
+  const indexes = dayOrder.map((day, index) => pickupDay.includes(day) ? index : null).filter((index) => index !== null)
+
+  return indexes.length ? Math.min(...indexes) : dayOrder.length
+}
+
+function sortSchedules(schedules) {
+  return [...schedules].sort((a, b) => {
+    const dayDiff = getScheduleDayIndex(a) - getScheduleDayIndex(b)
+    if (dayDiff) return dayDiff
+
+    return String(a.pickupTime || '').localeCompare(String(b.pickupTime || ''))
+  })
+}
+
 export async function getUserSchedules() {
   const schedules = await prisma.wasteSchedule.findMany({
     orderBy: [
-      { wasteCategory: 'asc' },
       { pickupDay: 'asc' },
+      { pickupTime: 'asc' },
     ],
   })
 
   return {
     district: null,
     isDummy: schedules.length === 0,
-    schedules: schedules.length ? schedules.map(toScheduleItem) : defaultSchedules,
+    schedules: sortSchedules(schedules.length ? schedules.map(toScheduleItem) : defaultSchedules),
   }
 }
 

@@ -200,9 +200,6 @@ function PetPage() {
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Virtual pet</p>
               <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Leafy the Waste Cat.</h1>
-              <div className="mt-5 rounded-[1.25rem] border border-moss/10 bg-[#fff8e8]/85 px-5 py-4 shadow-inner shadow-white/40">
-                <p className="text-sm font-black text-leaf-900">{feedback}</p>
-              </div>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
           </div>
@@ -212,7 +209,9 @@ function PetPage() {
             <div className="mx-auto mt-2 max-w-sm rounded-[1.25rem] bg-[#fff8e8]/80 p-4">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Mood</p>
               <h2 className="mt-1 text-2xl font-black text-leaf-900">{moodInfo.label}</h2>
-              <p className="mt-2 text-sm leading-6 text-moss/65">{moodInfo.message}</p>
+              <div className="mt-3 rounded-[1.25rem] border border-moss/10 bg-[#fff8e8]/85 px-5 py-4 shadow-inner shadow-white/40">
+                <p className="text-sm font-black text-leaf-900">{feedback}</p>
+              </div>
             </div>
           </div>
         </div>

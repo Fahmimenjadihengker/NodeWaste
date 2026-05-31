@@ -9,8 +9,26 @@ const categoryLabels = {
   DAUR_ULANG_RESIDU: 'Daur Ulang/Residu',
 }
 
+const dayOrder = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu']
+
 function getCategoryLabel(category) {
   return categoryLabels[category] || category
+}
+
+function getScheduleDayIndex(schedule) {
+  const pickupDay = String(schedule.pickupDay || '').toLowerCase()
+  const indexes = dayOrder.map((day, index) => pickupDay.includes(day) ? index : null).filter((index) => index !== null)
+
+  return indexes.length ? Math.min(...indexes) : dayOrder.length
+}
+
+function sortSchedules(schedules) {
+  return [...schedules].sort((a, b) => {
+    const dayDiff = getScheduleDayIndex(a) - getScheduleDayIndex(b)
+    if (dayDiff) return dayDiff
+
+    return String(a.pickupTime || '').localeCompare(String(b.pickupTime || ''))
+  })
 }
 
 function ScheduleDesktopTable({ schedules }) {
@@ -68,10 +86,12 @@ function ScheduleMobileRows({ schedules }) {
 }
 
 function ScheduleTable({ schedules }) {
+  const sortedSchedules = sortSchedules(schedules)
+
   return (
     <>
-      <ScheduleDesktopTable schedules={schedules} />
-      <ScheduleMobileRows schedules={schedules} />
+      <ScheduleDesktopTable schedules={sortedSchedules} />
+      <ScheduleMobileRows schedules={sortedSchedules} />
     </>
   )
 }
