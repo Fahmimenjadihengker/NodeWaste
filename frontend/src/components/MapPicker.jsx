@@ -62,10 +62,14 @@ export default function MapPicker({ latitude, longitude, onChange }) {
   );
 
   useEffect(() => {
-    if (position) {
-      onChange(position.lat, position.lng);
-    }
-  }, [onChange, position]);
+    if (!position) return;
+
+    const currentLat = Number(latitude);
+    const currentLng = Number(longitude);
+    if (currentLat === position.lat && currentLng === position.lng) return;
+
+    onChange(position.lat, position.lng);
+  }, [latitude, longitude, onChange, position]);
 
   // Update internal state if props change externally
   useEffect(() => {

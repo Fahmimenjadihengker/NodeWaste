@@ -15,6 +15,7 @@ const historyFilters = [
 ]
 
 const emptyStats = { ecoPoints: 0, xp: 0, level: 1, totalScans: 0, validScans: 0, nextLevelXp: 100 }
+const historyPageSize = 10
 
 function getInitial(name) {
   return (name?.trim()?.charAt(0) || 'E').toUpperCase()
@@ -29,7 +30,11 @@ function InfoItem({ label, value }) {
   )
 }
 
-function HistorySection({ activeFilter, items, onFilterChange }) {
+function HistorySection({ activeFilter, items, page, onPageChange, onFilterChange }) {
+  const totalPages = Math.max(1, Math.ceil(items.length / historyPageSize))
+  const currentPage = Math.min(page, totalPages)
+  const pageItems = items.slice((currentPage - 1) * historyPageSize, currentPage * historyPageSize)
+
   return (
     <AppCard>
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -47,7 +52,7 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
       </div>
 
       <div className="mt-6 divide-y divide-moss/10">
-        {items.length ? items.map((item) => (
+        {pageItems.length ? pageItems.map((item) => (
           <article key={item.id} className="py-5 first:pt-0 last:pb-0">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
@@ -60,6 +65,23 @@ function HistorySection({ activeFilter, items, onFilterChange }) {
           </article>
         )) : <p className="rounded-[1.25rem] bg-[#f8f4e6] p-5 text-sm font-semibold text-moss/65">Belum ada aktivitas untuk filter ini.</p>}
       </div>
+
+      {items.length > historyPageSize ? (
+        <div className="mt-6 flex flex-col gap-3 border-t border-moss/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-bold text-moss/55">
+            Menampilkan {(currentPage - 1) * historyPageSize + 1}-{Math.min(currentPage * historyPageSize, items.length)} dari {items.length} aktivitas
+          </p>
+          <div className="flex items-center gap-2">
+            <button className="rounded-full bg-[#f8f4e6] px-4 py-2 text-sm font-black text-moss/60 transition hover:text-leaf-900 disabled:cursor-not-allowed disabled:opacity-40" type="button" disabled={currentPage === 1} onClick={() => onPageChange(Math.max(1, currentPage - 1))}>
+              Sebelumnya
+            </button>
+            <span className="rounded-full bg-leaf-600 px-4 py-2 text-sm font-black text-white">{currentPage}/{totalPages}</span>
+            <button className="rounded-full bg-[#f8f4e6] px-4 py-2 text-sm font-black text-moss/60 transition hover:text-leaf-900 disabled:cursor-not-allowed disabled:opacity-40" type="button" disabled={currentPage === totalPages} onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}>
+              Berikutnya
+            </button>
+          </div>
+        </div>
+      ) : null}
     </AppCard>
   )
 }
@@ -70,6 +92,7 @@ function ProfilePage() {
   const [profile, setProfile] = useState(() => cachedProfile?.data || { user, address: null, stats: emptyStats })
   const [isLoading, setIsLoading] = useState(!cachedProfile)
   const [activeFilter, setActiveFilter] = useState('all')
+  const [historyPage, setHistoryPage] = useState(1)
   const [history, setHistory] = useState(() => getCachedActivities('all')?.data?.activities || [])
   const stats = { ...emptyStats, ...profile.stats }
   const currentUser = profile.user || user
@@ -112,6 +135,11 @@ function ProfilePage() {
   const confirmLogout = async () => {
     const confirmed = await sweetConfirm({ title: 'Keluar akun?', text: 'Sesi kamu akan diakhiri dari perangkat ini.', confirmText: 'Logout', danger: true })
     if (confirmed) onLogout()
+  }
+
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter)
+    setHistoryPage(1)
   }
 
   return (
@@ -157,7 +185,7 @@ function ProfilePage() {
       </AppCard>
 
       <div className="mt-8">
-        <HistorySection activeFilter={activeFilter} items={filteredHistory} onFilterChange={setActiveFilter} />
+        <HistorySection activeFilter={activeFilter} items={filteredHistory} page={historyPage} onPageChange={setHistoryPage} onFilterChange={handleFilterChange} />
       </div>
     </div>
   )

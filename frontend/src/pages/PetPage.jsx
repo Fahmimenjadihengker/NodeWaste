@@ -31,6 +31,7 @@ const moodCopy = {
   excited: { label: 'Semangat', message: 'Leafy makin aktif setelah diajak bermain.' },
   hungry: { label: 'Lapar', message: 'Leafy mulai lapar. Beri makan saat EcoPoints cukup.' },
   lonely: { label: 'Butuh main', message: 'Ajak Leafy bermain agar happiness naik lagi.' },
+  angry: { label: 'Sebel', message: 'Leafy kesal kalau diklik terlalu sering.' },
 }
 
 function getPetMood(pet, fallbackMood) {
@@ -122,7 +123,7 @@ function PetPage() {
     load: getPet,
     fallback: { ecoPoints: 0, pet, activities: [] },
   })
-  const mood = getPetMood(pet, lastMood)
+  const mood = avatarMood === 'angry' ? 'angry' : getPetMood(pet, lastMood)
   const moodInfo = moodCopy[mood]
   const satiety = 100 - pet.hunger
   const satietyStatus = getSatietyStatus(satiety)
@@ -202,7 +203,7 @@ function PetPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Virtual pet</p>
-              <h1 className="mt-3 text-4xl font-black tracking-[-0.05em] text-leaf-900 sm:text-5xl">Leafy the Waste Cat.</h1>
+              <h1 className="mt-3 text-3xl font-black tracking-[-0.05em] text-leaf-900 sm:text-4xl xl:text-5xl">Leafy the Waste Cat.</h1>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
           </div>
@@ -212,7 +213,7 @@ function PetPage() {
             <div className="mx-auto mt-2 max-w-sm rounded-[1.25rem] bg-[#fff8e8]/80 p-4">
               <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Mood</p>
               <h2 className="mt-1 text-2xl font-black text-leaf-900">{moodInfo.label}</h2>
-              <p className="mt-3 text-sm font-black leading-6 text-leaf-900">{feedback}</p>
+              <p className="mt-3 text-sm font-semibold leading-6 text-moss/65">{feedback}</p>
             </div>
           </div>
         </div>

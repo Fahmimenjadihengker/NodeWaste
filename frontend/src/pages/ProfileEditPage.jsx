@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useOutletContext } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import AddressForm from '../components/AddressForm.jsx'
 import AppCard from '../components/AppCard.jsx'
 import { SkeletonText } from '../components/Skeleton.jsx'
@@ -109,6 +109,10 @@ function ProfileEditPage() {
     if (file) setPhotoPreview(URL.createObjectURL(file))
   }
 
+  const cancelEdit = () => {
+    navigate('/profile', { replace: true })
+  }
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
       <AppCard className="rounded-[1.75rem] shadow-[0_22px_70px_rgba(32,58,37,0.1)] sm:p-8">
@@ -145,7 +149,7 @@ function ProfileEditPage() {
 
         <div className="mt-8 flex flex-wrap gap-3">
           <button className="rounded-full bg-leaf-600 px-6 py-3 text-sm font-black text-white transition hover:bg-leaf-900 disabled:cursor-not-allowed disabled:opacity-60" type="button" onClick={saveProfile} disabled={isLoading}>Simpan profile</button>
-          <Link className="rounded-full border border-moss/20 px-6 py-3 text-sm font-black text-moss" to="/profile">Batal</Link>
+          <button className="rounded-full border border-moss/20 px-6 py-3 text-sm font-black text-moss" type="button" onClick={cancelEdit}>Batal</button>
         </div>
         {feedback ? <p className="mt-4 rounded-2xl bg-[#fff3cf] p-4 text-sm font-bold text-moss">{feedback}</p> : null}
       </AppCard>
