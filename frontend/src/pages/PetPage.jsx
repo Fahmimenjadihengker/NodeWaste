@@ -203,7 +203,7 @@ function PetPage() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Virtual pet</p>
-              <h1 className="mt-3 text-3xl font-black tracking-[-0.05em] text-leaf-900 sm:text-4xl xl:text-5xl">Leafy the Waste Cat.</h1>
+              <h1 className="mt-3 whitespace-nowrap text-[2rem] font-black leading-none tracking-[-0.05em] text-leaf-900 sm:text-[2.35rem] xl:text-[2.8rem]">Leafy the Waste Cat.</h1>
             </div>
             <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#fff8e8] px-4 py-2 text-sm font-black text-leaf-900">Lv. {pet.level}</span>
           </div>
@@ -238,7 +238,7 @@ function PetPage() {
             ))}
           </div>
           <AppCard as="div" tone="softCream" className="sm:col-span-2 self-start">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan cepat</p>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-moss/45">Panduan</p>
             <h2 className="mt-3 text-2xl font-black tracking-[-0.03em] text-leaf-900">Cara merawat</h2>
             <div className="mt-5 space-y-3 text-sm font-semibold leading-6 text-moss/65">
               <p>Jika lapar, beri makan.</p>

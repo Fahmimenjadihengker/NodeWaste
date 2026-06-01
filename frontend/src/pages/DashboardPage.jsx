@@ -22,6 +22,7 @@ const scanClassificationSegments = [
 
 const emptyScanClassificationCounts = { berbahaya: 0, daurUlang: 0, dibakar: 0, tidakDibakar: 0 }
 const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+const chartHeightRem = 11
 
 function emptyChartItems(labels) {
   return labels.map((label) => ({ label, valid: 0, classifications: emptyScanClassificationCounts }))
@@ -70,6 +71,9 @@ function ScanActivityChart({ data, classifications, validScans }) {
     { key: 'monthly', label: 'Monthly' },
   ]
   const maxScan = Math.max(...chartData.map((item) => Object.values(item.classifications).reduce((sum, value) => sum + value, 0)), 1)
+  const yStep = Math.max(1, Math.ceil(maxScan / 4))
+  const yMax = yStep * 4
+  const yTicks = Array.from({ length: 5 }, (_, index) => yMax - (index * yStep))
   const classificationSummary = classifications.map((classification) => ({
     label: classification.label,
     value: classification.value,
@@ -114,14 +118,14 @@ function ScanActivityChart({ data, classifications, validScans }) {
       <div className="mt-8 overflow-x-auto pb-2">
         <div className={`relative pb-5 pl-10 pr-2 pt-8 ${range === 'monthly' ? 'min-w-[44rem]' : 'min-w-[34rem]'} sm:min-w-0`}>
           <div className="absolute left-0 top-8 flex h-44 w-8 flex-col justify-between text-right text-xs font-bold text-moss/45">
-            {[maxScan, Math.round(maxScan * 0.67), Math.round(maxScan * 0.33), 0].map((value, index) => (
-              <span key={`${value}-${index}`}>{value}</span>
+            {yTicks.map((value) => (
+              <span key={value}>{value}</span>
             ))}
           </div>
 
           <div className="absolute left-10 right-2 top-8 h-44 border-b border-moss/20">
-            {[0, 1, 2, 3].map((line) => (
-              <div key={line} className="absolute left-0 right-0 border-t border-moss/10" style={{ top: `${line * 33.33}%` }} />
+            {yTicks.map((value, index) => (
+              <div key={value} className={`absolute left-0 right-0 ${index === yTicks.length - 1 ? 'border-t border-moss/20' : 'border-t border-moss/10'}`} style={{ top: `${(index / (yTicks.length - 1)) * 100}%` }} />
             ))}
           </div>
 
@@ -134,7 +138,7 @@ function ScanActivityChart({ data, classifications, validScans }) {
                   <div className="flex h-full w-full max-w-24 items-end justify-center gap-1.5">
                     {scanClassificationSegments.map((segment) => {
                       const value = segment.key === 'total' ? classificationTotal : item.classifications[segment.key]
-                      const height = value ? Math.max((value / maxScan) * 11, 1) : 0
+                      const height = value ? (value / yMax) * chartHeightRem : 0
 
                       return (
                         <div
