@@ -8,6 +8,7 @@ import {
   updateCurrentDriverProfilePhoto,
 } from '../controllers/driver.controller.js'
 import { authMiddleware, requireRole } from '../middlewares/auth.middleware.js'
+import { uploadLimiter, validateUploadedImage } from '../middlewares/security.middleware.js'
 
 const router = Router()
 const upload = multer({
@@ -19,7 +20,7 @@ router.use(authMiddleware, requireRole('DRIVER'))
 router.get('/dashboard', getCurrentDriverDashboard)
 router.get('/profile', getCurrentDriverProfile)
 router.put('/profile', updateCurrentDriverProfile)
-router.put('/profile/photo', upload.single('photo'), updateCurrentDriverProfilePhoto)
+router.put('/profile/photo', uploadLimiter, upload.single('photo'), validateUploadedImage, updateCurrentDriverProfilePhoto)
 router.get('/map', getCurrentDriverMap)
 
 export default router

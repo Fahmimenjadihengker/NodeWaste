@@ -21,6 +21,7 @@ NodeWaste/
 - Scan gambar dikirim ke AI classifier eksternal melalui endpoint `/predict`; field `recommendation["Kategori sampah"]` disimpan sebagai kategori scan dan `recommendation["Klasifikasi jenis sampah"]` disimpan sebagai klasifikasi scan (`Berbahaya`, `Daur Ulang`, `Dibakar`, atau `Tidak dibakar`).
 - Klasifikasi scan dan kategori jadwal disimpan sebagai teks biasa agar fleksibel untuk admin dan hasil classifier.
 - PWA: frontend installable dengan app shell caching melalui `vite-plugin-pwa`.
+- Security: backend memakai Helmet security headers, CORS allowlist terbatas, rate limit, body size limit, validasi JWT secret production, dan validasi magic bytes untuk upload gambar.
 
 ## Menjalankan Project
 
@@ -63,6 +64,8 @@ PORT=5000
 CORS_ORIGIN="http://localhost:5173"
 JWT_SECRET="change_this_secret"
 JWT_EXPIRES_IN="7d"
+CORS_ORIGIN="https://nodewaste.vercel.app"
+API_DOCS_ENABLED="false"
 AI_CLASSIFIER_BASE_URL="https://nodewaste-ai-api-production.up.railway.app"
 AI_CLASSIFIER_TIMEOUT_MS=15000
 ```
@@ -98,3 +101,11 @@ Frontend:
 
 - Backend: `backend/README.md`
 - Frontend: `frontend/README.md`
+- Dokumentasi aktif: `docs/README.md`
+
+## Security Notes
+
+- `JWT_SECRET` production wajib random, kuat, dan minimal 32 karakter.
+- CORS production mengizinkan `https://nodewaste.vercel.app`, origin dari `CORS_ORIGIN`, dan preview Vercel project dengan hostname `nodewaste-*.vercel.app`.
+- Swagger `/api-docs` mati otomatis saat `NODE_ENV=production` kecuali `API_DOCS_ENABLED=true`.
+- Token frontend masih disimpan di `localStorage`; jangan render HTML mentah dari data user/server dan tetap jaga dependency dari XSS.

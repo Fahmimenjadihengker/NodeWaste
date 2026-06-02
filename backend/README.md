@@ -10,8 +10,9 @@ Backend membaca environment variable berikut:
 
 - `DATABASE_URL` wajib untuk koneksi PostgreSQL.
 - `PORT` default `5000`.
-- `CORS_ORIGIN` opsional, bisa berisi beberapa origin dipisah koma. Selain default lokal, backend juga mengizinkan hostname `*.vercel.app` lewat HTTPS.
+- `CORS_ORIGIN` opsional, bisa berisi beberapa origin dipisah koma. Selain default lokal dan `https://nodewaste.vercel.app`, backend hanya mengizinkan preview Vercel project dengan hostname `nodewaste-*.vercel.app` lewat HTTPS.
 - `JWT_SECRET`, `JWT_EXPIRES_IN`, dan `BCRYPT_SALT_ROUNDS` mengatur autentikasi dan hashing password.
+- `API_DOCS_ENABLED` mengontrol Swagger UI. Di production, `/api-docs` hanya aktif jika `API_DOCS_ENABLED=true`.
 - `AI_CLASSIFIER_BASE_URL` default `https://nodewaste-ai-api-production.up.railway.app`.
 - `AI_CLASSIFIER_TIMEOUT_MS` default `15000`.
 
@@ -38,6 +39,7 @@ Contoh lengkap tersedia di `.env.example`.
 - `src/services/` berisi business logic dan akses Prisma.
 - `src/validators/` validasi payload request.
 - `src/middlewares/auth.middleware.js` JWT auth dan guard role.
+- `src/middlewares/security.middleware.js` rate limit dan validasi magic bytes upload gambar.
 - `src/config/prisma.js` Prisma Client singleton.
 - `src/config/swagger.js` dokumen Swagger.
 - `prisma/schema.prisma` model database utama.
@@ -90,7 +92,7 @@ Contoh lengkap tersedia di `.env.example`.
 
 ## Role dan Akses
 
-- Public: `POST /api/auth/register`, `POST /api/auth/register/driver`, `POST /api/auth/login`, `GET /api/health`, `GET /api/health/db`, `GET /api/recycling-facilities`, dan `GET /api-docs`.
+- Public: `POST /api/auth/register`, `POST /api/auth/register/driver`, `POST /api/auth/login`, `GET /api/health`, `GET /api/health/db`, dan `GET /api/recycling-facilities`. `GET /api-docs` aktif di development dan opsional di production lewat `API_DOCS_ENABLED=true`.
 - Authenticated all roles: `GET /api/auth/me` dan endpoint `regions`.
 - `USER`: profile user, dashboard, pet, activities, schedules, dan scans.
 - `DRIVER`: dashboard driver, profile driver, upload foto profile driver, dan map driver.
@@ -123,5 +125,15 @@ Seed driver/admin tidak berjalan otomatis. Jalankan `npm run seed:driver` atau `
 Endpoint scan menerima upload gambar JPEG/PNG maksimal 5 MB. Backend mengirim file tersebut ke AI classifier sebagai `multipart/form-data` field `file`, lalu menyimpan `classification.predicted_class`, confidence, `recommendation["Kategori sampah"]`, dan `recommendation["Klasifikasi jenis sampah"]` sebelum menyimpan reward EcoPoints/XP.
 
 Upload foto profile user dan driver menerima field `photo` maksimal 2 MB dan saat ini disimpan sebagai data URL base64 di kolom `users.profile_photo_url`.
+
+## Security Hardening
+
+- Express mematikan header `X-Powered-By` dan memakai Helmet untuk security headers dasar.
+- Backend memakai `express.json({ limit: "1mb" })` untuk membatasi payload JSON.
+- Rate limit aktif untuk seluruh `/api`, endpoint auth, serta endpoint upload scan/foto profile.
+- `JWT_SECRET` production wajib bukan default dan minimal 32 karakter; server akan gagal start jika tidak aman.
+- CORS tidak memakai wildcard umum. Production mengizinkan `https://nodewaste.vercel.app`, origin eksplisit dari `CORS_ORIGIN`, dan preview `nodewaste-*.vercel.app`.
+- Upload gambar divalidasi dari MIME dan magic bytes JPEG/PNG agar file spoofing sederhana ditolak.
+- Swagger UI mati otomatis di production kecuali `API_DOCS_ENABLED=true`.
 
 Supabase RLS diaktifkan memakai `backend/prisma/rls.sql` dengan policy deny-by-default untuk direct client access. Backend tetap mengakses data lewat Prisma server-side.

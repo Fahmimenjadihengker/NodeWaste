@@ -3,6 +3,12 @@ import app from './app.js'
 import { connectDatabase } from './config/prisma.js'
 
 const port = Number(process.env.PORT || 5000)
+const jwtSecret = process.env.JWT_SECRET || ''
+
+if (process.env.NODE_ENV === 'production' && (jwtSecret.length < 32 || jwtSecret === 'dev_nodewaste_secret_change_me')) {
+  console.error('JWT_SECRET production wajib diisi dengan secret kuat minimal 32 karakter')
+  process.exit(1)
+}
 
 try {
   await connectDatabase()

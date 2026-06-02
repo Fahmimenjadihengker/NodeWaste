@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import { createScan } from "../controllers/scan.controller.js";
 import { authMiddleware, requireRole } from "../middlewares/auth.middleware.js";
+import { uploadLimiter, validateUploadedImage } from "../middlewares/security.middleware.js";
 
 const router = express.Router();
 const upload = multer({
@@ -19,6 +20,6 @@ const upload = multer({
   },
 });
 
-router.post("/", authMiddleware, requireRole("USER"), upload.single("image"), createScan);
+router.post("/", authMiddleware, requireRole("USER"), uploadLimiter, upload.single("image"), validateUploadedImage, createScan);
 
 export default router;

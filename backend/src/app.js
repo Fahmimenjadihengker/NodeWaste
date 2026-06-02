@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import activityRoutes from "./routes/activity.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -15,8 +16,11 @@ import prisma from "./config/prisma.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerDocument } from "./config/swagger.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
+import { apiLimiter } from "./middlewares/security.middleware.js";
 
 const app = express();
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
 const defaultAllowedOrigins = [
   "http://localhost:5173",
   "https://nodewaste.vercel.app",
@@ -39,11 +43,18 @@ function isAllowedOrigin(origin) {
 
   try {
     const { hostname, protocol } = new URL(normalizedOrigin)
-    return protocol === "https:" && hostname.endsWith(".vercel.app")
+    return protocol === "https:" && hostname.endsWith(".vercel.app") && hostname.startsWith("nodewaste-")
   } catch {
     return false
   }
 }
+
+const isApiDocsEnabled = process.env.API_DOCS_ENABLED === "true" || process.env.NODE_ENV !== "production";
+
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  contentSecurityPolicy: false,
+}));
 
 app.use(
   cors({
@@ -53,11 +64,17 @@ app.use(
         return;
       }
 
-      callback(new Error("Not allowed by CORS"));
+      const error = new Error("Not allowed by CORS");
+      error.statusCode = 403;
+      callback(error);
     },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
+app.use("/api", apiLimiter);
 
 app.get("/api/health", (_request, response) => {
   response.json({
@@ -106,14 +123,15 @@ app.use("/api/scans", scanRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/recycling-facilities", facilityRoutes);
 
-// Dokumentasi Swagger UI
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerDocument, {
-    customSiteTitle: "NodeWaste API Docs",
-  }),
-);
+if (isApiDocsEnabled) {
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument, {
+      customSiteTitle: "NodeWaste API Docs",
+    }),
+  );
+}
 app.use(errorMiddleware);
 
 export default app;

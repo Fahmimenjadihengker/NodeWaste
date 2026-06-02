@@ -61,6 +61,10 @@ VITE_API_BASE_URL="http://localhost:5000/api"
 - Dashboard, pet, activities, schedules, profile, admin, driver, scan, regions, dan recycling facilities mengambil data dari backend API.
 - `src/services/dashboardData.js` masih tersedia sebagai data lokal/fallback visual, bukan sumber utama dashboard saat runtime.
 - Styling utama memakai Tailwind CSS dan komponen internal, tanpa UI library eksternal.
+- Dashboard chart menampilkan `Daily` 7 hari terakhir, `Weekly` M1-M4 bulan berjalan, dan `Monthly` Jan-Des tahun berjalan.
+- Profile history dipaginasi 10 aktivitas per halaman.
+- Jadwal user diurutkan Senin sampai Minggu, termasuk data cache lama di frontend.
+- Token di `localStorage` sensitif terhadap XSS; jangan memakai `dangerouslySetInnerHTML` untuk data user/API dan jangan simpan secret di variable `VITE_`.
 
 ## PWA
 
