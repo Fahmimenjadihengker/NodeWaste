@@ -28,7 +28,7 @@ function FeatureOverlaySection({ features }) {
             <h2 className="mt-3 text-4xl font-black leading-tight tracking-[-0.045em] text-leaf-900 sm:text-5xl">Dibuat untuk kebiasaan yang realistis.</h2>
           </div>
           <p className="max-w-2xl text-lg leading-8 text-moss/70">
-            NodeWaste tidak mencoba membuat semuanya terasa ramai. Fokusnya adalah memberi pemahaman, dorongan ringan, dan catatan progres yang cukup untuk membantu kamu lebih konsisten memilah sampah.
+            NodeWaste fokus pada alur yang praktis: scan sampah, baca rekomendasi, kumpulkan progres, rawat Leafy, dan ikuti jadwal pengambilan sampah tanpa membuat pengalaman terasa ramai.
           </p>
         </div>
 

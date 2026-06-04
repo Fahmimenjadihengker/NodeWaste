@@ -25,7 +25,7 @@ function WorkflowScrollSection({ steps }) {
       <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
         <div className="lg:sticky lg:top-32">
           <p className="text-sm font-black uppercase tracking-[0.24em] text-leaf-700">Cara kerja</p>
-          <h2 className="mt-3 text-4xl font-black leading-tight tracking-[-0.045em] text-leaf-900 sm:text-5xl">Tiga langkah yang mudah diulang.</h2>
+          <h2 className="mt-3 text-4xl font-black leading-tight tracking-[-0.045em] text-leaf-900 sm:text-5xl">Tiga langkah dari foto ke aksi.</h2>
         </div>
 
         <div>

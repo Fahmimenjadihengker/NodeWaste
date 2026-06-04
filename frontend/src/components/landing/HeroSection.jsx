@@ -10,11 +10,11 @@ function HeroSection() {
       <div className="relative mx-auto grid max-w-7xl items-start gap-12 px-5 pb-16 pt-8 sm:px-8 md:pb-24 lg:grid-cols-[1fr_0.86fr] lg:items-center lg:px-10 lg:pb-28 lg:pt-14">
         <div className="animate-fade-up">
           <h1 className="max-w-4xl text-4xl font-black leading-[1.02] tracking-[-0.055em] text-leaf-900 sm:text-5xl md:text-6xl lg:text-7xl lg:leading-[0.95]">
-            Memilah sampah dimulai dari mengenali apa yang kita buang.
+            Scan sampah, baca rekomendasi, dan rawat kebiasaan hijau.
           </h1>
 
           <p className="mt-6 max-w-2xl animate-fade-up text-base leading-8 text-moss/70 [animation-delay:120ms] [animation-fill-mode:both] sm:text-lg lg:mt-7 lg:text-xl">
-            NodeWaste membantu kamu mengenali kategori sampah dari kamera, membaca panduan pengelolaan yang singkat, dan menjaga kebiasaan ramah lingkungan lewat progres yang sederhana.
+            NodeWaste membantu mengenali kategori dan klasifikasi sampah dari kamera, memberi rekomendasi penanganan, mencatat progres, dan membuat kebiasaan memilah terasa lebih mudah dijalani.
           </p>
 
           <div className="mt-9 flex animate-fade-up flex-col gap-3 [animation-delay:220ms] [animation-fill-mode:both] sm:flex-row">

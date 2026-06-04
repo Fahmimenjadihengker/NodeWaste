@@ -2,7 +2,7 @@
 
 Backend NodeWaste berbasis Express, PostgreSQL, dan Prisma. API memakai JWT auth, role `USER`, `DRIVER`, dan `ADMIN`, serta menyimpan data aplikasi lewat Prisma Client.
 
-Scope implementasi saat ini mencakup auth role-aware, profile user dengan alamat wilayah.id, upload foto profile, dashboard user, pet Leafy, activity, scan gambar dengan AI classifier eksternal, jadwal pengangkutan global, recycling facilities, endpoint wilayah, endpoint driver, endpoint admin, dan dokumentasi Swagger.
+Scope implementasi saat ini mencakup auth role-aware, profile user dengan alamat wilayah.id, upload foto profile, dashboard user, pet Leafy, activity, scan gambar dengan AI classifier eksternal, jadwal pengambilan sampah standalone, recycling facilities, endpoint wilayah, endpoint driver, endpoint admin, dan dokumentasi Swagger opsional.
 
 ## Environment
 
@@ -88,7 +88,7 @@ Contoh lengkap tersedia di `.env.example`.
 - `PUT /api/admin/schedules/:id`
 - `DELETE /api/admin/schedules/:id`
 - `GET /api/recycling-facilities`
-- `GET /api-docs`
+- `GET /api-docs` jika aktif di environment
 
 ## Role dan Akses
 
@@ -118,13 +118,13 @@ Saat user register, backend membuat row `users` dengan 100 EcoPoints awal dan pe
 
 Status Leafy mengalami decay harian saat data pet dibuka: happiness berkurang 3 poin per hari dan hunger naik 5 poin per hari. Frontend menampilkan hunger sebagai indikator kenyang (`100 - hunger`).
 
-Jadwal user dan admin memakai tabel `waste_schedules` standalone. Jika belum ada data jadwal di database, endpoint user mengembalikan fallback default untuk kategori `Organik`, `Anorganik`, `B3`, dan `Daur Ulang/Residu`.
+Jadwal user dan admin memakai tabel `waste_schedules` standalone. Jika belum ada data jadwal di database, endpoint user mengembalikan fallback default untuk kategori `Organik`, `Anorganik`, `B3`, dan `Daur Ulang/Residu`. Data jadwal diurutkan berdasarkan urutan Senin sampai Minggu; jadwal multi-hari memakai hari paling awal sebagai kunci urutan.
 
 Seed driver/admin tidak berjalan otomatis. Jalankan `npm run seed:driver` atau `npm run seed:admin` hanya saat membutuhkan data demo. Akun demo driver adalah `driver.demo@nodewaste.test`; akun demo admin adalah `admin.demo@nodewaste.test`. Keduanya memakai password `password123`.
 
 Endpoint scan menerima upload gambar JPEG/PNG maksimal 5 MB. Backend mengirim file tersebut ke AI classifier sebagai `multipart/form-data` field `file`, lalu menyimpan `classification.predicted_class`, confidence, `recommendation["Kategori sampah"]`, dan `recommendation["Klasifikasi jenis sampah"]` sebelum menyimpan reward EcoPoints/XP.
 
-Upload foto profile user dan driver menerima field `photo` maksimal 2 MB dan saat ini disimpan sebagai data URL base64 di kolom `users.profile_photo_url`.
+Upload foto profile user dan driver menerima field `photo` maksimal 2 MB, divalidasi sebagai JPEG/PNG, dan saat ini disimpan sebagai data URL base64 di kolom `users.profile_photo_url`.
 
 ## Security Hardening
 

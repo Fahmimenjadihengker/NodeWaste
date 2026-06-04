@@ -1,6 +1,6 @@
 # NodeWaste
 
-NodeWaste adalah web app edukasi dan gamifikasi pengelolaan sampah. Aplikasi ini membantu user belajar memilah sampah, melakukan scan sampah dengan AI classifier, mengumpulkan EcoPoints/XP, merawat pet Leafy, melihat jadwal pengangkutan, serta menyediakan area khusus driver dan admin.
+NodeWaste adalah web app edukasi dan gamifikasi pengelolaan sampah. Aplikasi ini membantu user mengenali sampah lewat scan gambar, membaca rekomendasi penanganan, mengumpulkan EcoPoints/XP, merawat Leafy, mengikuti jadwal pengambilan sampah, serta menyediakan area operasional untuk driver dan admin.
 
 Project memakai struktur monorepo sederhana:
 
@@ -13,12 +13,12 @@ NodeWaste/
 ## Scope Saat Ini
 
 - Public app: landing page, login, dan register.
-- User app: dashboard, scan sampah, pet Leafy, jadwal standalone, profile, alamat berbasis wilayah.id, dan fasilitas daur ulang.
+- User app: dashboard, scan sampah, pet Leafy, jadwal standalone, profile, alamat berbasis wilayah.id, dan riwayat aktivitas.
 - Driver app: map rumah user berdasarkan district driver, processing site, profile driver, dan upload foto profile.
 - Admin app: dashboard, manajemen semua akun role `USER`/`DRIVER`/`ADMIN`, EcoPoints user, dan jadwal pengangkutan standalone.
 - Backend API: auth role-aware, profile, dashboard, pet, activity, schedules, scans, regions, recycling facilities, driver, dan admin.
 - Database: PostgreSQL lewat Prisma. Supabase dapat dipakai untuk deployment.
-- Scan gambar dikirim ke AI classifier eksternal melalui endpoint `/predict`; field `recommendation["Kategori sampah"]` disimpan sebagai kategori scan dan `recommendation["Klasifikasi jenis sampah"]` disimpan sebagai klasifikasi scan (`Berbahaya`, `Daur Ulang`, `Dibakar`, atau `Tidak dibakar`).
+- Scan gambar dikirim ke AI classifier eksternal melalui endpoint `/predict`; `recommendation["Kategori sampah"]` disimpan sebagai kategori scan dan `recommendation["Klasifikasi jenis sampah"]` disimpan sebagai klasifikasi scan (`Berbahaya`, `Daur Ulang`, `Dibakar`, atau `Tidak dibakar`).
 - Klasifikasi scan dan kategori jadwal disimpan sebagai teks biasa agar fleksibel untuk admin dan hasil classifier.
 - PWA: frontend installable dengan app shell caching melalui `vite-plugin-pwa`.
 - Security: backend memakai Helmet security headers, CORS allowlist terbatas, rate limit, body size limit, validasi JWT secret production, dan validasi magic bytes untuk upload gambar.
@@ -61,10 +61,10 @@ Contoh backend:
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
 PORT=5000
-CORS_ORIGIN="http://localhost:5173"
-JWT_SECRET="change_this_secret"
+NODE_ENV="development"
+JWT_SECRET="change_this_secret_minimal_32_chars"
 JWT_EXPIRES_IN="7d"
-CORS_ORIGIN="https://nodewaste.vercel.app"
+CORS_ORIGIN="http://localhost:5173"
 API_DOCS_ENABLED="false"
 AI_CLASSIFIER_BASE_URL="https://nodewaste-ai-api-production.up.railway.app"
 AI_CLASSIFIER_TIMEOUT_MS=15000
@@ -109,3 +109,10 @@ Frontend:
 - CORS production mengizinkan `https://nodewaste.vercel.app`, origin dari `CORS_ORIGIN`, dan preview Vercel project dengan hostname `nodewaste-*.vercel.app`.
 - Swagger `/api-docs` mati otomatis saat `NODE_ENV=production` kecuali `API_DOCS_ENABLED=true`.
 - Token frontend masih disimpan di `localStorage`; jangan render HTML mentah dari data user/server dan tetap jaga dependency dari XSS.
+
+## Fitur Terbaru
+
+- Dashboard scan menampilkan grafik `Daily`, `Weekly`, dan `Monthly` dengan skala bar yang sinkron.
+- Profile menampilkan riwayat aktivitas dengan pagination 10 item per halaman.
+- Jadwal pengambilan sampah diurutkan Senin sampai Minggu.
+- Leafy memakai model avatar yang sama di dashboard dan halaman pet; bubble chat hanya tampil di landing page.

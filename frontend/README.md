@@ -64,6 +64,8 @@ VITE_API_BASE_URL="http://localhost:5000/api"
 - Dashboard chart menampilkan `Daily` 7 hari terakhir, `Weekly` M1-M4 bulan berjalan, dan `Monthly` Jan-Des tahun berjalan.
 - Profile history dipaginasi 10 aktivitas per halaman.
 - Jadwal user diurutkan Senin sampai Minggu, termasuk data cache lama di frontend.
+- Landing page menjelaskan alur scan, rekomendasi, progress, Leafy, jadwal, serta role driver/admin secara ringkas.
+- Leafy bubble chat hanya dipakai di landing page. Dashboard dan halaman pet memakai model `LeafyAvatar` yang sama tanpa bubble chat otomatis.
 - Token di `localStorage` sensitif terhadap XSS; jangan memakai `dangerouslySetInnerHTML` untuk data user/API dan jangan simpan secret di variable `VITE_`.
 
 ## PWA
