@@ -15,6 +15,7 @@ import driverRoutes from "./routes/driver.routes.js";
 import prisma from "./config/prisma.js";
 import swaggerUi from "swagger-ui-express";
 import { swaggerDocument } from "./config/swagger.js";
+import { customCss } from "./config/swaggerTheme.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { apiLimiter } from "./middlewares/security.middleware.js";
 
@@ -129,6 +130,7 @@ if (isApiDocsEnabled) {
     swaggerUi.serve,
     swaggerUi.setup(swaggerDocument, {
       customSiteTitle: "NodeWaste API Docs",
+      customCss: customCss,
     }),
   );
 }
